@@ -172,8 +172,9 @@
     </div>
     
     <script src="js/storage.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        const storageManager = new StorageManager();
+        storageManager.checkAuth();
         
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
