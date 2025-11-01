@@ -24,6 +24,13 @@ Manage library operations including member management, book tracking, fee collec
 - Enabled cache control for proper frontend updates
 - **NEW**: Added Seat Management System with color-coded status (available/occupied/reserved)
 - Fixed modal functionality by adding main.js to all pages
+- **ENHANCED**: Improved member seat selection with visual seat picker
+  - Added "Select Seat" button to navigate to seat selection page
+  - Implemented "No Seat" option for members without assigned seats
+  - Added selection mode with visual alert banner on seats page
+  - Form data preservation during seat selection navigation
+  - Click available seats to select and auto-return to member form
+  - Cancel button to return without selection while preserving form data
 
 ## Architecture
 
