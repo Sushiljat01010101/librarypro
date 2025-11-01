@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/reports.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item active">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Reports & Analytics</h1>
+                    <p class="subtitle">View detailed analytics and insights</p>
+                </div>
+                <div class="header-right">
+                    <select id="reportPeriod">
+                        <option value="monthly">Monthly View</option>
+                        <option value="yearly">Yearly View</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="page-content">
+                <div class="stats-overview">
+                    <div class="overview-card">
+                        <h3>Total Revenue (All Time)</h3>
+                        <p class="overview-value" id="totalRevenue">₹0</p>
+                        <small id="revenueGrowth">+0% from last period</small>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Total Expenses (All Time)</h3>
+                        <p class="overview-value" id="totalExpensesOverview">₹0</p>
+                        <small id="expenseGrowth">+0% from last period</small>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Net Profit (All Time)</h3>
+                        <p class="overview-value" id="totalProfit">₹0</p>
+                        <small id="profitMargin">0% profit margin</small>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Revenue vs Expense Trend</h3>
+                        <canvas id="revenueExpenseChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Category-wise Expense Distribution</h3>
+                        <canvas id="expenseCategoryChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Books Status</h3>
+                        <canvas id="booksStatusChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Payment Collection Rate</h3>
+                        <canvas id="paymentCollectionChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card full-width">
+                        <h3>Monthly Revenue Comparison</h3>
+                        <canvas id="monthlyComparisonChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="comparison-section">
+                    <h2>Period Comparison</h2>
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <h4>Current Month</h4>
+                            <div class="comparison-stats">
+                                <div class="stat-item">
+                                    <span>Revenue</span>
+                                    <strong id="currentRevenue">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Expenses</span>
+                                    <strong id="currentExpenses">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Profit</span>
+                                    <strong id="currentProfit">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>New Members</span>
+                                    <strong id="currentMembers">0</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-card">
+                            <h4>Previous Month</h4>
+                            <div class="comparison-stats">
+                                <div class="stat-item">
+                                    <span>Revenue</span>
+                                    <strong id="prevRevenue">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Expenses</span>
+                                    <strong id="prevExpenses">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Profit</span>
+                                    <strong id="prevProfit">₹0</strong>
+                                </div>
+                                <div class="stat-item">
+                                    <span>New Members</span>
+                                    <strong id="prevMembers">0</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

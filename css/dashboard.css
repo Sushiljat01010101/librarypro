@@ -1,0 +1,151 @@
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(244, 196, 48, 0.1);
+}
+
+.stat-icon {
+    font-size: 48px;
+    opacity: 0.9;
+}
+
+.stat-info h3 {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary-gold);
+    margin-bottom: 8px;
+}
+
+.stat-detail {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.stat-detail .active {
+    color: var(--success);
+}
+
+.stat-detail .pending {
+    color: var(--warning);
+}
+
+.stat-detail .paid {
+    color: var(--success);
+}
+
+.card-members {
+    border-top: 3px solid #4caf50;
+}
+
+.card-seats {
+    border-top: 3px solid #2196f3;
+}
+
+.card-books {
+    border-top: 3px solid #9c27b0;
+}
+
+.card-fees {
+    border-top: 3px solid var(--primary-gold);
+}
+
+.card-expenses {
+    border-top: 3px solid #ff9800;
+}
+
+.card-profit {
+    border-top: 3px solid #00bcd4;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    color: var(--primary-gold);
+    font-size: 18px;
+}
+
+.card-body {
+    padding: 0;
+}
+
+.activity-list {
+    padding: 20px 25px;
+}
+
+.activity-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item .activity-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.activity-item .activity-time {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/members.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item active">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Member Management</h1>
+                    <p class="subtitle">Manage library members</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" id="addMemberBtn">+ Add Member</button>
+                    <button class="btn-secondary" id="exportMembersBtn">📥 Export CSV</button>
+                </div>
+            </header>
+            
+            <div class="page-content">
+                <div class="filters-section">
+                    <div class="search-box">
+                        <input type="text" id="searchMembers" placeholder="Search by name, contact, or seat...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <select id="membershipFilter">
+                            <option value="all">All Memberships</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="members-grid" id="membersGrid">
+                    <p class="no-data">No members found. Click "Add Member" to get started.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Member</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="memberForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberName">Full Name *</label>
+                        <input type="text" id="memberName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberContact">Contact Number *</label>
+                        <input type="tel" id="memberContact" required pattern="[0-9]{10}">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberEmail">Email</label>
+                        <input type="email" id="memberEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberSeat">Seat Number *</label>
+                        <input type="number" id="memberSeat" required min="1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="membershipType">Membership Type *</label>
+                        <select id="membershipType" required>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberFee">Monthly Fee (₹) *</label>
+                        <input type="number" id="memberFee" required min="0">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="joiningDate">Joining Date *</label>
+                        <input type="date" id="joiningDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberStatus">Status *</label>
+                        <select id="memberStatus" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="memberPhoto">Profile Photo URL</label>
+                    <input type="url" id="memberPhoto" placeholder="https://example.com/photo.jpg">
+                </div>
+                
+                <div class="form-group">
+                    <label for="memberAddress">Address</label>
+                    <textarea id="memberAddress" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script src="js/members.js"></script>
+</body>
+</html>

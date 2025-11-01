@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/books.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item active">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Book Management</h1>
+                    <p class="subtitle">Manage library books and transactions</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" id="addBookBtn">+ Add Book</button>
+                    <button class="btn-secondary" id="issueBookBtn">📤 Issue Book</button>
+                </div>
+            </header>
+            
+            <div class="page-content">
+                <div class="filters-section">
+                    <div class="search-box">
+                        <input type="text" id="searchBooks" placeholder="Search by title, author, or ISBN...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Science">Science</option>
+                            <option value="Technology">Technology</option>
+                            <option value="History">History</option>
+                            <option value="Biography">Biography</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="all">All Books</option>
+                            <option value="available">Available</option>
+                            <option value="issued">Issued</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="booksTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>ISBN</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Available</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="no-data">No books found. Click "Add Book" to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="section-title">
+                    <h2>Issued Books</h2>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="issuedBooksTable">
+                        <thead>
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Member</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Fine</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="no-data">No books issued yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Book</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="bookForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookTitle">Book Title *</label>
+                        <input type="text" id="bookTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookAuthor">Author *</label>
+                        <input type="text" id="bookAuthor" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookISBN">ISBN *</label>
+                        <input type="text" id="bookISBN" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookCategory">Category *</label>
+                        <select id="bookCategory" required>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Science">Science</option>
+                            <option value="Technology">Technology</option>
+                            <option value="History">History</option>
+                            <option value="Biography">Biography</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookPublisher">Publisher</label>
+                        <input type="text" id="bookPublisher">
+                    </div>
+                    <div class="form-group">
+                        <label for="bookQuantity">Quantity *</label>
+                        <input type="number" id="bookQuantity" required min="1" value="1">
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="issueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Issue Book</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="issueForm">
+                <div class="form-group">
+                    <label for="issueBook">Select Book *</label>
+                    <select id="issueBook" required>
+                        <option value="">-- Select Book --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="issueMember">Select Member *</label>
+                    <select id="issueMember" required>
+                        <option value="">-- Select Member --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="issueDate">Issue Date *</label>
+                    <input type="date" id="issueDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dueDate">Due Date *</label>
+                    <input type="date" id="dueDate" required>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Issue Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script src="js/books.js"></script>
+</body>
+</html>

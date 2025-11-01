@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item active">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Settings & Backup</h1>
+                    <p class="subtitle">Manage system settings and data</p>
+                </div>
+            </header>
+            
+            <div class="page-content">
+                <div class="settings-section">
+                    <h2>Library Settings</h2>
+                    <form id="settingsForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="libraryName">Library Name</label>
+                                <input type="text" id="libraryName" value="My Library">
+                            </div>
+                            <div class="form-group">
+                                <label for="totalSeats">Total Seats</label>
+                                <input type="number" id="totalSeats" value="50" min="1">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="defaultFine">Default Fine per Day (₹)</label>
+                                <input type="number" id="defaultFine" value="5" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="bookReturnDays">Default Book Return Days</label>
+                                <input type="number" id="bookReturnDays" value="14" min="1">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Save Settings</button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Change Password</h2>
+                    <form id="passwordForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" required minlength="6">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Password</button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Data Backup & Restore</h2>
+                    <div class="backup-controls">
+                        <div class="backup-card">
+                            <h3>📥 Export Data</h3>
+                            <p>Download all library data as a JSON file for backup</p>
+                            <button class="btn-primary" id="exportDataBtn">Export Backup</button>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h3>📤 Import Data</h3>
+                            <p>Restore library data from a backup file</p>
+                            <input type="file" id="importFile" accept=".json" style="display: none;">
+                            <button class="btn-secondary" id="importDataBtn">Import Backup</button>
+                        </div>
+                        
+                        <div class="backup-card danger">
+                            <h3>🗑️ Clear All Data</h3>
+                            <p>Permanently delete all library data (cannot be undone)</p>
+                            <button class="btn-danger" id="clearAllDataBtn">Clear All Data</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>System Information</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span>Total Members</span>
+                            <strong id="infoMembers">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Total Books</span>
+                            <strong id="infoBooks">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Fee Records</span>
+                            <strong id="infoFees">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Expense Records</span>
+                            <strong id="infoExpenses">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Activity Logs</span>
+                            <strong id="infoActivities">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Storage Used</span>
+                            <strong id="infoStorage">0 KB</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script>
+        const storageManager = new StorageManager();
+        
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                storageManager.logout();
+            }
+        });
+        
+        const settingsForm = document.getElementById('settingsForm');
+        const passwordForm = document.getElementById('passwordForm');
+        
+        const settings = storageManager.getSettings();
+        if (settings) {
+            document.getElementById('libraryName').value = settings.libraryName || 'My Library';
+            document.getElementById('totalSeats').value = settings.totalSeats || 50;
+            document.getElementById('defaultFine').value = settings.defaultFine || 5;
+            document.getElementById('bookReturnDays').value = settings.bookReturnDays || 14;
+        }
+        
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSettings = {
+                libraryName: document.getElementById('libraryName').value,
+                totalSeats: parseInt(document.getElementById('totalSeats').value),
+                defaultFine: parseInt(document.getElementById('defaultFine').value),
+                bookReturnDays: parseInt(document.getElementById('bookReturnDays').value)
+            };
+            storageManager.saveSettings(newSettings);
+            alert('Settings saved successfully!');
+        });
+        
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            const user = storageManager.getUser();
+            if (user.password !== current) {
+                alert('Current password is incorrect!');
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                alert('New passwords do not match!');
+                return;
+            }
+            
+            user.password = newPass;
+            localStorage.setItem('libraryUser', JSON.stringify(user));
+            alert('Password updated successfully!');
+            passwordForm.reset();
+        });
+        
+        document.getElementById('exportDataBtn').addEventListener('click', () => {
+            const data = {
+                members: storageManager.getMembers(),
+                books: storageManager.getBooks(),
+                issuedBooks: storageManager.getIssuedBooks(),
+                fees: storageManager.getFees(),
+                expenses: storageManager.getExpenses(),
+                activities: storageManager.getActivities(),
+                settings: storageManager.getSettings(),
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `library-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            storageManager.addActivity('Data exported successfully', 'system');
+            alert('Data exported successfully!');
+        });
+        
+        document.getElementById('importDataBtn').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+        
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    if (confirm('This will overwrite all existing data. Continue?')) {
+                        if (data.members) localStorage.setItem('libraryMembers', JSON.stringify(data.members));
+                        if (data.books) localStorage.setItem('libraryBooks', JSON.stringify(data.books));
+                        if (data.issuedBooks) localStorage.setItem('issuedBooks', JSON.stringify(data.issuedBooks));
+                        if (data.fees) localStorage.setItem('libraryFees', JSON.stringify(data.fees));
+                        if (data.expenses) localStorage.setItem('libraryExpenses', JSON.stringify(data.expenses));
+                        if (data.activities) localStorage.setItem('libraryActivities', JSON.stringify(data.activities));
+                        if (data.settings) localStorage.setItem('librarySettings', JSON.stringify(data.settings));
+                        
+                        alert('Data imported successfully! Reloading page...');
+                        location.reload();
+                    }
+                } catch (error) {
+                    alert('Invalid backup file!');
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        document.getElementById('clearAllDataBtn').addEventListener('click', () => {
+            if (confirm('This will permanently delete ALL data. Are you absolutely sure?')) {
+                if (confirm('Last chance! This action cannot be undone. Continue?')) {
+                    localStorage.removeItem('libraryMembers');
+                    localStorage.removeItem('libraryBooks');
+                    localStorage.removeItem('issuedBooks');
+                    localStorage.removeItem('libraryFees');
+                    localStorage.removeItem('libraryExpenses');
+                    localStorage.removeItem('libraryActivities');
+                    localStorage.removeItem('librarySettings');
+                    
+                    alert('All data cleared! Redirecting to login...');
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+        
+        function updateSystemInfo() {
+            document.getElementById('infoMembers').textContent = storageManager.getMembers().length;
+            document.getElementById('infoBooks').textContent = storageManager.getBooks().length;
+            document.getElementById('infoFees').textContent = storageManager.getFees().length;
+            document.getElementById('infoExpenses').textContent = storageManager.getExpenses().length;
+            document.getElementById('infoActivities').textContent = storageManager.getActivities().length;
+            
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            document.getElementById('infoStorage').textContent = (totalSize / 1024).toFixed(2) + ' KB';
+        }
+        
+        updateSystemInfo();
+        
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+    </script>
+</body>
+</html>

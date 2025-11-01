@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p class="subtitle">Overview of your library</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span id="currentUser">Admin</span>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="dashboard-content">
+                <div class="stats-grid">
+                    <div class="stat-card card-members">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3>Total Members</h3>
+                            <p class="stat-value" id="totalMembers">0</p>
+                            <small class="stat-detail">
+                                <span class="active" id="activeMembers">0</span> Active | 
+                                <span id="inactiveMembers">0</span> Inactive
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card card-seats">
+                        <div class="stat-icon">💺</div>
+                        <div class="stat-info">
+                            <h3>Seats</h3>
+                            <p class="stat-value" id="occupiedSeats">0</p>
+                            <small class="stat-detail">
+                                Occupied / <span id="totalSeats">50</span> Total
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card card-books">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <h3>Total Books</h3>
+                            <p class="stat-value" id="totalBooks">0</p>
+                            <small class="stat-detail">
+                                <span id="issuedBooks">0</span> Issued | 
+                                <span id="availableBooks">0</span> Available
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card card-fees">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>This Month's Fees</h3>
+                            <p class="stat-value" id="monthlyRevenue">₹0</p>
+                            <small class="stat-detail">
+                                <span class="paid" id="paidMembers">0</span> Paid | 
+                                <span class="pending" id="pendingMembers">0</span> Pending
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card card-expenses">
+                        <div class="stat-icon">💸</div>
+                        <div class="stat-info">
+                            <h3>Monthly Expenses</h3>
+                            <p class="stat-value" id="monthlyExpense">₹0</p>
+                            <small class="stat-detail" id="expenseDetail">0 transactions</small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card card-profit">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <h3>Monthly Profit</h3>
+                            <p class="stat-value" id="monthlyProfit">₹0</p>
+                            <small class="stat-detail" id="profitDetail">Revenue - Expenses</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Members</h3>
+                            <a href="members.html" class="btn-link">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table" id="recentMembersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Seat</th>
+                                        <th>Status</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" class="no-data">No members yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Overdue Books</h3>
+                            <a href="books.html" class="btn-link">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table" id="overdueTable">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Member</th>
+                                        <th>Due Date</th>
+                                        <th>Fine</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" class="no-data">No overdue books</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Pending Payments</h3>
+                            <a href="fees.html" class="btn-link">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table" id="pendingPaymentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Month</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" class="no-data">No pending payments</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                            <a href="activity.html" class="btn-link">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list" id="recentActivity">
+                                <p class="no-data">No recent activity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

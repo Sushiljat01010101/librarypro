@@ -1,0 +1,100 @@
+.section-title {
+    margin: 30px 0 20px;
+}
+
+.section-title h2 {
+    color: var(--primary-gold);
+    font-size: 22px;
+}
+
+.action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #45a049;
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #f57c00;
+}
+
+.btn-info {
+    background: var(--info);
+    color: white;
+}
+
+.btn-info:hover {
+    background: #1976d2;
+}
+
+.btn-edit {
+    background: var(--bg-secondary);
+    color: var(--primary-gold);
+    border: 1px solid var(--primary-gold);
+}
+
+.btn-edit:hover {
+    background: var(--primary-gold);
+    color: var(--bg-primary);
+}
+
+.btn-delete {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+}
+
+.status-available {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-issued {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.status-overdue {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.fine-amount {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .action-btns {
+        flex-direction: column;
+    }
+    
+    .btn-sm {
+        width: 100%;
+    }
+}

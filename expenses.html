@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/expenses.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="expenses.html" class="nav-item active">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Expense Management</h1>
+                    <p class="subtitle">Track and manage library expenses</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" id="addExpenseBtn">+ Add Expense</button>
+                    <button class="btn-secondary" id="exportExpensesBtn">📥 Export Data</button>
+                </div>
+            </header>
+            
+            <div class="page-content">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <h3>This Month</h3>
+                        <p class="amount" id="monthlyExpense">₹0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>This Year</h3>
+                        <p class="amount" id="yearlyExpense">₹0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Total Expenses</h3>
+                        <p class="amount" id="totalExpenses">₹0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Transactions</h3>
+                        <p class="amount" id="transactionCount">0</p>
+                    </div>
+                </div>
+                
+                <div class="category-summary" id="categorySummary">
+                    <h3>Category-wise Breakdown (This Month)</h3>
+                    <div class="category-grid">
+                        <div class="category-item">
+                            <span class="category-name">General</span>
+                            <span class="category-amount" id="catGeneral">₹0</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Utilities</span>
+                            <span class="category-amount" id="catUtilities">₹0</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Maintenance</span>
+                            <span class="category-amount" id="catMaintenance">₹0</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Rent</span>
+                            <span class="category-amount" id="catRent">₹0</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Others</span>
+                            <span class="category-amount" id="catOthers">₹0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters-section">
+                    <div class="search-box">
+                        <input type="text" id="searchExpenses" placeholder="Search by description...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="General">General</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Others">Others</option>
+                        </select>
+                        <select id="monthFilter">
+                            <option value="">All Time</option>
+                        </select>
+                        <select id="paymentMethodFilter">
+                            <option value="all">All Methods</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank">Bank Transfer</option>
+                            <option value="Card">Card</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Added By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="no-data">No expenses recorded. Click "Add Expense" to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Expense</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expenseDate">Date *</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Category *</label>
+                        <select id="expenseCategory" required>
+                            <option value="General">General</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount (₹) *</label>
+                        <input type="number" id="expenseAmount" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseMethod">Payment Method *</label>
+                        <select id="expenseMethod" required>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank">Bank Transfer</option>
+                            <option value="Card">Card</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expenseDescription">Description *</label>
+                    <textarea id="expenseDescription" required rows="3"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="js/storage.js"></script>
+    <script src="js/expenses.js"></script>
+</body>
+</html>
