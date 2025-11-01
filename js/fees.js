@@ -19,14 +19,17 @@ function loadFees() {
     const tbody = document.querySelector('#feesTable tbody');
     
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="no-data">No fee records found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="no-data">No fee records found.</td></tr>';
         return;
     }
     
-    tbody.innerHTML = filtered.map(fee => `
-        <tr>
+    tbody.innerHTML = filtered.map(fee => {
+        const nextDue = storageManager.getNextDueDateForMember(fee.memberId);
+        const member = storageManager.getMembers().find(m => m.id === fee.memberId);
+        
+        return `<tr>
             <td>${fee.memberName}</td>
-            <td>Seat ${fees.find(f => f.id === fee.id) ? storageManager.getMembers().find(m => m.id === fee.memberId)?.seat || '-' : '-'}</td>
+            <td>Seat ${member?.seat || '-'}</td>
             <td>${fee.month}</td>
             <td>${storageManager.formatCurrency(fee.amount)}</td>
             <td>
@@ -36,13 +39,14 @@ function loadFees() {
             </td>
             <td>${fee.paymentDate ? storageManager.formatDate(fee.paymentDate) : '-'}</td>
             <td>${fee.paymentMethod || '-'}</td>
+            <td>${nextDue ? storageManager.formatDate(nextDue) : '-'}</td>
             <td>
                 ${fee.status === 'pending' ? 
                     `<button class="btn-sm btn-success" onclick="markAsPaid('${fee.id}')">Mark Paid</button>` : 
                     '<span class="badge success">✓ Paid</span>'}
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
     
     updateStats();
 }
@@ -72,21 +76,10 @@ function populateMonthFilter() {
         months.map(m => `<option value="${m}">${m}</option>`).join('');
 }
 
-document.getElementById('generateFeesBtn').addEventListener('click', () => {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-    
-    const generated = storageManager.generateMonthlyFees(month, year);
-    
-    if (generated > 0) {
-        alert(`Generated ${generated} fee records for this month!`);
-        populateMonthFilter();
-        loadFees();
-    } else {
-        alert('Fee records for this month already exist or no active members found.');
-    }
-});
+function autoGenerateFees() {
+    const generated = storageManager.autoGenerateMembershipFees();
+    return generated;
+}
 
 document.getElementById('recordPaymentBtn').addEventListener('click', () => {
     currentEditId = null;
@@ -186,5 +179,6 @@ document.getElementById('searchFees').addEventListener('input', loadFees);
 document.getElementById('monthFilter').addEventListener('change', loadFees);
 document.getElementById('statusFilter').addEventListener('change', loadFees);
 
+autoGenerateFees();
 populateMonthFilter();
 loadFees();

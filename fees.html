@@ -62,11 +62,10 @@
             <header class="page-header">
                 <div class="header-left">
                     <h1>Fee Management</h1>
-                    <p class="subtitle">Track and manage member fees</p>
+                    <p class="subtitle">Track and manage member fees (Auto-generated monthly)</p>
                 </div>
                 <div class="header-right">
-                    <button class="btn-primary" id="generateFeesBtn">🔄 Generate Monthly Fees</button>
-                    <button class="btn-secondary" id="recordPaymentBtn">+ Record Payment</button>
+                    <button class="btn-primary" id="recordPaymentBtn">+ Record Payment</button>
                 </div>
             </header>
             
@@ -117,12 +116,13 @@
                                 <th>Status</th>
                                 <th>Payment Date</th>
                                 <th>Payment Method</th>
+                                <th>Next Due Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="8" class="no-data">No fee records. Click "Generate Monthly Fees" to create records.</td>
+                                <td colspan="9" class="no-data">No fee records found. Fees are automatically generated based on member joining dates.</td>
                             </tr>
                         </tbody>
                     </table>

@@ -352,6 +352,70 @@ class StorageManager {
         return generated;
     }
     
+    autoGenerateMembershipFees() {
+        const members = this.getMembers().filter(m => m.status === 'active');
+        const today = new Date();
+        
+        let totalGenerated = 0;
+        
+        members.forEach(member => {
+            if (!member.joiningDate) {
+                return;
+            }
+            
+            const joiningDate = new Date(member.joiningDate);
+            const currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            let feeDate = new Date(joiningDate.getFullYear(), joiningDate.getMonth(), 1);
+            
+            while (feeDate <= currentDate) {
+                const monthYear = `${feeDate.getFullYear()}-${String(feeDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                const fees = this.getFees();
+                const exists = fees.find(f => 
+                    f.memberId === member.id && 
+                    f.month === monthYear
+                );
+                
+                if (!exists) {
+                    this.addFee({
+                        memberId: member.id,
+                        memberName: member.name,
+                        month: monthYear,
+                        amount: member.fee || 0,
+                        status: 'pending',
+                        paymentDate: null,
+                        paymentMethod: null
+                    });
+                    totalGenerated++;
+                }
+                
+                feeDate.setMonth(feeDate.getMonth() + 1);
+            }
+        });
+        
+        return totalGenerated;
+    }
+    
+    getNextDueDateForMember(memberId) {
+        const member = this.getMembers().find(m => m.id === memberId);
+        if (!member || !member.joiningDate) {
+            return null;
+        }
+        
+        const joiningDate = new Date(member.joiningDate);
+        const today = new Date();
+        const dayOfMonth = joiningDate.getDate();
+        
+        let nextDue = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
+        
+        if (nextDue <= today) {
+            nextDue.setMonth(nextDue.getMonth() + 1);
+        }
+        
+        return nextDue.toISOString().split('T')[0];
+    }
+    
     getExpenses() {
         return JSON.parse(localStorage.getItem('libraryExpenses')) || [];
     }
