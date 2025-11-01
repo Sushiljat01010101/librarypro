@@ -40,8 +40,10 @@ Manage library operations including member management, book tracking, fee collec
 - **AUTOMATED FEE GENERATION**: Improved fee management system
   - Removed manual "Generate Monthly Fees" button
   - Implemented automatic fee generation based on each member's joining date
-  - Fees automatically generate from joining date to current month when fees page loads
+  - Fees only generate when due date has arrived or passed (smart due date checking)
+  - Handles edge cases: members joining on 30th/31st get proper due dates in February
   - Added "Next Due Date" column to fees table
+  - Only overdue fees show as pending; future fees remain hidden until due
   - Improved UI with fade-in animations and better styling
   - Prevents duplicate fee generation with smart refetching logic
 
@@ -134,7 +136,9 @@ library-management/
 
 ### 5. Fee Management
 - **Automatic fee generation** based on each member's joining date
-- Fees auto-generate from joining date to current month on page load
+- Fees only generate when due date has arrived or passed
+- Smart due date checking handles edge cases (30th/31st joining dates in February)
+- Only overdue fees show as pending; future fees remain hidden until due
 - Mark payments as paid/pending
 - Record payment details (date, method, notes)
 - Filter by month and status
