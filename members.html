@@ -121,8 +121,17 @@
                         <input type="email" id="memberEmail">
                     </div>
                     <div class="form-group">
-                        <label for="memberSeat">Seat Number *</label>
-                        <input type="number" id="memberSeat" required min="1">
+                        <label for="memberSeat">Seat Selection</label>
+                        <div class="seat-selection-container">
+                            <input type="hidden" id="memberSeat" value="">
+                            <div class="seat-display" id="seatDisplay">
+                                <span class="seat-placeholder">No seat selected</span>
+                            </div>
+                            <div class="seat-buttons">
+                                <button type="button" class="btn-seat-select" id="selectSeatBtn">🪑 Select Seat</button>
+                                <button type="button" class="btn-no-seat" id="noSeatBtn">No Seat</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

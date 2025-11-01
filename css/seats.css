@@ -1,3 +1,68 @@
+.selection-mode-alert {
+    background: linear-gradient(135deg, rgba(244, 196, 48, 0.15), rgba(244, 196, 48, 0.05));
+    border: 2px solid var(--primary-gold);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.alert-icon {
+    font-size: 32px;
+}
+
+.alert-text {
+    flex: 1;
+}
+
+.alert-text strong {
+    color: var(--primary-gold);
+    font-size: 16px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.alert-text p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+}
+
+.btn-cancel-selection {
+    padding: 10px 20px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-selection:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+}
+
 .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

@@ -2,6 +2,21 @@ storageManager.checkAuth();
 
 let currentEditId = null;
 
+function updateSeatDisplay(seatValue) {
+    const seatDisplay = document.getElementById('seatDisplay');
+    const seatInput = document.getElementById('memberSeat');
+    
+    if (!seatValue || seatValue === '0' || seatValue === 0) {
+        seatDisplay.innerHTML = '<span class="seat-placeholder">No seat selected</span>';
+        seatDisplay.classList.remove('has-seat');
+        seatInput.value = '';
+    } else {
+        seatDisplay.innerHTML = `<span class="seat-selected">🪑 Seat ${seatValue}</span>`;
+        seatDisplay.classList.add('has-seat');
+        seatInput.value = seatValue;
+    }
+}
+
 function loadMembers() {
     const members = storageManager.getMembers();
     const searchTerm = document.getElementById('searchMembers').value.toLowerCase();
@@ -9,10 +24,11 @@ function loadMembers() {
     const membershipFilter = document.getElementById('membershipFilter').value;
     
     let filtered = members.filter(member => {
+        const seatValue = member.seat ? member.seat.toString() : '';
         const matchesSearch = 
             member.name.toLowerCase().includes(searchTerm) ||
             member.contact.includes(searchTerm) ||
-            member.seat.toString().includes(searchTerm);
+            seatValue.includes(searchTerm);
         
         const matchesStatus = statusFilter === 'all' || member.status === statusFilter;
         const matchesMembership = membershipFilter === 'all' || member.membershipType === membershipFilter;
@@ -44,7 +60,7 @@ function loadMembers() {
                 <div class="member-details">
                     <div class="detail-row">
                         <span class="detail-label">Seat Number</span>
-                        <span class="detail-value">${member.seat}</span>
+                        <span class="detail-value">${member.seat ? member.seat : 'No Seat'}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Membership</span>
@@ -81,17 +97,84 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Add Member';
     document.getElementById('memberForm').reset();
     document.getElementById('joiningDate').valueAsDate = new Date();
+    updateSeatDisplay(null);
     showModal('memberModal');
 });
 
+document.getElementById('selectSeatBtn').addEventListener('click', () => {
+    const formData = {
+        name: document.getElementById('memberName').value,
+        contact: document.getElementById('memberContact').value,
+        email: document.getElementById('memberEmail').value,
+        membershipType: document.getElementById('membershipType').value,
+        fee: document.getElementById('memberFee').value,
+        joiningDate: document.getElementById('joiningDate').value,
+        status: document.getElementById('memberStatus').value,
+        photo: document.getElementById('memberPhoto').value,
+        address: document.getElementById('memberAddress').value,
+        editId: currentEditId
+    };
+    
+    sessionStorage.setItem('memberFormData', JSON.stringify(formData));
+    window.location.href = 'seats.html?mode=select&return=members';
+});
+
+document.getElementById('noSeatBtn').addEventListener('click', () => {
+    updateSeatDisplay(null);
+    document.getElementById('noSeatBtn').classList.add('active');
+    setTimeout(() => {
+        document.getElementById('noSeatBtn').classList.remove('active');
+    }, 1000);
+});
+
+function checkForSeatSelection() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedSeat = urlParams.get('seat');
+    const formData = sessionStorage.getItem('memberFormData');
+    
+    if (formData) {
+        const data = JSON.parse(formData);
+        
+        currentEditId = data.editId;
+        document.getElementById('modalTitle').textContent = currentEditId ? 'Edit Member' : 'Add Member';
+        document.getElementById('memberName').value = data.name || '';
+        document.getElementById('memberContact').value = data.contact || '';
+        document.getElementById('memberEmail').value = data.email || '';
+        document.getElementById('membershipType').value = data.membershipType || 'monthly';
+        document.getElementById('memberFee').value = data.fee || '';
+        document.getElementById('joiningDate').value = data.joiningDate || new Date().toISOString().split('T')[0];
+        document.getElementById('memberStatus').value = data.status || 'active';
+        document.getElementById('memberPhoto').value = data.photo || '';
+        document.getElementById('memberAddress').value = data.address || '';
+        
+        if (selectedSeat) {
+            updateSeatDisplay(selectedSeat);
+        } else {
+            updateSeatDisplay(null);
+        }
+        
+        sessionStorage.removeItem('memberFormData');
+        
+        showModal('memberModal');
+        
+        if (selectedSeat) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
+
+window.addEventListener('DOMContentLoaded', checkForSeatSelection);
+
 document.getElementById('memberForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    
+    const seatValue = document.getElementById('memberSeat').value;
     
     const member = {
         name: document.getElementById('memberName').value,
         contact: document.getElementById('memberContact').value,
         email: document.getElementById('memberEmail').value,
-        seat: parseInt(document.getElementById('memberSeat').value),
+        seat: seatValue ? parseInt(seatValue) : 0,
         membershipType: document.getElementById('membershipType').value,
         fee: parseFloat(document.getElementById('memberFee').value),
         joiningDate: document.getElementById('joiningDate').value,
@@ -120,7 +203,7 @@ function editMember(id) {
         document.getElementById('memberName').value = member.name;
         document.getElementById('memberContact').value = member.contact;
         document.getElementById('memberEmail').value = member.email || '';
-        document.getElementById('memberSeat').value = member.seat;
+        updateSeatDisplay(member.seat);
         document.getElementById('membershipType').value = member.membershipType;
         document.getElementById('memberFee').value = member.fee;
         document.getElementById('joiningDate').value = member.joiningDate;

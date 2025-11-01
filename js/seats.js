@@ -1,6 +1,29 @@
 storageManager.checkAuth();
 
 let selectedSeatId = null;
+let isSelectionMode = false;
+let returnPage = null;
+
+function checkSelectionMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    returnPage = urlParams.get('return');
+    
+    if (mode === 'select' && returnPage) {
+        isSelectionMode = true;
+        document.getElementById('selectionModeAlert').style.display = 'block';
+        document.getElementById('statusFilter').value = 'available';
+        loadSeats();
+    }
+}
+
+document.getElementById('cancelSelectionBtn').addEventListener('click', () => {
+    if (returnPage === 'members') {
+        window.location.href = 'members.html';
+    }
+});
+
+window.addEventListener('DOMContentLoaded', checkSelectionMode);
 
 function loadSeats() {
     const seats = storageManager.getSeats();
@@ -59,6 +82,14 @@ function updateStats() {
 
 function handleSeatClick(seatId, status) {
     selectedSeatId = seatId;
+    
+    if (isSelectionMode && status === 'available') {
+        const seatNumber = seatId.replace('S', '');
+        if (returnPage === 'members') {
+            window.location.href = `members.html?seat=${seatNumber}`;
+        }
+        return;
+    }
     
     if (status === 'available') {
         showAssignModal(seatId);
