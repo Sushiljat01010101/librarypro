@@ -31,6 +31,12 @@ Manage library operations including member management, book tracking, fee collec
   - Form data preservation during seat selection navigation
   - Click available seats to select and auto-return to member form
   - Cancel button to return without selection while preserving form data
+- **SYNCHRONIZED**: Member-Seat automatic synchronization
+  - When member is added with seat, seat automatically becomes occupied on seats page
+  - When member's seat is changed, old seat becomes available and new seat becomes occupied
+  - When member is deleted, their seat automatically becomes available
+  - Duplicate seat assignment prevention (if seat is occupied, member gets no seat)
+  - Real-time sync between members and seats data
 
 ## Architecture
 
