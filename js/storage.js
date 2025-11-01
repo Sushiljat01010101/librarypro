@@ -2,6 +2,7 @@ class StorageManager {
     constructor() {
         this.initializeDefaultUser();
         this.initializeSettings();
+        this.initializeSeats();
     }
     
     initializeDefaultUser() {
@@ -362,6 +363,117 @@ class StorageManager {
     
     clearActivities() {
         localStorage.setItem('libraryActivities', JSON.stringify([]));
+    }
+    
+    initializeSeats() {
+        const seats = this.getSeats();
+        if (seats.length === 0) {
+            const settings = this.getSettings();
+            const totalSeats = settings.totalSeats || 50;
+            const newSeats = [];
+            
+            for (let i = 1; i <= totalSeats; i++) {
+                newSeats.push({
+                    id: `S${i}`,
+                    number: i,
+                    status: 'available',
+                    memberId: null,
+                    memberName: null,
+                    assignedDate: null
+                });
+            }
+            
+            this.saveSeats(newSeats);
+            return newSeats;
+        }
+        return seats;
+    }
+    
+    getSeats() {
+        return JSON.parse(localStorage.getItem('librarySeats')) || [];
+    }
+    
+    saveSeats(seats) {
+        localStorage.setItem('librarySeats', JSON.stringify(seats));
+    }
+    
+    assignSeat(seatId, memberId) {
+        const seats = this.getSeats();
+        const members = this.getMembers();
+        const seat = seats.find(s => s.id === seatId);
+        const member = members.find(m => m.id === memberId);
+        
+        if (seat && member && seat.status === 'available') {
+            seat.status = 'occupied';
+            seat.memberId = memberId;
+            seat.memberName = member.name;
+            seat.assignedDate = new Date().toISOString().split('T')[0];
+            
+            this.saveSeats(seats);
+            this.addActivity(`Seat ${seat.id} assigned to ${member.name}`, 'seat');
+            return true;
+        }
+        return false;
+    }
+    
+    freeSeat(seatId) {
+        const seats = this.getSeats();
+        const seat = seats.find(s => s.id === seatId);
+        
+        if (seat && seat.status === 'occupied') {
+            const memberName = seat.memberName;
+            seat.status = 'available';
+            seat.memberId = null;
+            seat.memberName = null;
+            seat.assignedDate = null;
+            
+            this.saveSeats(seats);
+            this.addActivity(`Seat ${seat.id} freed (was: ${memberName})`, 'seat');
+            return true;
+        }
+        return false;
+    }
+    
+    reserveSeat(seatId) {
+        const seats = this.getSeats();
+        const seat = seats.find(s => s.id === seatId);
+        
+        if (seat && seat.status === 'available') {
+            seat.status = 'reserved';
+            this.saveSeats(seats);
+            this.addActivity(`Seat ${seat.id} reserved`, 'seat');
+            return true;
+        }
+        return false;
+    }
+    
+    unreserveSeat(seatId) {
+        const seats = this.getSeats();
+        const seat = seats.find(s => s.id === seatId);
+        
+        if (seat && seat.status === 'reserved') {
+            seat.status = 'available';
+            this.saveSeats(seats);
+            this.addActivity(`Seat ${seat.id} unreserved`, 'seat');
+            return true;
+        }
+        return false;
+    }
+    
+    getSeatStats() {
+        const seats = this.getSeats();
+        const total = seats.length;
+        const occupied = seats.filter(s => s.status === 'occupied').length;
+        const available = seats.filter(s => s.status === 'available').length;
+        const reserved = seats.filter(s => s.status === 'reserved').length;
+        
+        return {
+            total,
+            occupied,
+            available,
+            reserved,
+            occupancyRate: total > 0 ? ((occupied / total) * 100).toFixed(1) : 0
+        };
     }
     
     formatDate(dateString) {
