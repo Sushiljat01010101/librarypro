@@ -103,6 +103,11 @@ library-management/
 
 ### 2. Member Management
 - Add, edit, delete members
+- **Cascade deletion**: When member is deleted, all related data is automatically removed:
+  - Member's seat is freed and becomes available
+  - All fee records (paid and pending) are deleted
+  - All issued books are returned (availability updated)
+  - Issued book records are removed
 - Seat number assignment and tracking
 - Membership types (monthly, quarterly, yearly)
 - Active/inactive status
