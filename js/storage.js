@@ -85,9 +85,34 @@ class StorageManager {
     addMember(member) {
         const members = this.getMembers();
         member.id = Date.now().toString();
+        
+        if (member.seat && member.seat > 0) {
+            const seatId = `S${member.seat}`;
+            const seats = this.getSeats();
+            const targetSeat = seats.find(s => s.id === seatId);
+            
+            if (targetSeat && targetSeat.status === 'occupied' && targetSeat.memberId !== member.id) {
+                member.seat = 0;
+            }
+        }
+        
         members.push(member);
         this.saveMembers(members);
         this.addActivity(`New member added: ${member.name}`, 'member');
+        
+        if (member.seat && member.seat > 0) {
+            const seatId = `S${member.seat}`;
+            const success = this.assignSeatToMember(seatId, member.id, member.name);
+            if (!success) {
+                member.seat = 0;
+                const index = members.findIndex(m => m.id === member.id);
+                if (index !== -1) {
+                    members[index].seat = 0;
+                    this.saveMembers(members);
+                }
+            }
+        }
+        
         return member;
     }
     
@@ -95,9 +120,38 @@ class StorageManager {
         const members = this.getMembers();
         const index = members.findIndex(m => m.id === id);
         if (index !== -1) {
+            const oldMember = members[index];
+            const oldSeat = oldMember.seat;
+            let newSeat = updatedMember.seat;
+            
+            if (newSeat && newSeat > 0) {
+                const newSeatId = `S${newSeat}`;
+                const seats = this.getSeats();
+                const targetSeat = seats.find(s => s.id === newSeatId);
+                
+                if (targetSeat && targetSeat.status === 'occupied' && targetSeat.memberId !== id) {
+                    newSeat = oldSeat || 0;
+                    updatedMember.seat = newSeat;
+                }
+            }
+            
+            if (oldSeat && oldSeat > 0 && oldSeat !== newSeat) {
+                this.freeSeatByMemberId(id);
+            }
+            
             members[index] = { ...members[index], ...updatedMember };
             this.saveMembers(members);
             this.addActivity(`Member updated: ${members[index].name}`, 'member');
+            
+            if (newSeat && newSeat > 0 && oldSeat !== newSeat) {
+                const newSeatId = `S${newSeat}`;
+                const success = this.assignSeatToMember(newSeatId, id, members[index].name);
+                if (!success) {
+                    members[index].seat = 0;
+                    this.saveMembers(members);
+                }
+            }
+            
             return true;
         }
         return false;
@@ -106,6 +160,11 @@ class StorageManager {
     deleteMember(id) {
         const members = this.getMembers();
         const member = members.find(m => m.id === id);
+        
+        if (member && member.seat && member.seat > 0) {
+            this.freeSeatByMemberId(id);
+        }
+        
         const filtered = members.filter(m => m.id !== id);
         this.saveMembers(filtered);
         if (member) {
@@ -411,6 +470,44 @@ class StorageManager {
             
             this.saveSeats(seats);
             this.addActivity(`Seat ${seat.id} assigned to ${member.name}`, 'seat');
+            return true;
+        }
+        return false;
+    }
+    
+    assignSeatToMember(seatId, memberId, memberName) {
+        const seats = this.getSeats();
+        const seat = seats.find(s => s.id === seatId);
+        
+        if (seat) {
+            if (seat.status === 'occupied' && seat.memberId === memberId) {
+                return true;
+            }
+            
+            if (seat.status === 'available' || seat.status === 'reserved') {
+                seat.status = 'occupied';
+                seat.memberId = memberId;
+                seat.memberName = memberName;
+                seat.assignedDate = new Date().toISOString().split('T')[0];
+                
+                this.saveSeats(seats);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    freeSeatByMemberId(memberId) {
+        const seats = this.getSeats();
+        const seat = seats.find(s => s.memberId === memberId);
+        
+        if (seat) {
+            seat.status = 'available';
+            seat.memberId = null;
+            seat.memberName = null;
+            seat.assignedDate = null;
+            
+            this.saveSeats(seats);
             return true;
         }
         return false;
