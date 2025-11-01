@@ -161,15 +161,48 @@ class StorageManager {
         const members = this.getMembers();
         const member = members.find(m => m.id === id);
         
-        if (member && member.seat && member.seat > 0) {
+        if (!member) {
+            return false;
+        }
+        
+        if (member.seat && member.seat > 0) {
             this.freeSeatByMemberId(id);
         }
         
+        const fees = this.getFees();
+        const memberFees = fees.filter(f => f.memberId === id);
+        const feesCount = memberFees.length;
+        const updatedFees = fees.filter(f => f.memberId !== id);
+        this.saveFees(updatedFees);
+        
+        const issuedBooks = this.getIssuedBooks();
+        const memberBooks = issuedBooks.filter(ib => ib.memberId === id && !ib.returned);
+        
+        memberBooks.forEach(issuedBook => {
+            const books = this.getBooks();
+            const book = books.find(b => b.id === issuedBook.bookId);
+            if (book) {
+                book.available++;
+                this.saveBooks(books);
+            }
+        });
+        
+        const booksCount = memberBooks.length;
+        const updatedIssuedBooks = issuedBooks.filter(ib => ib.memberId !== id);
+        this.saveIssuedBooks(updatedIssuedBooks);
+        
         const filtered = members.filter(m => m.id !== id);
         this.saveMembers(filtered);
-        if (member) {
-            this.addActivity(`Member deleted: ${member.name}`, 'member');
+        
+        let activityMsg = `Member deleted: ${member.name}`;
+        if (feesCount > 0 || booksCount > 0) {
+            const details = [];
+            if (feesCount > 0) details.push(`${feesCount} fee record(s)`);
+            if (booksCount > 0) details.push(`${booksCount} issued book(s)`);
+            activityMsg += ` (Removed: ${details.join(', ')})`;
         }
+        this.addActivity(activityMsg, 'member');
+        
         return true;
     }
     
