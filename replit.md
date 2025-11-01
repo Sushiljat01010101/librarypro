@@ -37,6 +37,13 @@ Manage library operations including member management, book tracking, fee collec
   - When member is deleted, their seat automatically becomes available
   - Duplicate seat assignment prevention (if seat is occupied, member gets no seat)
   - Real-time sync between members and seats data
+- **AUTOMATED FEE GENERATION**: Improved fee management system
+  - Removed manual "Generate Monthly Fees" button
+  - Implemented automatic fee generation based on each member's joining date
+  - Fees automatically generate from joining date to current month when fees page loads
+  - Added "Next Due Date" column to fees table
+  - Improved UI with fade-in animations and better styling
+  - Prevents duplicate fee generation with smart refetching logic
 
 ## Architecture
 
@@ -126,12 +133,15 @@ library-management/
 - Stock alerts for low quantity
 
 ### 5. Fee Management
-- Monthly fee auto-generation for active members
+- **Automatic fee generation** based on each member's joining date
+- Fees auto-generate from joining date to current month on page load
 - Mark payments as paid/pending
 - Record payment details (date, method, notes)
 - Filter by month and status
+- Next due date tracking for each member
 - Payment collection statistics
 - Revenue tracking and reporting
+- No manual fee generation required
 
 ### 6. Expense Management
 - Record expenses with categories (General, Utilities, Maintenance, Rent, Others)
