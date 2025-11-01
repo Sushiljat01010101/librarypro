@@ -364,12 +364,25 @@ class StorageManager {
             }
             
             const joiningDate = new Date(member.joiningDate);
+            const joiningDay = joiningDate.getDate();
             const currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
             
             let feeDate = new Date(joiningDate.getFullYear(), joiningDate.getMonth(), 1);
             
             while (feeDate <= currentDate) {
                 const monthYear = `${feeDate.getFullYear()}-${String(feeDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                const isCurrentMonth = feeDate.getFullYear() === today.getFullYear() && 
+                                      feeDate.getMonth() === today.getMonth();
+                
+                if (isCurrentMonth) {
+                    const lastDayOfMonth = new Date(feeDate.getFullYear(), feeDate.getMonth() + 1, 0).getDate();
+                    const effectiveDueDay = Math.min(joiningDay, lastDayOfMonth);
+                    
+                    if (today.getDate() < effectiveDueDay) {
+                        break;
+                    }
+                }
                 
                 const fees = this.getFees();
                 const exists = fees.find(f => 
