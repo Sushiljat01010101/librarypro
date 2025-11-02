@@ -75,6 +75,10 @@ function loadMembers() {
                         <span class="detail-value">${storageManager.formatDate(member.joiningDate)}</span>
                     </div>
                     <div class="detail-row">
+                        <span class="detail-label">Next Payment Date</span>
+                        <span class="detail-value">${member.nextPaymentDate ? storageManager.formatDate(member.nextPaymentDate) : '-'}</span>
+                    </div>
+                    <div class="detail-row">
                         <span class="detail-label">Status</span>
                         <span class="detail-value">
                             <span class="badge ${member.status === 'active' ? 'success' : 'danger'}">
@@ -235,6 +239,7 @@ document.getElementById('exportMembersBtn').addEventListener('click', () => {
         Membership: m.membershipType,
         Fee: m.fee,
         'Joining Date': m.joiningDate,
+        'Next Payment Date': m.nextPaymentDate || '',
         Status: m.status,
         Address: m.address || ''
     }));
