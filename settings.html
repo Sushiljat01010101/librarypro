@@ -143,6 +143,57 @@
                 </div>
                 
                 <div class="settings-section">
+                    <h2>🪑 Seat Management</h2>
+                    <p class="subtitle" style="margin-bottom: 20px; color: var(--text-secondary);">Dynamically add or remove seats from your library</p>
+                    
+                    <div class="seat-management-controls">
+                        <div class="seat-stats-row">
+                            <div class="seat-stat-card">
+                                <div class="stat-label">Current Total Seats</div>
+                                <div class="stat-value" id="currentTotalSeats">0</div>
+                            </div>
+                            <div class="seat-stat-card available">
+                                <div class="stat-label">Available Seats</div>
+                                <div class="stat-value" id="currentAvailableSeats">0</div>
+                            </div>
+                            <div class="seat-stat-card occupied">
+                                <div class="stat-label">Occupied Seats</div>
+                                <div class="stat-value" id="currentOccupiedSeats">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="seat-action-cards">
+                            <div class="action-card">
+                                <h3>➕ Add Seats</h3>
+                                <p>Add new seats to your library</p>
+                                <div class="action-controls">
+                                    <input type="number" id="seatsToAdd" placeholder="Number of seats" min="1" value="1">
+                                    <button class="btn-primary" id="addSeatsBtn">Add Seats</button>
+                                </div>
+                            </div>
+                            
+                            <div class="action-card">
+                                <h3>➖ Remove Seats</h3>
+                                <p>Remove trailing available seats from the end (occupied seats cannot be removed)</p>
+                                <div class="action-controls">
+                                    <input type="number" id="seatsToRemove" placeholder="Number of seats" min="1" value="1">
+                                    <button class="btn-danger" id="removeSeatsBtn">Remove Seats</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bulk-action-card">
+                            <h3>🔄 Set Exact Seat Count</h3>
+                            <p>Set the total number of seats (will add or remove as needed)</p>
+                            <div class="action-controls">
+                                <input type="number" id="exactSeatCount" placeholder="Exact number of seats" min="1">
+                                <button class="btn-secondary" id="setExactSeatsBtn">Set Seat Count</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
                     <h2>System Information</h2>
                     <div class="info-grid">
                         <div class="info-item">
@@ -200,14 +251,68 @@
         
         settingsForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const currentSettings = storageManager.getSettings();
+            const newTotalSeats = parseInt(document.getElementById('totalSeats').value);
+            const oldTotalSeats = currentSettings.totalSeats;
+            
             const newSettings = {
                 libraryName: document.getElementById('libraryName').value,
-                totalSeats: parseInt(document.getElementById('totalSeats').value),
+                totalSeats: newTotalSeats,
                 defaultFine: parseInt(document.getElementById('defaultFine').value),
                 bookReturnDays: parseInt(document.getElementById('bookReturnDays').value)
             };
-            storageManager.saveSettings(newSettings);
-            alert('Settings saved successfully!');
+            
+            if (newTotalSeats !== oldTotalSeats) {
+                const stats = storageManager.getSeatStats();
+                const currentTotal = stats.total;
+                const difference = newTotalSeats - currentTotal;
+                
+                if (difference > 0) {
+                    if (confirm(`This will add ${difference} new seat(s) to match the total seats setting. Continue?`)) {
+                        const result = storageManager.setExactSeatCount(newTotalSeats);
+                        if (result.success) {
+                            storageManager.saveSettings(newSettings);
+                            alert(`Settings saved! ${difference} seat(s) added. New total: ${result.newTotal}`);
+                            updateSeatStats();
+                        } else {
+                            alert('Failed to update seats');
+                            return;
+                        }
+                    } else {
+                        document.getElementById('totalSeats').value = oldTotalSeats;
+                        return;
+                    }
+                } else if (difference < 0) {
+                    const seatsToRemove = Math.abs(difference);
+                    if (seatsToRemove > stats.available) {
+                        alert(`Cannot reduce to ${newTotalSeats} seats. This requires removing ${seatsToRemove} seats, but only ${stats.available} are available.\n${stats.occupied} seats are occupied and cannot be removed.\n\nPlease free up some seats first or use the Seat Management section below.`);
+                        document.getElementById('totalSeats').value = oldTotalSeats;
+                        return;
+                    }
+                    
+                    if (confirm(`This will remove ${seatsToRemove} seat(s) to match the total seats setting. Continue?`)) {
+                        const result = storageManager.setExactSeatCount(newTotalSeats);
+                        if (result.success) {
+                            storageManager.saveSettings(newSettings);
+                            alert(`Settings saved! ${seatsToRemove} seat(s) removed. New total: ${result.newTotal}`);
+                            updateSeatStats();
+                        } else {
+                            alert(result.message || 'Failed to update seats');
+                            document.getElementById('totalSeats').value = oldTotalSeats;
+                            return;
+                        }
+                    } else {
+                        document.getElementById('totalSeats').value = oldTotalSeats;
+                        return;
+                    }
+                } else {
+                    storageManager.saveSettings(newSettings);
+                    alert('Settings saved successfully!');
+                }
+            } else {
+                storageManager.saveSettings(newSettings);
+                alert('Settings saved successfully!');
+            }
         });
         
         passwordForm.addEventListener('submit', (e) => {
@@ -241,6 +346,7 @@
                 fees: storageManager.getFees(),
                 expenses: storageManager.getExpenses(),
                 activities: storageManager.getActivities(),
+                seats: storageManager.getSeats(),
                 settings: storageManager.getSettings(),
                 exportDate: new Date().toISOString()
             };
@@ -277,6 +383,7 @@
                         if (data.fees) localStorage.setItem('libraryFees', JSON.stringify(data.fees));
                         if (data.expenses) localStorage.setItem('libraryExpenses', JSON.stringify(data.expenses));
                         if (data.activities) localStorage.setItem('libraryActivities', JSON.stringify(data.activities));
+                        if (data.seats) localStorage.setItem('librarySeats', JSON.stringify(data.seats));
                         if (data.settings) localStorage.setItem('librarySettings', JSON.stringify(data.settings));
                         
                         alert('Data imported successfully! Reloading page...');
@@ -298,6 +405,7 @@
                     localStorage.removeItem('libraryFees');
                     localStorage.removeItem('libraryExpenses');
                     localStorage.removeItem('libraryActivities');
+                    localStorage.removeItem('librarySeats');
                     localStorage.removeItem('librarySettings');
                     
                     alert('All data cleared! Redirecting to login...');
@@ -323,6 +431,109 @@
         }
         
         updateSystemInfo();
+        
+        function updateSeatStats() {
+            const stats = storageManager.getSeatStats();
+            document.getElementById('currentTotalSeats').textContent = stats.total;
+            document.getElementById('currentAvailableSeats').textContent = stats.available;
+            document.getElementById('currentOccupiedSeats').textContent = stats.occupied;
+        }
+        
+        updateSeatStats();
+        
+        document.getElementById('addSeatsBtn').addEventListener('click', () => {
+            const count = parseInt(document.getElementById('seatsToAdd').value);
+            if (!count || count < 1) {
+                alert('Please enter a valid number of seats to add');
+                return;
+            }
+            
+            if (confirm(`Add ${count} new seat(s) to the library?`)) {
+                const result = storageManager.addSeats(count);
+                if (result.success) {
+                    alert(`Successfully added ${count} seat(s)! New total: ${result.newTotal}`);
+                    updateSeatStats();
+                    updateSystemInfo();
+                    const settings = storageManager.getSettings();
+                    settings.totalSeats = result.newTotal;
+                    storageManager.saveSettings(settings);
+                    document.getElementById('totalSeats').value = result.newTotal;
+                    document.getElementById('seatsToAdd').value = '1';
+                } else {
+                    alert('Failed to add seats');
+                }
+            }
+        });
+        
+        document.getElementById('removeSeatsBtn').addEventListener('click', () => {
+            const count = parseInt(document.getElementById('seatsToRemove').value);
+            if (!count || count < 1) {
+                alert('Please enter a valid number of seats to remove');
+                return;
+            }
+            
+            if (confirm(`Remove ${count} trailing seat(s) from the end of the library?\n\nNote: Only available seats from the end can be removed. Occupied seats will prevent removal.`)) {
+                const result = storageManager.removeSeats(count);
+                if (result.success) {
+                    alert(`Successfully removed ${result.removed} seat(s)! New total: ${result.newTotal}`);
+                    updateSeatStats();
+                    updateSystemInfo();
+                    const settings = storageManager.getSettings();
+                    settings.totalSeats = result.newTotal;
+                    storageManager.saveSettings(settings);
+                    document.getElementById('totalSeats').value = result.newTotal;
+                    document.getElementById('seatsToRemove').value = '1';
+                } else {
+                    alert(result.message || 'Failed to remove seats');
+                }
+            }
+        });
+        
+        document.getElementById('setExactSeatsBtn').addEventListener('click', () => {
+            const exactCount = parseInt(document.getElementById('exactSeatCount').value);
+            if (!exactCount || exactCount < 1) {
+                alert('Please enter a valid seat count');
+                return;
+            }
+            
+            const stats = storageManager.getSeatStats();
+            const currentTotal = stats.total;
+            
+            if (exactCount === currentTotal) {
+                alert('The seat count is already at this number');
+                return;
+            }
+            
+            const difference = exactCount - currentTotal;
+            let message = '';
+            
+            if (difference > 0) {
+                message = `This will add ${difference} new seat(s). Continue?`;
+            } else {
+                const seatsToRemove = Math.abs(difference);
+                if (seatsToRemove > stats.available) {
+                    alert(`Cannot set seat count to ${exactCount}. This requires removing ${seatsToRemove} seats, but only ${stats.available} are available.\n${stats.occupied} seats are occupied and cannot be removed.`);
+                    return;
+                }
+                message = `This will remove ${seatsToRemove} seat(s). Continue?`;
+            }
+            
+            if (confirm(message)) {
+                const result = storageManager.setExactSeatCount(exactCount);
+                if (result.success) {
+                    alert(`Seat count updated successfully! New total: ${result.newTotal}`);
+                    updateSeatStats();
+                    updateSystemInfo();
+                    const settings = storageManager.getSettings();
+                    settings.totalSeats = result.newTotal;
+                    storageManager.saveSettings(settings);
+                    document.getElementById('totalSeats').value = result.newTotal;
+                    document.getElementById('exactSeatCount').value = '';
+                } else {
+                    alert(result.message || 'Failed to update seat count');
+                }
+            }
+        });
         
         document.getElementById('sidebarToggle').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('collapsed');

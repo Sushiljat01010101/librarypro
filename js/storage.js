@@ -683,6 +683,95 @@ class StorageManager {
         };
     }
     
+    addSeats(count) {
+        const seats = this.getSeats();
+        const currentTotal = seats.length;
+        const newSeats = [];
+        
+        for (let i = 1; i <= count; i++) {
+            const seatNumber = currentTotal + i;
+            newSeats.push({
+                id: `S${seatNumber}`,
+                number: seatNumber,
+                status: 'available',
+                memberId: null,
+                memberName: null,
+                assignedDate: null
+            });
+        }
+        
+        const updatedSeats = [...seats, ...newSeats];
+        this.saveSeats(updatedSeats);
+        this.addActivity(`Added ${count} new seat(s). Total seats: ${updatedSeats.length}`, 'seat');
+        
+        return {
+            success: true,
+            newTotal: updatedSeats.length,
+            added: count
+        };
+    }
+    
+    removeSeats(count) {
+        const seats = this.getSeats();
+        
+        let removableCount = 0;
+        for (let i = seats.length - 1; i >= 0; i--) {
+            if (seats[i].status === 'available') {
+                removableCount++;
+            } else {
+                break;
+            }
+        }
+        
+        if (removableCount < count) {
+            return {
+                success: false,
+                message: `Cannot remove ${count} seats. Only ${removableCount} trailing available seats can be removed. ${seats.length - removableCount} seats at the end are occupied or reserved.`
+            };
+        }
+        
+        const updatedSeats = seats.slice(0, seats.length - count);
+        
+        this.saveSeats(updatedSeats);
+        this.addActivity(`Removed ${count} seat(s). Total seats: ${updatedSeats.length}`, 'seat');
+        
+        const members = this.getMembers();
+        const updatedMembers = members.map(member => {
+            if (member.seat > updatedSeats.length) {
+                return { ...member, seat: 0 };
+            }
+            return member;
+        });
+        this.saveMembers(updatedMembers);
+        
+        return {
+            success: true,
+            newTotal: updatedSeats.length,
+            removed: count
+        };
+    }
+    
+    setExactSeatCount(targetCount) {
+        const seats = this.getSeats();
+        const currentTotal = seats.length;
+        const difference = targetCount - currentTotal;
+        
+        if (difference === 0) {
+            return {
+                success: true,
+                newTotal: currentTotal,
+                message: 'Seat count already matches target'
+            };
+        }
+        
+        if (difference > 0) {
+            return this.addSeats(difference);
+        } else {
+            const seatsToRemove = Math.abs(difference);
+            return this.removeSeats(seatsToRemove);
+        }
+    }
+    
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-IN', {

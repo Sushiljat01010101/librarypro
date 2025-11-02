@@ -193,9 +193,17 @@ library-management/
 ### 9. Settings & Backup
 - Library configuration (name, total seats, default fine, return days)
 - Password management
-- Complete data export to JSON
-- Import data from backup
-- Clear all data option
+- **🆕 Dynamic Seat Management:**
+  - Add seats individually or in bulk
+  - Remove trailing available seats (prevents data corruption)
+  - Set exact seat count with automatic add/remove
+  - Real-time seat statistics display
+  - Smart validation to prevent removing occupied seats
+  - Automatic sync with settings total seats field
+  - Activity logging for all seat operations
+- Complete data export to JSON (includes seats)
+- Import data from backup (includes seats)
+- Clear all data option (includes seats)
 - System information display
 - Storage usage tracking
 
