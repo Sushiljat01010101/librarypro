@@ -584,7 +584,7 @@ class StorageManager {
             return null;
         }
         
-        if (member.nextPaymentDate) {
+        if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
             return member.nextPaymentDate;
         }
         

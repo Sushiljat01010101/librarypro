@@ -101,6 +101,7 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Add Member';
     document.getElementById('memberForm').reset();
     document.getElementById('joiningDate').valueAsDate = new Date();
+    document.getElementById('nextPaymentDate').value = '';
     updateSeatDisplay(null);
     showModal('memberModal');
 });
