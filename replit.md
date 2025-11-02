@@ -25,7 +25,7 @@ The system encompasses several core features:
 -   **Member Management**: CRUD operations for members, including seat assignment, membership types, status tracking, next payment date selection, and CSV export. Features cascade deletion for related data (seats, fees, books). Members can have an optional next payment date field to track upcoming payment deadlines.
 -   **Seat Management**: A visual grid layout with color-coded seat statuses (Available, Occupied, Reserved). Supports individual or bulk seat additions, safe removal of trailing seats, and real-time statistics. Automatic synchronization with member assignments.
 -   **Book Management**: CRUD operations for books, issue/return functionality, overdue tracking with fine calculation, and stock alerts.
--   **Fee Management**: Automated fee generation based on member joining dates, smart due date checking, and tracking of payments (paid/pending).
+-   **Fee Management**: Automated fee generation based on member joining dates, smart due date checking using member's custom next payment date (if set) or calculated from joining date, and tracking of payments (paid/pending).
 -   **Expense Management**: Recording and categorization of expenses, tracking by month/year, and CSV export.
 -   **Dashboard**: Provides real-time summaries of members, seat occupancy, book inventory, revenue, expenses, and profit, along with recent activity.
 -   **Reports & Analytics**: Visualizations for revenue vs. expense trends, category-wise expense distribution, book status, and payment collection rates using Chart.js.
