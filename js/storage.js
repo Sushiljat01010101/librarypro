@@ -580,7 +580,15 @@ class StorageManager {
     
     getNextDueDateForMember(memberId) {
         const member = this.getMembers().find(m => m.id === memberId);
-        if (!member || !member.joiningDate) {
+        if (!member) {
+            return null;
+        }
+        
+        if (member.nextPaymentDate) {
+            return member.nextPaymentDate;
+        }
+        
+        if (!member.joiningDate) {
             return null;
         }
         
