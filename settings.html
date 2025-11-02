@@ -255,8 +255,19 @@
             const newTotalSeats = parseInt(document.getElementById('totalSeats').value);
             const oldTotalSeats = currentSettings.totalSeats;
             
+            let libraryName = document.getElementById('libraryName').value.trim();
+            if (libraryName.length === 0) {
+                alert('Library name cannot be empty!');
+                return;
+            }
+            
+            if (libraryName.length > 100) {
+                alert('Library name is too long! Please keep it under 100 characters.');
+                return;
+            }
+            
             const newSettings = {
-                libraryName: document.getElementById('libraryName').value,
+                libraryName: libraryName,
                 totalSeats: newTotalSeats,
                 defaultFine: parseInt(document.getElementById('defaultFine').value),
                 bookReturnDays: parseInt(document.getElementById('bookReturnDays').value)
@@ -312,6 +323,10 @@
             } else {
                 storageManager.saveSettings(newSettings);
                 alert('Settings saved successfully!');
+            }
+            
+            if (typeof updateLibraryName === 'function') {
+                updateLibraryName();
             }
         });
         

@@ -89,3 +89,38 @@ const currentUser = document.getElementById('currentUser');
 if (currentUser) {
     currentUser.textContent = storageManager.getUser().name;
 }
+
+function updateLibraryName() {
+    const settings = storageManager.getSettings();
+    let libraryName = settings.libraryName || 'My Library';
+    
+    libraryName = String(libraryName).trim();
+    if (libraryName.length === 0) {
+        libraryName = 'My Library';
+    }
+    
+    const logoElements = document.querySelectorAll('.logo');
+    logoElements.forEach(logo => {
+        logo.textContent = `📚 ${libraryName}`;
+    });
+    
+    const loginTitle = document.querySelector('.logo-section h1');
+    if (loginTitle) {
+        loginTitle.textContent = libraryName;
+    }
+    
+    const pageTitle = document.querySelector('title');
+    if (pageTitle && !window.location.pathname.endsWith('index.html') && window.location.pathname !== '/') {
+        const currentTitle = pageTitle.textContent;
+        const parts = currentTitle.split(' - ');
+        if (parts.length > 1) {
+            pageTitle.textContent = `${parts[0]} - ${libraryName}`;
+        }
+    } else if (pageTitle && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/')) {
+        pageTitle.textContent = `${libraryName} - Login`;
+    }
+}
+
+if (typeof storageManager !== 'undefined') {
+    updateLibraryName();
+}
