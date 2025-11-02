@@ -14,7 +14,26 @@ Manage library operations including member management, book tracking, fee collec
 - Professional golden-yellow theme
 - Chart.js integration for analytics
 
-## Recent Changes (November 1, 2025)
+## Recent Changes (November 2, 2025)
+- **ENHANCED**: Settings page fully working with all features functional
+- **NEW**: Dynamic library name system
+  - Library name now displays across all pages (sidebar, login, page titles)
+  - Updates automatically when changed in settings
+  - Secure implementation preventing XSS attacks
+  - Input validation (non-empty, max 100 characters)
+  - Graceful fallback to "My Library" for empty values
+- **NEW**: Dynamic Seat Management in Settings
+  - Add seats individually or in bulk
+  - Remove trailing available seats safely
+  - Set exact seat count with smart validation
+  - Real-time seat statistics display
+  - Prevents data corruption by protecting occupied seats
+  - Automatic sync with total seats setting
+  - Activity logging for all operations
+- **FIXED**: Backup export/import now includes seats data
+- **FIXED**: Clear all data properly removes seats data
+
+## Previous Changes (November 1, 2025)
 - Initial project setup and complete implementation
 - Created all 10 HTML pages with navigation
 - Implemented golden-yellow theme with dark mode aesthetics
