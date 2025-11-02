@@ -22,7 +22,7 @@ The system is implemented as a Single-Page Application (SPA) using:
 ### Feature Specifications
 The system encompasses several core features:
 -   **Authentication**: Admin login with session management and password change.
--   **Member Management**: CRUD operations for members, including seat assignment, membership types, status tracking, and CSV export. Features cascade deletion for related data (seats, fees, books).
+-   **Member Management**: CRUD operations for members, including seat assignment, membership types, status tracking, next payment date selection, and CSV export. Features cascade deletion for related data (seats, fees, books). Members can have an optional next payment date field to track upcoming payment deadlines.
 -   **Seat Management**: A visual grid layout with color-coded seat statuses (Available, Occupied, Reserved). Supports individual or bulk seat additions, safe removal of trailing seats, and real-time statistics. Automatic synchronization with member assignments.
 -   **Book Management**: CRUD operations for books, issue/return functionality, overdue tracking with fine calculation, and stock alerts.
 -   **Fee Management**: Automated fee generation based on member joining dates, smart due date checking, and tracking of payments (paid/pending).
