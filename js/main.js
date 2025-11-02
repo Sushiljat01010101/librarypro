@@ -154,6 +154,11 @@ function updateLibraryName() {
         logo.textContent = `📚 ${libraryName}`;
     });
     
+    const mobileLibraryName = document.querySelector('.mobile-library-name');
+    if (mobileLibraryName) {
+        mobileLibraryName.textContent = `📚 ${libraryName}`;
+    }
+    
     const loginTitle = document.querySelector('.logo-section h1');
     if (loginTitle) {
         loginTitle.textContent = libraryName;
