@@ -109,6 +109,7 @@ document.getElementById('selectSeatBtn').addEventListener('click', () => {
         membershipType: document.getElementById('membershipType').value,
         fee: document.getElementById('memberFee').value,
         joiningDate: document.getElementById('joiningDate').value,
+        nextPaymentDate: document.getElementById('nextPaymentDate').value,
         status: document.getElementById('memberStatus').value,
         photo: document.getElementById('memberPhoto').value,
         address: document.getElementById('memberAddress').value,
@@ -143,6 +144,7 @@ function checkForSeatSelection() {
         document.getElementById('membershipType').value = data.membershipType || 'monthly';
         document.getElementById('memberFee').value = data.fee || '';
         document.getElementById('joiningDate').value = data.joiningDate || new Date().toISOString().split('T')[0];
+        document.getElementById('nextPaymentDate').value = data.nextPaymentDate || '';
         document.getElementById('memberStatus').value = data.status || 'active';
         document.getElementById('memberPhoto').value = data.photo || '';
         document.getElementById('memberAddress').value = data.address || '';
@@ -178,6 +180,7 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         membershipType: document.getElementById('membershipType').value,
         fee: parseFloat(document.getElementById('memberFee').value),
         joiningDate: document.getElementById('joiningDate').value,
+        nextPaymentDate: document.getElementById('nextPaymentDate').value,
         status: document.getElementById('memberStatus').value,
         photo: document.getElementById('memberPhoto').value,
         address: document.getElementById('memberAddress').value
@@ -207,6 +210,7 @@ function editMember(id) {
         document.getElementById('membershipType').value = member.membershipType;
         document.getElementById('memberFee').value = member.fee;
         document.getElementById('joiningDate').value = member.joiningDate;
+        document.getElementById('nextPaymentDate').value = member.nextPaymentDate || '';
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberPhoto').value = member.photo || '';
         document.getElementById('memberAddress').value = member.address || '';
