@@ -15,6 +15,27 @@ Manage library operations including member management, book tracking, fee collec
 - Chart.js integration for analytics
 
 ## Recent Changes (November 2, 2025)
+- **NEW**: Dark/Light Theme Toggle
+  - Smooth theme switching between dark and light modes
+  - Theme preference persists across all pages
+  - Beautiful light theme with optimized color palette
+  - Instant theme application on page load
+  - Toggle available in settings page with sun/moon icons
+- **NEW**: Auto Backup System
+  - Automatic backup scheduling (daily, weekly, monthly intervals)
+  - Background backup checks every hour
+  - Next backup time display and tracking
+  - Last backup timestamp tracking
+  - Success notifications with smooth animations
+  - Activity log integration for backup history
+  - One-click enable/disable from settings
+- **ENHANCED**: Settings Page UI/UX Improvements
+  - Modern preference cards with better spacing
+  - Professional toggle switches for theme and auto backup
+  - Organized sections with clear visual hierarchy
+  - Smooth animations and transitions
+  - Real-time preference updates
+  - Improved backup frequency selector
 - **ENHANCED**: Settings page fully working with all features functional
 - **NEW**: Dynamic library name system
   - Library name now displays across all pages (sidebar, login, page titles)

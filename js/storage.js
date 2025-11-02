@@ -45,6 +45,141 @@ class StorageManager {
         localStorage.setItem('librarySettings', JSON.stringify(settings));
     }
     
+    getPreferences() {
+        const defaultPreferences = {
+            theme: 'dark',
+            autoBackup: false,
+            backupInterval: 'weekly',
+            lastBackupTime: null,
+            nextBackupTime: null
+        };
+        return JSON.parse(localStorage.getItem('libraryPreferences')) || defaultPreferences;
+    }
+    
+    savePreferences(preferences) {
+        localStorage.setItem('libraryPreferences', JSON.stringify(preferences));
+    }
+    
+    setTheme(theme) {
+        const preferences = this.getPreferences();
+        preferences.theme = theme;
+        this.savePreferences(preferences);
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+    
+    getTheme() {
+        const preferences = this.getPreferences();
+        return preferences.theme || 'dark';
+    }
+    
+    applyTheme() {
+        const theme = this.getTheme();
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+    
+    performAutoBackup() {
+        const data = {
+            members: this.getMembers(),
+            books: this.getBooks(),
+            issuedBooks: this.getIssuedBooks(),
+            fees: this.getFees(),
+            expenses: this.getExpenses(),
+            activities: this.getActivities(),
+            seats: this.getSeats(),
+            settings: this.getSettings(),
+            exportDate: new Date().toISOString(),
+            backupType: 'auto'
+        };
+        
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `library-auto-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        const preferences = this.getPreferences();
+        preferences.lastBackupTime = new Date().toISOString();
+        preferences.nextBackupTime = this.calculateNextBackupTime(preferences.backupInterval);
+        this.savePreferences(preferences);
+        
+        this.addActivity('Auto backup performed successfully', 'system');
+        
+        this.showBackupNotification('Auto backup completed successfully!');
+        
+        return true;
+    }
+    
+    showBackupNotification(message) {
+        if (typeof window !== 'undefined') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--success);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideInUp 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutDown 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    }
+    
+    calculateNextBackupTime(interval) {
+        const now = new Date();
+        let next = new Date(now);
+        
+        switch(interval) {
+            case 'daily':
+                next.setDate(next.getDate() + 1);
+                break;
+            case 'weekly':
+                next.setDate(next.getDate() + 7);
+                break;
+            case 'monthly':
+                next.setMonth(next.getMonth() + 1);
+                break;
+            default:
+                next.setDate(next.getDate() + 7);
+        }
+        
+        return next.toISOString();
+    }
+    
+    checkAndPerformScheduledBackup() {
+        const preferences = this.getPreferences();
+        
+        if (!preferences.autoBackup) {
+            return false;
+        }
+        
+        if (!preferences.nextBackupTime) {
+            return false;
+        }
+        
+        const now = new Date();
+        const nextBackup = new Date(preferences.nextBackupTime);
+        
+        if (now >= nextBackup) {
+            this.performAutoBackup();
+            return true;
+        }
+        
+        return false;
+    }
+    
     login(username, password, remember) {
         const user = this.getUser();
         if (user.username === username && user.password === password) {

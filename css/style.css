@@ -17,6 +17,23 @@
     --sidebar-collapsed: 70px;
 }
 
+[data-theme="light"] {
+    --primary-gold: #d4a017;
+    --dark-gold: #b8860b;
+    --light-gold: #f4c430;
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #757575;
+    --border-color: #e0e0e0;
+    --success: #4caf50;
+    --danger: #f44336;
+    --warning: #ff9800;
+    --info: #2196f3;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -25,10 +42,11 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .login-page {
@@ -36,7 +54,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
 }
 
 .login-container {
@@ -82,6 +100,28 @@ body {
     }
     50% {
         transform: translateY(-10px);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
     }
 }
 
@@ -623,6 +663,147 @@ body {
     color: var(--primary-gold);
     margin-bottom: 20px;
     font-size: 20px;
+}
+
+.appearance-controls,
+.auto-backup-controls {
+    margin-top: 15px;
+}
+
+.preference-card {
+    background: var(--bg-secondary);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.preference-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.preference-header h3 {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.preference-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 70px;
+    height: 34px;
+    flex-shrink: 0;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    transition: 0.4s;
+    border-radius: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+}
+
+.theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 2px;
+    background: var(--primary-gold);
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.theme-switch input:checked + .theme-slider {
+    background: var(--primary-gold);
+}
+
+.theme-switch input:checked + .theme-slider:before {
+    transform: translateX(34px);
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+    font-size: 14px;
+    z-index: 1;
+    transition: opacity 0.3s;
+}
+
+.theme-switch input:not(:checked) + .theme-slider .theme-icon-sun {
+    opacity: 0.5;
+}
+
+.theme-switch input:checked + .theme-slider .theme-icon-moon {
+    opacity: 0.5;
+}
+
+.backup-frequency {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.backup-select {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.backup-select:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+}
+
+.backup-info {
+    margin-top: 15px;
+    padding: 15px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.backup-info p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.backup-info p:last-child {
+    margin-bottom: 0;
+}
+
+.backup-info strong {
+    color: var(--primary-gold);
 }
 
 .backup-controls {

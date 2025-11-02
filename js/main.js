@@ -1,5 +1,13 @@
 const storageManager = new StorageManager();
 
+storageManager.applyTheme();
+
+storageManager.checkAndPerformScheduledBackup();
+
+setInterval(() => {
+    storageManager.checkAndPerformScheduledBackup();
+}, 60 * 60 * 1000);
+
 if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
     const loginForm = document.getElementById('loginForm');
     

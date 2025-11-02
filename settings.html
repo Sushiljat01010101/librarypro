@@ -67,6 +67,27 @@
             
             <div class="page-content">
                 <div class="settings-section">
+                    <h2>🎨 Appearance Preferences</h2>
+                    <div class="appearance-controls">
+                        <div class="preference-card">
+                            <div class="preference-header">
+                                <div>
+                                    <h3>Theme Mode</h3>
+                                    <p>Choose between light and dark mode</p>
+                                </div>
+                                <label class="theme-switch">
+                                    <input type="checkbox" id="themeToggle">
+                                    <span class="theme-slider">
+                                        <span class="theme-icon-sun">☀️</span>
+                                        <span class="theme-icon-moon">🌙</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
                     <h2>Library Settings</h2>
                     <form id="settingsForm">
                         <div class="form-row">
@@ -116,6 +137,38 @@
                         </div>
                         <button type="submit" class="btn-primary">Update Password</button>
                     </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>⏰ Auto Backup Settings</h2>
+                    <div class="auto-backup-controls">
+                        <div class="preference-card">
+                            <div class="preference-header">
+                                <div>
+                                    <h3>Enable Auto Backup</h3>
+                                    <p>Automatically backup your data at regular intervals</p>
+                                </div>
+                                <label class="theme-switch">
+                                    <input type="checkbox" id="autoBackupToggle">
+                                    <span class="theme-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="backup-frequency" id="backupFrequencySection" style="display: none;">
+                            <div class="form-group">
+                                <label for="backupInterval">Backup Frequency</label>
+                                <select id="backupInterval" class="backup-select">
+                                    <option value="daily">Daily (Every 24 hours)</option>
+                                    <option value="weekly">Weekly (Every 7 days)</option>
+                                    <option value="monthly">Monthly (Every 30 days)</option>
+                                </select>
+                            </div>
+                            <div class="backup-info">
+                                <p>Last Auto Backup: <strong id="lastBackupTime">Never</strong></p>
+                                <p>Next Scheduled Backup: <strong id="nextBackupTime">-</strong></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="settings-section">
@@ -236,6 +289,68 @@
             if (confirm('Are you sure you want to logout?')) {
                 storageManager.logout();
             }
+        });
+        
+        const preferences = storageManager.getPreferences();
+        const themeToggle = document.getElementById('themeToggle');
+        const autoBackupToggle = document.getElementById('autoBackupToggle');
+        const backupFrequencySection = document.getElementById('backupFrequencySection');
+        const backupInterval = document.getElementById('backupInterval');
+        
+        themeToggle.checked = preferences.theme === 'light';
+        
+        themeToggle.addEventListener('change', (e) => {
+            const newTheme = e.target.checked ? 'light' : 'dark';
+            storageManager.setTheme(newTheme);
+        });
+        
+        autoBackupToggle.checked = preferences.autoBackup || false;
+        backupInterval.value = preferences.backupInterval || 'weekly';
+        
+        if (preferences.autoBackup) {
+            backupFrequencySection.style.display = 'block';
+        }
+        
+        function formatDateTime(isoString) {
+            if (!isoString) return 'Never';
+            const date = new Date(isoString);
+            return date.toLocaleString('en-IN', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        document.getElementById('lastBackupTime').textContent = formatDateTime(preferences.lastBackupTime);
+        document.getElementById('nextBackupTime').textContent = 
+            preferences.autoBackup && preferences.nextBackupTime ? formatDateTime(preferences.nextBackupTime) : '-';
+        
+        autoBackupToggle.addEventListener('change', (e) => {
+            const isEnabled = e.target.checked;
+            const prefs = storageManager.getPreferences();
+            prefs.autoBackup = isEnabled;
+            
+            if (isEnabled) {
+                backupFrequencySection.style.display = 'block';
+                prefs.nextBackupTime = storageManager.calculateNextBackupTime(prefs.backupInterval);
+                document.getElementById('nextBackupTime').textContent = formatDateTime(prefs.nextBackupTime);
+            } else {
+                backupFrequencySection.style.display = 'none';
+                prefs.nextBackupTime = null;
+                document.getElementById('nextBackupTime').textContent = '-';
+            }
+            
+            storageManager.savePreferences(prefs);
+        });
+        
+        backupInterval.addEventListener('change', (e) => {
+            const prefs = storageManager.getPreferences();
+            prefs.backupInterval = e.target.value;
+            prefs.nextBackupTime = storageManager.calculateNextBackupTime(e.target.value);
+            storageManager.savePreferences(prefs);
+            document.getElementById('nextBackupTime').textContent = formatDateTime(prefs.nextBackupTime);
         });
         
         const settingsForm = document.getElementById('settingsForm');
