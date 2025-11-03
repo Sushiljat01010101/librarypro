@@ -649,7 +649,13 @@ class StorageManager {
             }
             
             const joiningDate = new Date(member.joiningDate);
-            const joiningDay = joiningDate.getDate();
+            let dueDay = joiningDate.getDate();
+            
+            if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
+                const customDueDate = new Date(member.nextPaymentDate);
+                dueDay = customDueDate.getDate();
+            }
+            
             const currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
             
             let feeDate = new Date(joiningDate.getFullYear(), joiningDate.getMonth(), 1);
@@ -662,7 +668,7 @@ class StorageManager {
                 
                 if (isCurrentMonth) {
                     const lastDayOfMonth = new Date(feeDate.getFullYear(), feeDate.getMonth() + 1, 0).getDate();
-                    const effectiveDueDay = Math.min(joiningDay, lastDayOfMonth);
+                    const effectiveDueDay = Math.min(dueDay, lastDayOfMonth);
                     
                     if (today.getDate() < effectiveDueDay) {
                         break;
@@ -701,25 +707,39 @@ class StorageManager {
             return null;
         }
         
-        if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
-            return member.nextPaymentDate;
-        }
-        
         if (!member.joiningDate) {
             return null;
         }
         
-        const joiningDate = new Date(member.joiningDate);
         const today = new Date();
-        const dayOfMonth = joiningDate.getDate();
+        today.setHours(0, 0, 0, 0);
+        let dayOfMonth;
         
-        let nextDue = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
-        
-        if (nextDue <= today) {
-            nextDue.setMonth(nextDue.getMonth() + 1);
+        if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
+            const customDate = new Date(member.nextPaymentDate);
+            dayOfMonth = customDate.getDate();
+            
+            let nextDue = new Date(customDate);
+            nextDue.setHours(0, 0, 0, 0);
+            
+            while (nextDue <= today) {
+                nextDue.setMonth(nextDue.getMonth() + 1);
+            }
+            
+            return nextDue.toISOString().split('T')[0];
+        } else {
+            const joiningDate = new Date(member.joiningDate);
+            dayOfMonth = joiningDate.getDate();
+            
+            let nextDue = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
+            nextDue.setHours(0, 0, 0, 0);
+            
+            if (nextDue <= today) {
+                nextDue.setMonth(nextDue.getMonth() + 1);
+            }
+            
+            return nextDue.toISOString().split('T')[0];
         }
-        
-        return nextDue.toISOString().split('T')[0];
     }
     
     getExpenses() {
