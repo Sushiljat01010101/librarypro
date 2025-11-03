@@ -649,26 +649,28 @@ class StorageManager {
             }
             
             const joiningDate = new Date(member.joiningDate);
-            let dueDay = joiningDate.getDate();
+            let desiredDueDay = joiningDate.getDate();
             
             if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
                 const customDueDate = new Date(member.nextPaymentDate);
-                dueDay = customDueDate.getDate();
+                desiredDueDay = customDueDate.getDate();
             }
             
             const currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            let feeYear = joiningDate.getFullYear();
+            let feeMonth = joiningDate.getMonth();
             
-            let feeDate = new Date(joiningDate.getFullYear(), joiningDate.getMonth(), 1);
-            
-            while (feeDate <= currentDate) {
-                const monthYear = `${feeDate.getFullYear()}-${String(feeDate.getMonth() + 1).padStart(2, '0')}`;
+            while (feeYear < currentDate.getFullYear() || 
+                   (feeYear === currentDate.getFullYear() && feeMonth <= currentDate.getMonth())) {
                 
-                const isCurrentMonth = feeDate.getFullYear() === today.getFullYear() && 
-                                      feeDate.getMonth() === today.getMonth();
+                const monthYear = `${feeYear}-${String(feeMonth + 1).padStart(2, '0')}`;
+                
+                const isCurrentMonth = feeYear === today.getFullYear() && 
+                                      feeMonth === today.getMonth();
                 
                 if (isCurrentMonth) {
-                    const lastDayOfMonth = new Date(feeDate.getFullYear(), feeDate.getMonth() + 1, 0).getDate();
-                    const effectiveDueDay = Math.min(dueDay, lastDayOfMonth);
+                    const lastDayOfMonth = new Date(feeYear, feeMonth + 1, 0).getDate();
+                    const effectiveDueDay = Math.min(desiredDueDay, lastDayOfMonth);
                     
                     if (today.getDate() < effectiveDueDay) {
                         break;
@@ -694,7 +696,11 @@ class StorageManager {
                     totalGenerated++;
                 }
                 
-                feeDate.setMonth(feeDate.getMonth() + 1);
+                feeMonth++;
+                if (feeMonth > 11) {
+                    feeMonth = 0;
+                    feeYear++;
+                }
             }
         });
         
@@ -713,29 +719,55 @@ class StorageManager {
         
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        let dayOfMonth;
+        let desiredDay;
         
         if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
             const customDate = new Date(member.nextPaymentDate);
-            dayOfMonth = customDate.getDate();
+            desiredDay = customDate.getDate();
             
-            let nextDue = new Date(customDate);
+            let year = today.getFullYear();
+            let month = today.getMonth();
+            
+            const lastDayOfCurrentMonth = new Date(year, month + 1, 0).getDate();
+            const effectiveDay = Math.min(desiredDay, lastDayOfCurrentMonth);
+            let nextDue = new Date(year, month, effectiveDay);
             nextDue.setHours(0, 0, 0, 0);
             
             while (nextDue <= today) {
-                nextDue.setMonth(nextDue.getMonth() + 1);
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+                const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+                const clampedDay = Math.min(desiredDay, lastDayOfMonth);
+                nextDue = new Date(year, month, clampedDay);
+                nextDue.setHours(0, 0, 0, 0);
             }
             
             return nextDue.toISOString().split('T')[0];
         } else {
             const joiningDate = new Date(member.joiningDate);
-            dayOfMonth = joiningDate.getDate();
+            desiredDay = joiningDate.getDate();
             
-            let nextDue = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
+            let year = today.getFullYear();
+            let month = today.getMonth();
+            
+            const lastDayOfCurrentMonth = new Date(year, month + 1, 0).getDate();
+            const effectiveDay = Math.min(desiredDay, lastDayOfCurrentMonth);
+            let nextDue = new Date(year, month, effectiveDay);
             nextDue.setHours(0, 0, 0, 0);
             
             if (nextDue <= today) {
-                nextDue.setMonth(nextDue.getMonth() + 1);
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+                const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+                const clampedDay = Math.min(desiredDay, lastDayOfMonth);
+                nextDue = new Date(year, month, clampedDay);
+                nextDue.setHours(0, 0, 0, 0);
             }
             
             return nextDue.toISOString().split('T')[0];
