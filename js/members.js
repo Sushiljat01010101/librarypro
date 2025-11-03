@@ -48,6 +48,10 @@ function loadMembers() {
             `<img src="${member.photo}" alt="${member.name}">` : 
             '👤';
         
+        const aadharDisplay = member.aadhar ? 
+            `<span class="detail-value">XXXX XXXX ${member.aadhar.slice(-4)}</span>` : 
+            '<span class="detail-value text-muted">Not Provided</span>';
+        
         return `
             <div class="member-card">
                 <div class="member-header">
@@ -61,6 +65,10 @@ function loadMembers() {
                     <div class="detail-row">
                         <span class="detail-label">Seat Number</span>
                         <span class="detail-value">${member.seat ? member.seat : 'No Seat'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Aadhar Number</span>
+                        ${aadharDisplay}
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Membership</span>
@@ -111,6 +119,7 @@ document.getElementById('selectSeatBtn').addEventListener('click', () => {
         name: document.getElementById('memberName').value,
         contact: document.getElementById('memberContact').value,
         email: document.getElementById('memberEmail').value,
+        aadhar: document.getElementById('memberAadhar').value,
         membershipType: document.getElementById('membershipType').value,
         fee: document.getElementById('memberFee').value,
         joiningDate: document.getElementById('joiningDate').value,
@@ -146,6 +155,7 @@ function checkForSeatSelection() {
         document.getElementById('memberName').value = data.name || '';
         document.getElementById('memberContact').value = data.contact || '';
         document.getElementById('memberEmail').value = data.email || '';
+        document.getElementById('memberAadhar').value = data.aadhar || '';
         document.getElementById('membershipType').value = data.membershipType || 'monthly';
         document.getElementById('memberFee').value = data.fee || '';
         document.getElementById('joiningDate').value = data.joiningDate || new Date().toISOString().split('T')[0];
@@ -181,6 +191,7 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         name: document.getElementById('memberName').value,
         contact: document.getElementById('memberContact').value,
         email: document.getElementById('memberEmail').value,
+        aadhar: document.getElementById('memberAadhar').value,
         seat: seatValue ? parseInt(seatValue) : 0,
         membershipType: document.getElementById('membershipType').value,
         fee: parseFloat(document.getElementById('memberFee').value),
@@ -211,6 +222,7 @@ function editMember(id) {
         document.getElementById('memberName').value = member.name;
         document.getElementById('memberContact').value = member.contact;
         document.getElementById('memberEmail').value = member.email || '';
+        document.getElementById('memberAadhar').value = member.aadhar || '';
         updateSeatDisplay(member.seat);
         document.getElementById('membershipType').value = member.membershipType;
         document.getElementById('memberFee').value = member.fee;
@@ -236,6 +248,7 @@ document.getElementById('exportMembersBtn').addEventListener('click', () => {
         Name: m.name,
         Contact: m.contact,
         Email: m.email || '',
+        'Aadhar Number': m.aadhar || '',
         Seat: m.seat,
         Membership: m.membershipType,
         Fee: m.fee,

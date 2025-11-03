@@ -115,6 +115,11 @@ class TelegramNotifier {
             message += `📧 <b>Email:</b> ${this.escapeHtml(member.email)}\n`;
         }
         
+        if (member.aadhar) {
+            const maskedAadhar = `XXXX XXXX ${member.aadhar.slice(-4)}`;
+            message += `🆔 <b>Aadhar:</b> ${this.escapeHtml(maskedAadhar)}\n`;
+        }
+        
         if (member.seat && member.seat > 0) {
             message += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
         }
@@ -149,6 +154,11 @@ class TelegramNotifier {
         }
         if (oldMember.contact !== updatedMember.contact) {
             changes.push(`<b>Contact:</b> ${this.escapeHtml(oldMember.contact)} → ${this.escapeHtml(updatedMember.contact)}`);
+        }
+        if (oldMember.aadhar !== updatedMember.aadhar) {
+            const oldAadhar = oldMember.aadhar ? `XXXX XXXX ${oldMember.aadhar.slice(-4)}` : 'None';
+            const newAadhar = updatedMember.aadhar ? `XXXX XXXX ${updatedMember.aadhar.slice(-4)}` : 'None';
+            changes.push(`<b>Aadhar:</b> ${this.escapeHtml(oldAadhar)} → ${this.escapeHtml(newAadhar)}`);
         }
         if (oldMember.seat !== updatedMember.seat) {
             changes.push(`<b>Seat:</b> ${this.escapeHtml(oldMember.seat || 'None')} → ${this.escapeHtml(updatedMember.seat || 'None')}`);

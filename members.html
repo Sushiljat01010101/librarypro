@@ -136,6 +136,14 @@
                         <input type="email" id="memberEmail">
                     </div>
                     <div class="form-group">
+                        <label for="memberAadhar">Aadhar Number</label>
+                        <input type="text" id="memberAadhar" pattern="[0-9]{12}" maxlength="12" placeholder="Enter 12-digit Aadhar number">
+                        <small class="form-hint">12-digit unique Aadhar number</small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="memberSeat">Seat Selection</label>
                         <div class="seat-selection-container">
                             <input type="hidden" id="memberSeat" value="">
@@ -147,6 +155,8 @@
                                 <button type="button" class="btn-no-seat" id="noSeatBtn">No Seat</button>
                             </div>
                         </div>
+                    </div>
+                    <div class="form-group">
                     </div>
                 </div>
                 
