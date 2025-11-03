@@ -76,6 +76,13 @@
 - System **हर 1 घंटे में** check करता है कि backup का time आ गया है या नहीं
 - अगर time आ गया है, तो automatically backup run हो जाता है
 
+### 🔄 **NEW! Missed Backup Recovery**
+- **Browser बंद था backup time पर?** कोई problem नहीं!
+- जब भी आप browser खोलेंगे, system automatically check करेगा कि कोई backup miss तो नहीं हुआ
+- अगर miss हुआ है, तो **तुरंत backup लेगा और Telegram पर भेज देगा**
+- आपको notification मिलेगा: "🔄 Missed backup recovered and sent to Telegram!"
+- Telegram पर special message आएगा जिसमें लिखा होगा कि यह एक recovered backup है
+
 ### Backup में क्या होता है?
 जब backup run होता है:
 
@@ -147,14 +154,31 @@ Settings page पर आप हमेशा देख सकते हैं:
 
 ## 📱 Telegram पर Message कैसा आता है?
 
-जब backup Telegram पर भेजा जाता है तो आपको मिलेगा:
-
+### Normal Auto Backup:
 ```
-📦 Library Backup - Auto Backup
+📦 Auto Backup
 
 📚 My Library
 📅 Date: 03/11/2025
 ⏰ Time: 11:30:45 PM
+
+📊 Statistics:
+👥 Members: 25
+📚 Books: 150
+💰 Fee Records: 45
+💸 Expenses: 12
+```
+
+### 🔄 Missed Backup (Recovered):
+```
+⚠️ Missed Backup (Recovered)
+
+📚 My Library
+📅 Date: 03/11/2025
+⏰ Time: 02:15:30 PM
+
+🔄 This backup was missed when browser was closed. 
+   Sent automatically when you opened the app.
 
 📊 Statistics:
 👥 Members: 25
@@ -188,6 +212,28 @@ Settings page पर आप हमेशा देख सकते हैं:
 
 ---
 
+## 🎬 Practical Example - Missed Backup Recovery
+
+### Scenario:
+आपने Daily backup set किया है जो हर रात 11:00 PM पर run होता है। 
+
+**रात 10:30 PM** - आपने laptop बंद कर दिया  
+**रात 11:00 PM** - Backup scheduled था लेकिन browser बंद था ❌  
+**सुबह 9:00 AM** - आप library app खोलते हैं ✅  
+
+### क्या होगा?
+1. App load होते ही system check करेगा
+2. देखेगा कि रात 11:00 PM का backup miss हो गया
+3. Console में message: "⚠️ Missed backup detected!"
+4. तुरंत backup perform होगा (JSON file download)
+5. Telegram पर file भेजी जाएगी special message के साथ
+6. आपको notification मिलेगा: "🔄 Missed backup recovered and sent to Telegram!"
+7. Activity Log में entry: "Missed auto backup performed successfully"
+
+**Result:** आपका कल रात का backup आज सुबह automatically recover हो गया! 🎉
+
+---
+
 ## 🎉 सब Features काम कर रहे हैं!
 
 आपका system अब **पूरी तरह से ready** है:
@@ -196,6 +242,21 @@ Settings page पर आप हमेशा देख सकते हैं:
 - ✅ Telegram पर backup भेज रहा है
 - ✅ Custom timer set कर सकते हैं
 - ✅ Time-based automatic backup चल रहा है
+- ✅ **🔄 NEW! Missed Backup Recovery** - Browser बंद हो तो भी backup miss नहीं होगा!
+
+---
+
+## 🆕 Latest Update - Missed Backup Recovery
+
+**समस्या थी:** अगर backup का time आने पर browser बंद हो, तो backup नहीं होता था.
+
+**अब Solution:** Browser खुलते ही automatically missed backup detect होगा और Telegram पर भेज दिया जाएगा!
+
+**Benefits:**
+- 📱 Browser बंद होने पर भी कोई backup miss नहीं होगा
+- 🔄 Browser open करते ही automatic recovery
+- 📦 Missed backups भी Telegram पर special message के साथ पहुंचेंगे
+- 📝 Activity Log में clearly दिखेगा कि यह recovered backup था
 
 ---
 

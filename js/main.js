@@ -2,6 +2,8 @@ const storageManager = new StorageManager();
 
 storageManager.applyTheme();
 
+storageManager.checkForMissedBackups();
+
 storageManager.checkAndPerformScheduledBackup();
 
 setInterval(() => {

@@ -53,7 +53,8 @@ class StorageManager {
             lastBackupTime: null,
             nextBackupTime: null,
             customBackupTime: null,
-            sendBackupToTelegram: false
+            sendBackupToTelegram: false,
+            lastCheckTime: null
         };
         return JSON.parse(localStorage.getItem('libraryPreferences')) || defaultPreferences;
     }
@@ -79,7 +80,7 @@ class StorageManager {
         document.documentElement.setAttribute('data-theme', theme);
     }
     
-    async performAutoBackup() {
+    async performAutoBackup(isMissedBackup = false) {
         const data = {
             members: this.getMembers(),
             books: this.getBooks(),
@@ -90,7 +91,7 @@ class StorageManager {
             seats: this.getSeats(),
             settings: this.getSettings(),
             exportDate: new Date().toISOString(),
-            backupType: 'auto'
+            backupType: isMissedBackup ? 'auto-missed' : 'auto'
         };
         
         const jsonStr = JSON.stringify(data, null, 2);
@@ -115,7 +116,10 @@ class StorageManager {
         
         this.savePreferences(preferences);
         
-        this.addActivity('Auto backup performed successfully', 'system');
+        const activityMsg = isMissedBackup ? 
+            'Missed auto backup performed successfully (browser was closed during scheduled time)' : 
+            'Auto backup performed successfully';
+        this.addActivity(activityMsg, 'system');
         
         if (preferences.sendBackupToTelegram && typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
             const file = new File([blob], filename, { type: 'application/json' });
@@ -129,11 +133,15 @@ class StorageManager {
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#39;');
             };
-            const caption = `📦 <b>Library Backup - Auto Backup</b>\n\n` +
+            const backupTypeText = isMissedBackup ? 
+                '⚠️ <b>Missed Backup (Recovered)</b>' : 
+                '📦 <b>Auto Backup</b>';
+            const caption = `${backupTypeText}\n\n` +
                            `📚 <b>${escapeHtml(settings.libraryName || 'My Library')}</b>\n` +
                            `📅 <b>Date:</b> ${new Date().toLocaleDateString('en-IN')}\n` +
-                           `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('en-IN')}\n\n` +
-                           `📊 <b>Statistics:</b>\n` +
+                           `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('en-IN')}\n` +
+                           (isMissedBackup ? `\n🔄 <i>This backup was missed when browser was closed. Sent automatically when you opened the app.</i>\n` : '') +
+                           `\n📊 <b>Statistics:</b>\n` +
                            `👥 Members: ${data.members.length}\n` +
                            `📚 Books: ${data.books.length}\n` +
                            `💰 Fee Records: ${data.fees.length}\n` +
@@ -142,16 +150,28 @@ class StorageManager {
             try {
                 const result = await telegramNotifier.sendDocument(file, caption);
                 if (result.success) {
-                    this.showBackupNotification('Auto backup completed and sent to Telegram!');
+                    const successMsg = isMissedBackup ? 
+                        '🔄 Missed backup recovered and sent to Telegram!' : 
+                        'Auto backup completed and sent to Telegram!';
+                    this.showBackupNotification(successMsg);
                 } else {
-                    this.showBackupNotification('Auto backup completed! (Failed to send to Telegram)');
+                    const failMsg = isMissedBackup ?
+                        '🔄 Missed backup completed! (Failed to send to Telegram)' :
+                        'Auto backup completed! (Failed to send to Telegram)';
+                    this.showBackupNotification(failMsg);
                 }
             } catch (error) {
                 console.error('Error sending backup to Telegram:', error);
-                this.showBackupNotification('Auto backup completed! (Failed to send to Telegram)');
+                const errorMsg = isMissedBackup ?
+                    '🔄 Missed backup completed! (Failed to send to Telegram)' :
+                    'Auto backup completed! (Failed to send to Telegram)';
+                this.showBackupNotification(errorMsg);
             }
         } else {
-            this.showBackupNotification('Auto backup completed successfully!');
+            const msg = isMissedBackup ?
+                '🔄 Missed backup completed successfully!' :
+                'Auto backup completed successfully!';
+            this.showBackupNotification(msg);
         }
         
         return true;
@@ -205,6 +225,31 @@ class StorageManager {
     
     checkAndPerformScheduledBackup() {
         const preferences = this.getPreferences();
+        const now = new Date();
+        
+        preferences.lastCheckTime = now.toISOString();
+        this.savePreferences(preferences);
+        
+        if (!preferences.autoBackup) {
+            return false;
+        }
+        
+        if (!preferences.nextBackupTime) {
+            return false;
+        }
+        
+        const nextBackup = new Date(preferences.nextBackupTime);
+        
+        if (now >= nextBackup) {
+            this.performAutoBackup();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    checkForMissedBackups() {
+        const preferences = this.getPreferences();
         
         if (!preferences.autoBackup) {
             return false;
@@ -218,7 +263,9 @@ class StorageManager {
         const nextBackup = new Date(preferences.nextBackupTime);
         
         if (now >= nextBackup) {
-            this.performAutoBackup();
+            console.log('⚠️ Missed backup detected! Browser was closed during scheduled backup time.');
+            console.log('🔄 Recovering missed backup and sending to Telegram...');
+            this.performAutoBackup(true);
             return true;
         }
         
