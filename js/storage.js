@@ -777,16 +777,29 @@ class StorageManager {
     isFeeOverdue(fee) {
         if (fee.status !== 'pending') return false;
         
-        const nextDue = this.getNextDueDateForMember(fee.memberId);
-        if (!nextDue) return true;
+        const member = this.getMembers().find(m => m.id === fee.memberId);
+        if (!member || !member.joiningDate) return true;
+        
+        const joiningDate = new Date(member.joiningDate);
+        let desiredDueDay = joiningDate.getDate();
+        
+        if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
+            const customDate = new Date(member.nextPaymentDate);
+            desiredDueDay = customDate.getDate();
+        }
+        
+        const [feeYear, feeMonth] = fee.month.split('-').map(Number);
+        
+        const lastDayOfFeeMonth = new Date(feeYear, feeMonth, 0).getDate();
+        const actualDueDay = Math.min(desiredDueDay, lastDayOfFeeMonth);
+        
+        const feeDueDate = new Date(feeYear, feeMonth - 1, actualDueDay);
+        feeDueDate.setHours(0, 0, 0, 0);
         
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        const dueDate = new Date(nextDue);
-        dueDate.setHours(0, 0, 0, 0);
-        
-        return dueDate <= today;
+        return feeDueDate < today;
     }
     
     getExpenses() {
