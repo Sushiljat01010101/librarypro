@@ -248,6 +248,10 @@ class StorageManager {
             }
         }
         
+        if (typeof telegramNotifier !== 'undefined') {
+            telegramNotifier.notifyMemberAdded(member);
+        }
+        
         return member;
     }
     
@@ -255,7 +259,7 @@ class StorageManager {
         const members = this.getMembers();
         const index = members.findIndex(m => m.id === id);
         if (index !== -1) {
-            const oldMember = members[index];
+            const oldMember = { ...members[index] };
             const oldSeat = oldMember.seat;
             let newSeat = updatedMember.seat;
             
@@ -287,6 +291,10 @@ class StorageManager {
                 }
             }
             
+            if (typeof telegramNotifier !== 'undefined') {
+                telegramNotifier.notifyMemberUpdated(oldMember, members[index]);
+            }
+            
             return true;
         }
         return false;
@@ -299,6 +307,8 @@ class StorageManager {
         if (!member) {
             return false;
         }
+        
+        const memberCopy = { ...member };
         
         if (member.seat && member.seat > 0) {
             this.freeSeatByMemberId(id);
@@ -337,6 +347,10 @@ class StorageManager {
             activityMsg += ` (Removed: ${details.join(', ')})`;
         }
         this.addActivity(activityMsg, 'member');
+        
+        if (typeof telegramNotifier !== 'undefined') {
+            telegramNotifier.notifyMemberDeleted(memberCopy);
+        }
         
         return true;
     }
@@ -470,6 +484,11 @@ class StorageManager {
         if (fee.status === 'paid') {
             this.addActivity(`Fee payment recorded: ${fee.memberName} - ₹${fee.amount}`, 'fee');
         }
+        
+        if (typeof telegramNotifier !== 'undefined') {
+            telegramNotifier.notifyPaymentAdded(fee);
+        }
+        
         return fee;
     }
     
@@ -477,12 +496,18 @@ class StorageManager {
         const fees = this.getFees();
         const index = fees.findIndex(f => f.id === id);
         if (index !== -1) {
+            const oldFee = { ...fees[index] };
             const oldStatus = fees[index].status;
             fees[index] = { ...fees[index], ...updatedFee };
             this.saveFees(fees);
             if (oldStatus === 'pending' && updatedFee.status === 'paid') {
                 this.addActivity(`Fee payment recorded: ${fees[index].memberName} - ₹${fees[index].amount}`, 'fee');
             }
+            
+            if (typeof telegramNotifier !== 'undefined') {
+                telegramNotifier.notifyPaymentUpdated(oldFee, fees[index]);
+            }
+            
             return true;
         }
         return false;

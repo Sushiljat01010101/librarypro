@@ -155,6 +155,49 @@
                 </div>
                 
                 <div class="settings-section">
+                    <h2>📱 Telegram Notifications</h2>
+                    <p class="subtitle" style="margin-bottom: 20px; color: var(--text-secondary);">Receive real-time notifications on Telegram for member and payment activities</p>
+                    <form id="telegramForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telegramBotToken">Telegram Bot Token</label>
+                                <input type="text" id="telegramBotToken" placeholder="Enter your bot token (e.g., 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)">
+                                <small class="form-hint">Create a bot using @BotFather on Telegram to get the token</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telegramChatId">Telegram Chat ID</label>
+                                <input type="text" id="telegramChatId" placeholder="Enter your chat ID (e.g., 123456789)">
+                                <small class="form-hint">Use @userinfobot on Telegram to get your chat ID</small>
+                            </div>
+                        </div>
+                        <div class="telegram-status" id="telegramStatus" style="display: none; margin-bottom: 15px;">
+                            <p class="status-message"></p>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary">Save Telegram Settings</button>
+                            <button type="button" class="btn-secondary" id="testTelegramBtn">Test Notification</button>
+                        </div>
+                    </form>
+                    <div class="telegram-info" style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-radius: 8px; border-left: 4px solid var(--primary-gold);">
+                        <h4 style="margin-bottom: 10px; color: var(--text-primary);">📖 How to Setup:</h4>
+                        <ol style="margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+                            <li>Open Telegram and search for <strong>@BotFather</strong></li>
+                            <li>Send <code>/newbot</code> and follow instructions to create your bot</li>
+                            <li>Copy the <strong>Bot Token</strong> provided by BotFather</li>
+                            <li>Search for <strong>@userinfobot</strong> on Telegram</li>
+                            <li>Send any message to get your <strong>Chat ID</strong></li>
+                            <li>Enter both values above and click "Save Telegram Settings"</li>
+                            <li>Click "Test Notification" to verify the setup</li>
+                        </ol>
+                        <p style="margin-top: 15px; color: var(--text-muted); font-size: 14px;">
+                            <strong>Note:</strong> You'll receive notifications when members are added/edited/deleted and when payments are recorded/updated/deleted.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
                     <h2>⏰ Auto Backup Settings</h2>
                     <div class="auto-backup-controls">
                         <div class="preference-card">
@@ -295,6 +338,7 @@
     </div>
     
     <script src="js/storage.js"></script>
+    <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>
     <script>
         storageManager.checkAuth();
@@ -481,6 +525,87 @@
             localStorage.setItem('libraryUser', JSON.stringify(user));
             alert('Password updated successfully!');
             passwordForm.reset();
+        });
+        
+        const telegramForm = document.getElementById('telegramForm');
+        const telegramBotToken = document.getElementById('telegramBotToken');
+        const telegramChatId = document.getElementById('telegramChatId');
+        const telegramStatus = document.getElementById('telegramStatus');
+        
+        const currentSettings = storageManager.getSettings();
+        if (currentSettings.telegramBotToken) {
+            telegramBotToken.value = currentSettings.telegramBotToken;
+        }
+        if (currentSettings.telegramChatId) {
+            telegramChatId.value = currentSettings.telegramChatId;
+        }
+        
+        function showTelegramStatus(message, isError = false) {
+            const statusMessage = telegramStatus.querySelector('.status-message');
+            statusMessage.textContent = message;
+            telegramStatus.style.display = 'block';
+            telegramStatus.style.padding = '12px';
+            telegramStatus.style.borderRadius = '8px';
+            telegramStatus.style.border = `1px solid ${isError ? '#dc3545' : '#28a745'}`;
+            telegramStatus.style.background = isError ? 'rgba(220, 53, 69, 0.1)' : 'rgba(40, 167, 69, 0.1)';
+            statusMessage.style.color = isError ? '#dc3545' : '#28a745';
+            statusMessage.style.margin = '0';
+        }
+        
+        telegramForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const botToken = telegramBotToken.value.trim();
+            const chatId = telegramChatId.value.trim();
+            
+            const settings = storageManager.getSettings();
+            settings.telegramBotToken = botToken;
+            settings.telegramChatId = chatId;
+            
+            storageManager.saveSettings(settings);
+            
+            if (botToken && chatId) {
+                showTelegramStatus('✅ Telegram settings saved successfully! You will now receive notifications.', false);
+            } else {
+                showTelegramStatus('⚠️ Settings saved, but notifications are disabled (missing token or chat ID).', true);
+            }
+            
+            setTimeout(() => {
+                telegramStatus.style.display = 'none';
+            }, 5000);
+        });
+        
+        document.getElementById('testTelegramBtn').addEventListener('click', async () => {
+            const botToken = telegramBotToken.value.trim();
+            const chatId = telegramChatId.value.trim();
+            
+            if (!botToken || !chatId) {
+                showTelegramStatus('❌ Please enter both Bot Token and Chat ID before testing.', true);
+                return;
+            }
+            
+            const settings = storageManager.getSettings();
+            const libraryName = settings.libraryName || 'Library Management System';
+            
+            const testMessage = `🎉 <b>Test Notification</b>\n\n📚 <b>${libraryName}</b>\n━━━━━━━━━━━━━━━━━━\n\n✅ Telegram notifications are working correctly!\n\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
+            
+            const testBtn = document.getElementById('testTelegramBtn');
+            testBtn.disabled = true;
+            testBtn.textContent = 'Sending...';
+            
+            try {
+                const result = await telegramNotifier.sendMessage(testMessage);
+                
+                if (result.success) {
+                    showTelegramStatus('✅ Test notification sent successfully! Check your Telegram.', false);
+                } else {
+                    showTelegramStatus(`❌ Failed to send notification: ${result.error || 'Unknown error'}`, true);
+                }
+            } catch (error) {
+                showTelegramStatus(`❌ Error: ${error.message}`, true);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = 'Test Notification';
+            }
         });
         
         document.getElementById('exportDataBtn').addEventListener('click', () => {
