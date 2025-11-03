@@ -774,6 +774,21 @@ class StorageManager {
         }
     }
     
+    isFeeOverdue(fee) {
+        if (fee.status !== 'pending') return false;
+        
+        const nextDue = this.getNextDueDateForMember(fee.memberId);
+        if (!nextDue) return true;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const dueDate = new Date(nextDue);
+        dueDate.setHours(0, 0, 0, 0);
+        
+        return dueDate <= today;
+    }
+    
     getExpenses() {
         return JSON.parse(localStorage.getItem('libraryExpenses')) || [];
     }

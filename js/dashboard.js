@@ -23,7 +23,7 @@ function loadDashboardStats() {
     
     const monthlyFees = fees.filter(f => f.month === currentMonth);
     const paidFees = monthlyFees.filter(f => f.status === 'paid');
-    const pendingFees = monthlyFees.filter(f => f.status === 'pending');
+    const pendingFees = monthlyFees.filter(f => storageManager.isFeeOverdue(f));
     const monthlyRevenue = paidFees.reduce((sum, f) => sum + f.amount, 0);
     
     const monthlyExpenses = expenses.filter(e => e.date.startsWith(currentMonth));
@@ -106,7 +106,7 @@ function loadOverdueBooks() {
 }
 
 function loadPendingPayments() {
-    const fees = storageManager.getFees().filter(f => f.status === 'pending');
+    const fees = storageManager.getFees().filter(f => storageManager.isFeeOverdue(f));
     const tbody = document.querySelector('#pendingPaymentsTable tbody');
     
     if (fees.length === 0) {

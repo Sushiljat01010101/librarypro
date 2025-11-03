@@ -58,7 +58,8 @@ function updateStats() {
     
     const expected = monthlyFees.reduce((sum, f) => sum + f.amount, 0);
     const collected = monthlyFees.filter(f => f.status === 'paid').reduce((sum, f) => sum + f.amount, 0);
-    const pending = expected - collected;
+    const overdueFees = monthlyFees.filter(f => storageManager.isFeeOverdue(f));
+    const pending = overdueFees.reduce((sum, f) => sum + f.amount, 0);
     const rate = expected > 0 ? ((collected / expected) * 100).toFixed(1) : 0;
     
     document.getElementById('expectedAmount').textContent = storageManager.formatCurrency(expected);
