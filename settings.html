@@ -219,11 +219,43 @@
                                     <option value="daily">Daily (Every 24 hours)</option>
                                     <option value="weekly">Weekly (Every 7 days)</option>
                                     <option value="monthly">Monthly (Every 30 days)</option>
+                                    <option value="custom">Custom Schedule</option>
                                 </select>
                             </div>
+                            
+                            <div class="custom-schedule" id="customScheduleSection" style="display: none; margin-top: 15px;">
+                                <h4 style="margin-bottom: 15px; color: var(--text-primary);">📅 Custom Backup Schedule</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="backupDate">Backup Date</label>
+                                        <input type="date" id="backupDate" class="backup-select">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="backupTime">Backup Time</label>
+                                        <input type="time" id="backupTime" class="backup-select">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-primary" id="scheduleBackupBtn">Schedule Backup</button>
+                            </div>
+                            
                             <div class="backup-info">
                                 <p>Last Auto Backup: <strong id="lastBackupTime">Never</strong></p>
                                 <p>Next Scheduled Backup: <strong id="nextBackupTime">-</strong></p>
+                            </div>
+                            
+                            <div class="telegram-backup-toggle" style="margin-top: 15px;">
+                                <div class="preference-card">
+                                    <div class="preference-header">
+                                        <div>
+                                            <h4>Send Backups to Telegram</h4>
+                                            <p style="font-size: 14px; color: var(--text-secondary);">Automatically send backup files to Telegram when auto backup runs</p>
+                                        </div>
+                                        <label class="theme-switch">
+                                            <input type="checkbox" id="telegramBackupToggle">
+                                            <span class="theme-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -368,6 +400,10 @@
         
         if (preferences.autoBackup) {
             backupFrequencySection.style.display = 'block';
+            
+            if (preferences.backupInterval === 'custom') {
+                document.getElementById('customScheduleSection').style.display = 'block';
+            }
         }
         
         function formatDateTime(isoString) {
@@ -407,9 +443,54 @@
         backupInterval.addEventListener('change', (e) => {
             const prefs = storageManager.getPreferences();
             prefs.backupInterval = e.target.value;
-            prefs.nextBackupTime = storageManager.calculateNextBackupTime(e.target.value);
+            
+            const customScheduleSection = document.getElementById('customScheduleSection');
+            if (e.target.value === 'custom') {
+                customScheduleSection.style.display = 'block';
+                document.getElementById('nextBackupTime').textContent = prefs.customBackupTime ? formatDateTime(prefs.customBackupTime) : 'Not Scheduled';
+            } else {
+                customScheduleSection.style.display = 'none';
+                prefs.nextBackupTime = storageManager.calculateNextBackupTime(e.target.value);
+                document.getElementById('nextBackupTime').textContent = formatDateTime(prefs.nextBackupTime);
+            }
+            
             storageManager.savePreferences(prefs);
-            document.getElementById('nextBackupTime').textContent = formatDateTime(prefs.nextBackupTime);
+        });
+        
+        document.getElementById('scheduleBackupBtn').addEventListener('click', () => {
+            const backupDate = document.getElementById('backupDate').value;
+            const backupTime = document.getElementById('backupTime').value;
+            
+            if (!backupDate || !backupTime) {
+                alert('Please select both date and time for the backup');
+                return;
+            }
+            
+            const scheduledDateTime = new Date(`${backupDate}T${backupTime}`);
+            const now = new Date();
+            
+            if (scheduledDateTime <= now) {
+                alert('Please select a future date and time');
+                return;
+            }
+            
+            const prefs = storageManager.getPreferences();
+            prefs.customBackupTime = scheduledDateTime.toISOString();
+            prefs.nextBackupTime = prefs.customBackupTime;
+            storageManager.savePreferences(prefs);
+            
+            document.getElementById('nextBackupTime').textContent = formatDateTime(prefs.customBackupTime);
+            alert(`Backup scheduled for ${scheduledDateTime.toLocaleString('en-IN')}`);
+        });
+        
+        const telegramBackupToggle = document.getElementById('telegramBackupToggle');
+        const prefs = storageManager.getPreferences();
+        telegramBackupToggle.checked = prefs.sendBackupToTelegram || false;
+        
+        telegramBackupToggle.addEventListener('change', (e) => {
+            const prefs = storageManager.getPreferences();
+            prefs.sendBackupToTelegram = e.target.checked;
+            storageManager.savePreferences(prefs);
         });
         
         const settingsForm = document.getElementById('settingsForm');
@@ -608,7 +689,7 @@
             }
         });
         
-        document.getElementById('exportDataBtn').addEventListener('click', () => {
+        document.getElementById('exportDataBtn').addEventListener('click', async () => {
             const data = {
                 members: storageManager.getMembers(),
                 books: storageManager.getBooks(),
@@ -625,12 +706,44 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `library-backup-${new Date().toISOString().split('T')[0]}.json`;
+            const filename = `library-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
             
             storageManager.addActivity('Data exported successfully', 'system');
-            alert('Data exported successfully!');
+            
+            if (telegramNotifier.isConfigured()) {
+                const file = new File([blob], filename, { type: 'application/json' });
+                const settings = storageManager.getSettings();
+                const escapeHtml = (text) => {
+                    if (text === null || text === undefined) return '';
+                    return String(text)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                };
+                const caption = `📦 <b>Library Backup - Manual Export</b>\n\n` +
+                               `📚 <b>${escapeHtml(settings.libraryName || 'My Library')}</b>\n` +
+                               `📅 <b>Date:</b> ${new Date().toLocaleDateString('en-IN')}\n` +
+                               `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('en-IN')}\n\n` +
+                               `📊 <b>Statistics:</b>\n` +
+                               `👥 Members: ${data.members.length}\n` +
+                               `📚 Books: ${data.books.length}\n` +
+                               `💰 Fee Records: ${data.fees.length}\n` +
+                               `💸 Expenses: ${data.expenses.length}`;
+                
+                const result = await telegramNotifier.sendDocument(file, caption);
+                if (result.success) {
+                    alert('Data exported successfully and sent to Telegram!');
+                } else {
+                    alert('Data exported successfully! (Failed to send to Telegram)');
+                }
+            } else {
+                alert('Data exported successfully!');
+            }
         });
         
         document.getElementById('importDataBtn').addEventListener('click', () => {

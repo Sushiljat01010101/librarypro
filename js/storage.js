@@ -77,7 +77,7 @@ class StorageManager {
         document.documentElement.setAttribute('data-theme', theme);
     }
     
-    performAutoBackup() {
+    async performAutoBackup() {
         const data = {
             members: this.getMembers(),
             books: this.getBooks(),
@@ -96,18 +96,61 @@ class StorageManager {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `library-auto-backup-${new Date().toISOString().split('T')[0]}.json`;
+        const filename = `library-auto-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
         
         const preferences = this.getPreferences();
         preferences.lastBackupTime = new Date().toISOString();
-        preferences.nextBackupTime = this.calculateNextBackupTime(preferences.backupInterval);
+        
+        if (preferences.backupInterval === 'custom') {
+            preferences.nextBackupTime = null;
+            preferences.customBackupTime = null;
+        } else {
+            preferences.nextBackupTime = this.calculateNextBackupTime(preferences.backupInterval);
+        }
+        
         this.savePreferences(preferences);
         
         this.addActivity('Auto backup performed successfully', 'system');
         
-        this.showBackupNotification('Auto backup completed successfully!');
+        if (preferences.sendBackupToTelegram && typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
+            const file = new File([blob], filename, { type: 'application/json' });
+            const settings = this.getSettings();
+            const escapeHtml = (text) => {
+                if (text === null || text === undefined) return '';
+                return String(text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+            const caption = `📦 <b>Library Backup - Auto Backup</b>\n\n` +
+                           `📚 <b>${escapeHtml(settings.libraryName || 'My Library')}</b>\n` +
+                           `📅 <b>Date:</b> ${new Date().toLocaleDateString('en-IN')}\n` +
+                           `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('en-IN')}\n\n` +
+                           `📊 <b>Statistics:</b>\n` +
+                           `👥 Members: ${data.members.length}\n` +
+                           `📚 Books: ${data.books.length}\n` +
+                           `💰 Fee Records: ${data.fees.length}\n` +
+                           `💸 Expenses: ${data.expenses.length}`;
+            
+            try {
+                const result = await telegramNotifier.sendDocument(file, caption);
+                if (result.success) {
+                    this.showBackupNotification('Auto backup completed and sent to Telegram!');
+                } else {
+                    this.showBackupNotification('Auto backup completed! (Failed to send to Telegram)');
+                }
+            } catch (error) {
+                console.error('Error sending backup to Telegram:', error);
+                this.showBackupNotification('Auto backup completed! (Failed to send to Telegram)');
+            }
+        } else {
+            this.showBackupNotification('Auto backup completed successfully!');
+        }
         
         return true;
     }
