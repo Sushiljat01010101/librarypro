@@ -51,7 +51,9 @@ class StorageManager {
             autoBackup: false,
             backupInterval: 'weekly',
             lastBackupTime: null,
-            nextBackupTime: null
+            nextBackupTime: null,
+            customBackupTime: null,
+            sendBackupToTelegram: false
         };
         return JSON.parse(localStorage.getItem('libraryPreferences')) || defaultPreferences;
     }
