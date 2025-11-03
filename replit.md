@@ -32,6 +32,14 @@ The system encompasses several core features:
 -   **Activity Log**: Tracks all key actions with timestamps, user attribution, and filtering capabilities.
 -   **Settings & Backup**: Configurable library settings (name, total seats, fines), password management, dynamic seat management, complete data export/import (JSON), and data clearing options.
 -   **Telegram Notifications**: Real-time notifications sent to Telegram when members are added/updated/deleted and when payments are recorded/updated. Configurable via Settings page with Bot Token and Chat ID. Includes a test notification feature to verify the setup.
+-   **Auto Backup System**: Comprehensive automatic backup system with multiple scheduling options:
+    -   **Backup Intervals**: Daily (every 24 hours), Weekly (every 7 days), Monthly (every 30 days), or Custom schedule
+    -   **Custom Scheduling**: Allows users to schedule one-time backups at specific date and time
+    -   **JSON Export**: All backups are exported as JSON files containing complete library data (members, books, fees, expenses, activities, seats, settings)
+    -   **Telegram Integration**: Optional feature to automatically send backup files to Telegram bot when auto backups run
+    -   **Backup Monitoring**: Displays last backup time and next scheduled backup time
+    -   **Automatic Checks**: System checks for scheduled backups every hour and executes them when due
+    -   **Toggle Control**: Enable/disable auto backup and Telegram backup delivery independently
 
 ### System Design Choices
 -   **No Backend Dependency**: Relies entirely on client-side technologies and LocalStorage for data persistence, making it highly portable and easy to deploy.
