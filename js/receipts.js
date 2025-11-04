@@ -297,14 +297,26 @@ async function downloadSinglePDF(paymentId) {
 
 async function generatePDF(htmlContent, filename) {
     try {
+        if (!window.jspdf || !window.html2canvas) {
+            alert('PDF libraries not loaded yet. Please wait a moment and try again.');
+            return;
+        }
+        
         const container = document.getElementById('receiptContent');
         container.innerHTML = htmlContent;
+        container.style.display = 'block';
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         const canvas = await html2canvas(container, {
             scale: 2,
             backgroundColor: '#ffffff',
-            logging: false
+            logging: false,
+            useCORS: true,
+            allowTaint: true
         });
+        
+        container.style.display = 'none';
         
         const imgWidth = 210;
         const pageHeight = 297;
@@ -333,7 +345,7 @@ async function generatePDF(htmlContent, filename) {
         alert('PDF downloaded successfully!');
     } catch (error) {
         console.error('Error generating PDF:', error);
-        alert('Error generating PDF. Please try again.');
+        alert('Error generating PDF: ' + error.message + '. Please try again.');
     }
 }
 
