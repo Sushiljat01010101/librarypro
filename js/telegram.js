@@ -131,7 +131,12 @@ class TelegramNotifier {
             
             if (data.ok) {
                 console.log('Telegram photo sent successfully');
-                return { success: true };
+                const photoData = data.result.photo[data.result.photo.length - 1];
+                return { 
+                    success: true, 
+                    fileId: photoData.file_id,
+                    messageId: data.result.message_id
+                };
             } else {
                 console.error('Telegram API error:', data.description);
                 return { success: false, error: data.description };
