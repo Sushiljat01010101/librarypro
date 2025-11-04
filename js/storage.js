@@ -368,6 +368,17 @@ class StorageManager {
         
         if (typeof telegramNotifier !== 'undefined') {
             telegramNotifier.notifyMemberAdded(member);
+            
+            if (member.idProof) {
+                const caption = `🆔 <b>ID Proof</b>\n\n` +
+                              `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(member.name)}\n` +
+                              `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(member.contact)}\n` +
+                              `📅 <b>Uploaded:</b> ${new Date().toLocaleDateString('en-IN')}`;
+                
+                telegramNotifier.sendPhoto(member.idProof, caption).catch(err => {
+                    console.error('Failed to send ID proof to Telegram:', err);
+                });
+            }
         }
         
         return member;
