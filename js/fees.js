@@ -21,36 +21,77 @@ function loadFees() {
     });
     
     const tbody = document.querySelector('#feesTable tbody');
+    tbody.innerHTML = '';
     
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="no-data">No fee records found.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('colspan', '9');
+        td.className = 'no-data';
+        td.textContent = 'No fee records found.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
     
-    tbody.innerHTML = filtered.map(fee => {
+    filtered.forEach(fee => {
         const nextDue = storageManager.getNextMonthFromFeeMonth(fee.month, fee.memberId);
         const member = storageManager.getMembers().find(m => m.id === fee.memberId);
         
-        return `<tr>
-            <td>${fee.memberName}</td>
-            <td>Seat ${member?.seat || '-'}</td>
-            <td>${fee.month}</td>
-            <td>${storageManager.formatCurrency(fee.amount)}</td>
-            <td>
-                ${fee.status === 'paid' ? 
-                    '<span class="status-paid">Paid</span>' : 
-                    '<span class="status-pending">Pending</span>'}
-            </td>
-            <td>${fee.paymentDate ? storageManager.formatDate(fee.paymentDate) : '-'}</td>
-            <td>${fee.paymentMethod || '-'}</td>
-            <td>${nextDue ? storageManager.formatDate(nextDue) : '-'}</td>
-            <td>
-                ${fee.status === 'pending' ? 
-                    `<button class="btn-sm btn-success" onclick="markAsPaid('${fee.id}')">Mark Paid</button>` : 
-                    '<span class="badge success">✓ Paid</span>'}
-            </td>
-        </tr>`;
-    }).join('');
+        const tr = document.createElement('tr');
+        
+        const tdName = document.createElement('td');
+        tdName.textContent = fee.memberName;
+        tr.appendChild(tdName);
+        
+        const tdSeat = document.createElement('td');
+        tdSeat.textContent = `Seat ${member?.seat || '-'}`;
+        tr.appendChild(tdSeat);
+        
+        const tdMonth = document.createElement('td');
+        tdMonth.textContent = fee.month;
+        tr.appendChild(tdMonth);
+        
+        const tdAmount = document.createElement('td');
+        tdAmount.textContent = storageManager.formatCurrency(fee.amount);
+        tr.appendChild(tdAmount);
+        
+        const tdStatus = document.createElement('td');
+        const statusSpan = document.createElement('span');
+        statusSpan.className = fee.status === 'paid' ? 'status-paid' : 'status-pending';
+        statusSpan.textContent = fee.status === 'paid' ? 'Paid' : 'Pending';
+        tdStatus.appendChild(statusSpan);
+        tr.appendChild(tdStatus);
+        
+        const tdPaymentDate = document.createElement('td');
+        tdPaymentDate.textContent = fee.paymentDate ? storageManager.formatDate(fee.paymentDate) : '-';
+        tr.appendChild(tdPaymentDate);
+        
+        const tdPaymentMethod = document.createElement('td');
+        tdPaymentMethod.textContent = fee.paymentMethod || '-';
+        tr.appendChild(tdPaymentMethod);
+        
+        const tdNextDue = document.createElement('td');
+        tdNextDue.textContent = nextDue ? storageManager.formatDate(nextDue) : '-';
+        tr.appendChild(tdNextDue);
+        
+        const tdAction = document.createElement('td');
+        if (fee.status === 'pending') {
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm btn-success';
+            btn.textContent = 'Mark Paid';
+            btn.addEventListener('click', () => markAsPaid(fee.id));
+            tdAction.appendChild(btn);
+        } else {
+            const badge = document.createElement('span');
+            badge.className = 'badge success';
+            badge.textContent = '✓ Paid';
+            tdAction.appendChild(badge);
+        }
+        tr.appendChild(tdAction);
+        
+        tbody.appendChild(tr);
+    });
     
     updateStats();
 }
@@ -82,8 +123,19 @@ function populateMonthFilter() {
     const months = [...new Set(fees.map(f => f.month))].sort().reverse();
     
     const select = document.getElementById('monthFilter');
-    select.innerHTML = '<option value="">All Months</option>' + 
-        months.map(m => `<option value="${m}">${m}</option>`).join('');
+    select.innerHTML = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'All Months';
+    select.appendChild(defaultOption);
+    
+    months.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m;
+        option.textContent = m;
+        select.appendChild(option);
+    });
 }
 
 function autoGenerateFees() {
@@ -102,8 +154,19 @@ document.getElementById('recordPaymentBtn').addEventListener('click', () => {
 function loadPaymentForm() {
     const members = storageManager.getMembers().filter(m => m.status === 'active');
     const select = document.getElementById('paymentMember');
-    select.innerHTML = '<option value="">-- Select Member --</option>' + 
-        members.map(m => `<option value="${m.id}">${m.name} (Seat ${m.seat})</option>`).join('');
+    select.innerHTML = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Select Member --';
+    select.appendChild(defaultOption);
+    
+    members.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m.id;
+        option.textContent = `${m.name} (Seat ${m.seat})`;
+        select.appendChild(option);
+    });
     
     const now = new Date();
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
