@@ -305,7 +305,7 @@ function checkForSeatSelection() {
 
 window.addEventListener('DOMContentLoaded', checkForSeatSelection);
 
-document.getElementById('memberForm').addEventListener('submit', (e) => {
+document.getElementById('memberForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const seatValue = document.getElementById('memberSeat').value;
@@ -329,9 +329,9 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
     };
     
     if (currentEditId) {
-        storageManager.updateMember(currentEditId, member);
+        await storageManager.updateMember(currentEditId, member);
     } else {
-        storageManager.addMember(member);
+        await storageManager.addMember(member);
     }
     
     hideModal('memberModal');

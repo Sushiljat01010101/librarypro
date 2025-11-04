@@ -309,7 +309,7 @@ class StorageManager {
         localStorage.setItem('libraryMembers', JSON.stringify(members));
     }
     
-    addMember(member) {
+    async addMember(member) {
         const members = this.getMembers();
         member.id = Date.now().toString();
         
@@ -320,6 +320,35 @@ class StorageManager {
             
             if (targetSeat && targetSeat.status === 'occupied' && targetSeat.memberId !== member.id) {
                 member.seat = 0;
+            }
+        }
+        
+        const idProofData = member.idProof;
+        delete member.idProof;
+        
+        if (idProofData) {
+            if (typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
+                const caption = `🆔 <b>ID Proof</b>\n\n` +
+                              `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(member.name)}\n` +
+                              `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(member.contact)}\n` +
+                              `📅 <b>Uploaded:</b> ${new Date().toLocaleDateString('en-IN')}`;
+                
+                try {
+                    const result = await telegramNotifier.sendPhoto(idProofData, caption);
+                    if (result.success && result.fileId) {
+                        member.idProofTelegramFileId = result.fileId;
+                        console.log('ID proof sent to Telegram, file ID will be saved');
+                    } else {
+                        console.error('Failed to send ID proof to Telegram, ID proof will not be saved');
+                        alert('⚠️ Failed to upload ID proof to Telegram. Member will be added without ID proof.');
+                    }
+                } catch (err) {
+                    console.error('Failed to send ID proof to Telegram:', err);
+                    alert('⚠️ Error uploading ID proof to Telegram. Member will be added without ID proof.');
+                }
+            } else {
+                console.log('Telegram not configured, ID proof will not be saved');
+                alert('⚠️ Telegram is not configured. ID proof cannot be saved. Please configure Telegram in Settings to enable ID proof storage.');
             }
         }
         
@@ -368,56 +397,12 @@ class StorageManager {
         
         if (typeof telegramNotifier !== 'undefined') {
             telegramNotifier.notifyMemberAdded(member);
-            
-            if (member.idProof && telegramNotifier.isConfigured()) {
-                const caption = `🆔 <b>ID Proof</b>\n\n` +
-                              `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(member.name)}\n` +
-                              `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(member.contact)}\n` +
-                              `📅 <b>Uploaded:</b> ${new Date().toLocaleDateString('en-IN')}`;
-                
-                const idProofData = member.idProof;
-                
-                telegramNotifier.sendPhoto(idProofData, caption).then(result => {
-                    if (result.success && result.fileId) {
-                        const members = this.getMembers();
-                        const memberIndex = members.findIndex(m => m.id === member.id);
-                        if (memberIndex !== -1) {
-                            members[memberIndex].idProofTelegramFileId = result.fileId;
-                            delete members[memberIndex].idProof;
-                            this.saveMembers(members);
-                            console.log('ID proof sent to Telegram, only file ID saved locally');
-                        }
-                    } else {
-                        console.error('Failed to send ID proof to Telegram, keeping local copy');
-                    }
-                }).catch(err => {
-                    console.error('Failed to send ID proof to Telegram:', err);
-                });
-            } else if (member.idProof && !telegramNotifier.isConfigured()) {
-                delete member.idProof;
-                const members = this.getMembers();
-                const memberIndex = members.findIndex(m => m.id === member.id);
-                if (memberIndex !== -1) {
-                    delete members[memberIndex].idProof;
-                    this.saveMembers(members);
-                    console.log('Telegram not configured, ID proof not saved');
-                }
-            }
-        } else if (member.idProof) {
-            delete member.idProof;
-            const members = this.getMembers();
-            const memberIndex = members.findIndex(m => m.id === member.id);
-            if (memberIndex !== -1) {
-                delete members[memberIndex].idProof;
-                this.saveMembers(members);
-                console.log('Telegram notifier not available, ID proof not saved');
-            }
         }
         
         return member;
     }
     
-    updateMember(id, updatedMember) {
+    async updateMember(id, updatedMember) {
         const members = this.getMembers();
         const index = members.findIndex(m => m.id === id);
         if (index !== -1) {
@@ -440,6 +425,37 @@ class StorageManager {
                 this.freeSeatByMemberId(id);
             }
             
+            const idProofData = updatedMember.idProof;
+            delete updatedMember.idProof;
+            
+            if (idProofData) {
+                if (typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
+                    const memberName = updatedMember.name || members[index].name;
+                    const memberContact = updatedMember.contact || members[index].contact;
+                    const caption = `🆔 <b>ID Proof Updated</b>\n\n` +
+                                  `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(memberName)}\n` +
+                                  `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(memberContact)}\n` +
+                                  `📅 <b>Updated:</b> ${new Date().toLocaleDateString('en-IN')}`;
+                    
+                    try {
+                        const result = await telegramNotifier.sendPhoto(idProofData, caption);
+                        if (result.success && result.fileId) {
+                            updatedMember.idProofTelegramFileId = result.fileId;
+                            console.log('Updated ID proof sent to Telegram, file ID will be saved');
+                        } else {
+                            console.error('Failed to send updated ID proof to Telegram');
+                            alert('⚠️ Failed to upload ID proof to Telegram. Member will be updated without ID proof.');
+                        }
+                    } catch (err) {
+                        console.error('Failed to send updated ID proof to Telegram:', err);
+                        alert('⚠️ Error uploading ID proof to Telegram. Member will be updated without ID proof.');
+                    }
+                } else {
+                    console.log('Telegram not configured, ID proof will not be saved');
+                    alert('⚠️ Telegram is not configured. ID proof cannot be saved. Please configure Telegram in Settings.');
+                }
+            }
+            
             members[index] = { ...members[index], ...updatedMember };
             this.saveMembers(members);
             this.addActivity(`Member updated: ${members[index].name}`, 'member');
@@ -455,48 +471,6 @@ class StorageManager {
             
             if (typeof telegramNotifier !== 'undefined') {
                 telegramNotifier.notifyMemberUpdated(oldMember, members[index]);
-                
-                if (updatedMember.idProof && telegramNotifier.isConfigured()) {
-                    const caption = `🆔 <b>ID Proof Updated</b>\n\n` +
-                                  `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(members[index].name)}\n` +
-                                  `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(members[index].contact)}\n` +
-                                  `📅 <b>Updated:</b> ${new Date().toLocaleDateString('en-IN')}`;
-                    
-                    const idProofData = updatedMember.idProof;
-                    
-                    telegramNotifier.sendPhoto(idProofData, caption).then(result => {
-                        if (result.success && result.fileId) {
-                            const updatedMembers = this.getMembers();
-                            const memberIndex = updatedMembers.findIndex(m => m.id === id);
-                            if (memberIndex !== -1) {
-                                updatedMembers[memberIndex].idProofTelegramFileId = result.fileId;
-                                delete updatedMembers[memberIndex].idProof;
-                                this.saveMembers(updatedMembers);
-                                console.log('Updated ID proof sent to Telegram, only file ID saved locally');
-                            }
-                        } else {
-                            console.error('Failed to send updated ID proof to Telegram');
-                        }
-                    }).catch(err => {
-                        console.error('Failed to send updated ID proof to Telegram:', err);
-                    });
-                } else if (updatedMember.idProof && !telegramNotifier.isConfigured()) {
-                    const updatedMembers = this.getMembers();
-                    const memberIndex = updatedMembers.findIndex(m => m.id === id);
-                    if (memberIndex !== -1) {
-                        delete updatedMembers[memberIndex].idProof;
-                        this.saveMembers(updatedMembers);
-                        console.log('Telegram not configured, updated ID proof not saved');
-                    }
-                }
-            } else if (updatedMember.idProof) {
-                const updatedMembers = this.getMembers();
-                const memberIndex = updatedMembers.findIndex(m => m.id === id);
-                if (memberIndex !== -1) {
-                    delete updatedMembers[memberIndex].idProof;
-                    this.saveMembers(updatedMembers);
-                    console.log('Telegram notifier not available, updated ID proof not saved');
-                }
             }
             
             return true;
