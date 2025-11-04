@@ -41,31 +41,52 @@ function loadSeats() {
     });
     
     const container = document.getElementById('seatsGrid');
+    container.textContent = '';
     
     if (filtered.length === 0) {
-        container.innerHTML = '<p class="no-data">No seats found. Click "Initialize Seats" to set up the seating arrangement.</p>';
+        const noDataMsg = document.createElement('p');
+        noDataMsg.className = 'no-data';
+        noDataMsg.textContent = 'No seats found. Click "Initialize Seats" to set up the seating arrangement.';
+        container.appendChild(noDataMsg);
         updateStats();
         return;
     }
     
-    container.innerHTML = filtered.map(seat => {
+    filtered.forEach(seat => {
         const icon = seat.status === 'occupied' ? '👤' : 
                      seat.status === 'reserved' ? '🔒' : '🪑';
         
         const statusText = seat.status.charAt(0).toUpperCase() + seat.status.slice(1);
         
-        const memberInfo = seat.memberName ? 
-            `<div class="seat-member">${seat.memberName}</div>` : '';
+        const seatCard = document.createElement('div');
+        seatCard.className = 'seat-card ' + seat.status;
+        seatCard.addEventListener('click', () => handleSeatClick(seat.id, seat.status));
         
-        return `
-            <div class="seat-card ${seat.status}" onclick="handleSeatClick('${seat.id}', '${seat.status}')">
-                <div class="seat-icon">${icon}</div>
-                <div class="seat-number">${seat.id}</div>
-                <span class="seat-status ${seat.status}">${statusText}</span>
-                ${memberInfo}
-            </div>
-        `;
-    }).join('');
+        const seatIcon = document.createElement('div');
+        seatIcon.className = 'seat-icon';
+        seatIcon.textContent = icon;
+        
+        const seatNumber = document.createElement('div');
+        seatNumber.className = 'seat-number';
+        seatNumber.textContent = seat.id;
+        
+        const seatStatus = document.createElement('span');
+        seatStatus.className = 'seat-status ' + seat.status;
+        seatStatus.textContent = statusText;
+        
+        seatCard.appendChild(seatIcon);
+        seatCard.appendChild(seatNumber);
+        seatCard.appendChild(seatStatus);
+        
+        if (seat.memberName) {
+            const memberInfo = document.createElement('div');
+            memberInfo.className = 'seat-member';
+            memberInfo.textContent = seat.memberName;
+            seatCard.appendChild(memberInfo);
+        }
+        
+        container.appendChild(seatCard);
+    });
     
     updateStats();
 }
