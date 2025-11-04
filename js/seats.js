@@ -113,10 +113,19 @@ function showAssignModal(seatId) {
     const availableMembers = members.filter(m => !occupiedMemberIds.includes(m.id));
     
     const select = document.getElementById('assignMember');
-    select.innerHTML = '<option value="">-- Select Member --</option>' + 
-        availableMembers.map(m => 
-            `<option value="${m.id}">${m.name} (Seat: ${m.seat || 'Not Assigned'})</option>`
-        ).join('');
+    select.textContent = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Select Member --';
+    select.appendChild(defaultOption);
+    
+    availableMembers.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m.id;
+        option.textContent = `${m.name} (Seat: ${m.seat || 'Not Assigned'})`;
+        select.appendChild(option);
+    });
     
     showModal('assignModal');
 }
