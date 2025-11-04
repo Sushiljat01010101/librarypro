@@ -471,7 +471,7 @@ function printReceipt() {
     printWindow.document.close();
 }
 
-function exportToExcel() {
+function exportToCSV() {
     if (!currentMember || filteredPayments.length === 0) {
         alert('No payment records to export');
         return;
@@ -509,7 +509,7 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
     
-    alert('Excel file exported successfully!');
+    alert('CSV file exported successfully!');
 }
 
 loadMemberSelect();
