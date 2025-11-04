@@ -26,6 +26,7 @@ The system encompasses several core features:
 -   **Seat Management**: A visual grid layout with color-coded seat statuses (Available, Occupied, Reserved). Supports individual or bulk seat additions, safe removal of trailing seats, and real-time statistics. Automatic synchronization with member assignments.
 -   **Book Management**: CRUD operations for books, issue/return functionality, overdue tracking with fine calculation, and stock alerts.
 -   **Fee Management**: Automated fee generation based on member joining dates, smart due date checking using member's custom next payment date (if set) or calculated from joining date, tracking of payments (paid/pending), and comprehensive multi-month advance payment handling. The system intelligently starts from the earliest unpaid month when processing advance payments, updates existing pending fees to paid status, creates new fee records as needed, and automatically calculates the correct next payment date based on the billing cursor. This ensures accurate reconciliation of outstanding dues and proper tracking of advance payments.
+-   **Payment Receipts**: Comprehensive payment receipt management system with member search, complete payment history display, PDF generation for receipts, WhatsApp sharing functionality, date range filtering, CSV export, and print capabilities. Features include: member selection dropdown with search, visual payment timeline with status indicators, download PDF for all payments or individual payments, direct WhatsApp share with formatted payment details, date-based filtering, print receipt functionality, and CSV export for record-keeping. The page integrates jsPDF and html2canvas libraries for client-side PDF generation.
 -   **Expense Management**: Recording and categorization of expenses, tracking by month/year, and CSV export.
 -   **Dashboard**: Provides real-time summaries of members, seat occupancy, book inventory, revenue, expenses, and profit, along with recent activity.
 -   **Reports & Analytics**: Visualizations for revenue vs. expense trends, category-wise expense distribution, book status, and payment collection rates using Chart.js.
@@ -51,4 +52,6 @@ The system encompasses several core features:
 ## External Dependencies
 
 -   **Chart.js**: JavaScript charting library for data visualization in reports.
+-   **jsPDF**: JavaScript library for client-side PDF generation used in payment receipts.
+-   **html2canvas**: JavaScript library for converting HTML elements to canvas for PDF generation.
 -   **Python HTTP Server**: Used for local development and deployment to serve static files.
