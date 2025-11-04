@@ -1,6 +1,7 @@
 storageManager.checkAuth();
 
 let currentEditId = null;
+let currentIdProofData = null;
 
 function updateSeatDisplay(seatValue) {
     const seatDisplay = document.getElementById('seatDisplay');
@@ -104,6 +105,105 @@ function loadMembers() {
     }).join('');
 }
 
+function resetIdProofDisplay() {
+    currentIdProofData = null;
+    const preview = document.getElementById('idProofPreview');
+    const placeholder = document.querySelector('.id-proof-placeholder');
+    const image = document.getElementById('idProofImage');
+    const removeBtn = document.getElementById('removeIdProofBtn');
+    
+    preview.classList.remove('has-image');
+    placeholder.style.display = 'block';
+    image.style.display = 'none';
+    image.src = '';
+    removeBtn.style.display = 'none';
+}
+
+function displayIdProof(dataUrl) {
+    currentIdProofData = dataUrl;
+    const preview = document.getElementById('idProofPreview');
+    const placeholder = document.querySelector('.id-proof-placeholder');
+    const image = document.getElementById('idProofImage');
+    const removeBtn = document.getElementById('removeIdProofBtn');
+    
+    preview.classList.add('has-image');
+    placeholder.style.display = 'none';
+    image.src = dataUrl;
+    image.style.display = 'block';
+    removeBtn.style.display = 'inline-block';
+}
+
+document.getElementById('uploadIdProofBtn').addEventListener('click', () => {
+    document.getElementById('memberIdProof').click();
+});
+
+document.getElementById('memberIdProof').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            displayIdProof(event.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('captureIdProofBtn').addEventListener('click', async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' } 
+        });
+        
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10001; max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 10px 50px rgba(0,0,0,0.5);';
+        
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;';
+        
+        const captureBtn = document.createElement('button');
+        captureBtn.textContent = '📸 Capture Photo';
+        captureBtn.style.cssText = 'margin-top: 20px; padding: 15px 30px; font-size: 16px; background: var(--primary-gold); color: var(--bg-primary); border: none; border-radius: 8px; cursor: pointer; z-index: 10002; position: relative;';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '❌ Cancel';
+        cancelBtn.style.cssText = 'margin-top: 10px; padding: 12px 25px; font-size: 14px; background: var(--danger); color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 10002; position: relative;';
+        
+        overlay.appendChild(video);
+        overlay.appendChild(captureBtn);
+        overlay.appendChild(cancelBtn);
+        document.body.appendChild(overlay);
+        
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            
+            displayIdProof(dataUrl);
+            
+            stream.getTracks().forEach(track => track.stop());
+            document.body.removeChild(overlay);
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            stream.getTracks().forEach(track => track.stop());
+            document.body.removeChild(overlay);
+        });
+        
+    } catch (error) {
+        console.error('Camera access error:', error);
+        alert('Camera access denied or not available. Please use file upload instead.');
+    }
+});
+
+document.getElementById('removeIdProofBtn').addEventListener('click', () => {
+    resetIdProofDisplay();
+    document.getElementById('memberIdProof').value = '';
+});
+
 document.getElementById('addMemberBtn').addEventListener('click', () => {
     currentEditId = null;
     document.getElementById('modalTitle').textContent = 'Add Member';
@@ -113,6 +213,7 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('monthsPaidInAdvance').value = 1;
     document.getElementById('paymentMethod').value = 'cash';
     updateSeatDisplay(null);
+    resetIdProofDisplay();
     showModal('memberModal');
 });
 
@@ -207,7 +308,8 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         paymentMethod: document.getElementById('paymentMethod').value,
         status: document.getElementById('memberStatus').value,
         photo: document.getElementById('memberPhoto').value,
-        address: document.getElementById('memberAddress').value
+        address: document.getElementById('memberAddress').value,
+        idProof: currentIdProofData || null
     };
     
     if (currentEditId) {
@@ -241,6 +343,13 @@ function editMember(id) {
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberPhoto').value = member.photo || '';
         document.getElementById('memberAddress').value = member.address || '';
+        
+        if (member.idProof) {
+            displayIdProof(member.idProof);
+        } else {
+            resetIdProofDisplay();
+        }
+        
         showModal('memberModal');
     }
 }

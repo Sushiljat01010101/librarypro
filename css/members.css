@@ -196,3 +196,95 @@
     color: var(--bg-primary);
     border-color: var(--text-muted);
 }
+
+.id-proof-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.id-proof-preview {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.id-proof-preview.has-image {
+    border-color: var(--primary-gold);
+    background: linear-gradient(135deg, rgba(244, 196, 48, 0.1), rgba(244, 196, 48, 0.05));
+    border-style: solid;
+}
+
+.id-proof-placeholder {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+}
+
+.id-proof-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-upload,
+.btn-camera,
+.btn-remove {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-upload:hover {
+    background: var(--primary-gold);
+    color: var(--bg-primary);
+    border-color: var(--primary-gold);
+    transform: translateY(-2px);
+}
+
+.btn-camera:hover {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+    transform: translateY(-2px);
+}
+
+.btn-remove {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+}
+
+.btn-remove:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    .id-proof-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-upload,
+    .btn-camera,
+    .btn-remove {
+        width: 100%;
+        min-width: auto;
+    }
+}
