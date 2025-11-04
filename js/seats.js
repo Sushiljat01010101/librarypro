@@ -127,14 +127,16 @@ function showSeatDetail(seatId) {
     
     if (seat) {
         document.getElementById('detailSeatNumber').textContent = seat.id;
-        document.getElementById('detailStatus').textContent = 
-            `<span class="seat-status ${seat.status}">${seat.status.toUpperCase()}</span>`;
         document.getElementById('detailMemberName').textContent = seat.memberName || '-';
         document.getElementById('detailAssignedDate').textContent = 
             seat.assignedDate ? storageManager.formatDate(seat.assignedDate) : '-';
         
-        document.getElementById('detailStatus').innerHTML = 
-            `<span class="seat-status ${seat.status}">${seat.status.toUpperCase()}</span>`;
+        const statusContainer = document.getElementById('detailStatus');
+        statusContainer.textContent = '';
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'seat-status ' + seat.status;
+        statusSpan.textContent = seat.status.toUpperCase();
+        statusContainer.appendChild(statusSpan);
         
         showModal('seatDetailModal');
     }
