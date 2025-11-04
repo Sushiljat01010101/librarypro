@@ -431,6 +431,14 @@ class StorageManager {
                 this.freeSeatByMemberId(id);
             }
             
+            if (oldMember.status === 'active' && updatedMember.status === 'inactive') {
+                if (oldSeat && oldSeat > 0) {
+                    this.freeSeatByMemberId(id);
+                    updatedMember.seat = 0;
+                    newSeat = 0;
+                }
+            }
+            
             const idProofData = updatedMember.idProof;
             delete updatedMember.idProof;
             

@@ -4,6 +4,7 @@ let currentEditId = null;
 
 function loadFees() {
     const fees = storageManager.getFees();
+    const members = storageManager.getMembers();
     const searchTerm = document.getElementById('searchFees').value.toLowerCase();
     const monthFilter = document.getElementById('monthFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
@@ -13,7 +14,10 @@ function loadFees() {
         const matchesMonth = !monthFilter || fee.month === monthFilter;
         const matchesStatus = statusFilter === 'all' || fee.status === statusFilter;
         
-        return matchesSearch && matchesMonth && matchesStatus;
+        const member = members.find(m => m.id === fee.memberId);
+        const isInactiveMemberWithPendingPayment = member && member.status === 'inactive' && fee.status === 'pending';
+        
+        return matchesSearch && matchesMonth && matchesStatus && !isInactiveMemberWithPendingPayment;
     });
     
     const tbody = document.querySelector('#feesTable tbody');
@@ -53,8 +57,13 @@ function loadFees() {
 
 function updateStats() {
     const fees = storageManager.getFees();
+    const members = storageManager.getMembers();
     const currentMonth = new Date().toISOString().slice(0, 7);
-    const monthlyFees = fees.filter(f => f.month === currentMonth);
+    const monthlyFees = fees.filter(f => {
+        const member = members.find(m => m.id === f.memberId);
+        const isInactiveMemberWithPendingPayment = member && member.status === 'inactive' && f.status === 'pending';
+        return f.month === currentMonth && !isInactiveMemberWithPendingPayment;
+    });
     
     const expected = monthlyFees.reduce((sum, f) => sum + f.amount, 0);
     const collected = monthlyFees.filter(f => f.status === 'paid').reduce((sum, f) => sum + f.amount, 0);
