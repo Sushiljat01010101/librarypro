@@ -53,8 +53,8 @@ function loadMembers() {
             `<span class="detail-value">XXXX XXXX ${member.aadhar.slice(-4)}</span>` : 
             '<span class="detail-value text-muted">Not Provided</span>';
         
-        const idProofDisplay = member.idProofTelegramLink ? 
-            `<a href="${member.idProofTelegramLink}" target="_blank" style="color: var(--primary-gold); text-decoration: none; font-size: 13px;">📱 View ID Proof</a>` : 
+        const idProofDisplay = member.idProofTelegramFileId ? 
+            `<span style="color: var(--success); font-size: 13px;">✅ Stored on Telegram</span>` : 
             '<span class="detail-value text-muted">Not Uploaded</span>';
         
         return `
@@ -152,12 +152,12 @@ function displayTelegramIdProofReference(member) {
     preview.classList.add('has-image');
     placeholder.style.display = 'block';
     
-    let linkHtml = '';
-    if (member && member.idProofTelegramLink) {
-        linkHtml = `<a href="${member.idProofTelegramLink}" target="_blank" style="color: var(--primary-gold); text-decoration: underline; font-size: 13px; display: inline-block; margin-top: 8px;">📱 View on Telegram</a>`;
+    let infoHtml = '<br><small style="opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;">💡 To view ID proof, open your Telegram app and check the bot chat where photos are sent</small>';
+    if (member && member.idProofTelegramMessageId) {
+        infoHtml = `<br><small style="opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;">💡 Message ID: #${member.idProofTelegramMessageId}<br>View this photo in your Telegram bot chat</small>`;
     }
     
-    placeholder.innerHTML = `✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>${linkHtml}`;
+    placeholder.innerHTML = `✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>${infoHtml}`;
     image.style.display = 'none';
     image.src = '';
     removeBtn.style.display = 'none';
