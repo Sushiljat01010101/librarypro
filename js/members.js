@@ -114,6 +114,7 @@ function resetIdProofDisplay() {
     
     preview.classList.remove('has-image');
     placeholder.style.display = 'block';
+    placeholder.innerHTML = '📸 Upload ID Proof (Aadhar, License, etc.)';
     image.style.display = 'none';
     image.src = '';
     removeBtn.style.display = 'none';
@@ -131,6 +132,21 @@ function displayIdProof(dataUrl) {
     image.src = dataUrl;
     image.style.display = 'block';
     removeBtn.style.display = 'inline-block';
+}
+
+function displayTelegramIdProofReference() {
+    currentIdProofData = null;
+    const preview = document.getElementById('idProofPreview');
+    const placeholder = document.querySelector('.id-proof-placeholder');
+    const image = document.getElementById('idProofImage');
+    const removeBtn = document.getElementById('removeIdProofBtn');
+    
+    preview.classList.add('has-image');
+    placeholder.style.display = 'block';
+    placeholder.innerHTML = '✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>';
+    image.style.display = 'none';
+    image.src = '';
+    removeBtn.style.display = 'none';
 }
 
 document.getElementById('uploadIdProofBtn').addEventListener('click', () => {
@@ -346,6 +362,8 @@ function editMember(id) {
         
         if (member.idProof) {
             displayIdProof(member.idProof);
+        } else if (member.idProofTelegramFileId) {
+            displayTelegramIdProofReference();
         } else {
             resetIdProofDisplay();
         }

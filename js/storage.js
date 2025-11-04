@@ -455,6 +455,48 @@ class StorageManager {
             
             if (typeof telegramNotifier !== 'undefined') {
                 telegramNotifier.notifyMemberUpdated(oldMember, members[index]);
+                
+                if (updatedMember.idProof && telegramNotifier.isConfigured()) {
+                    const caption = `🆔 <b>ID Proof Updated</b>\n\n` +
+                                  `👤 <b>Member:</b> ${telegramNotifier.escapeHtml(members[index].name)}\n` +
+                                  `📱 <b>Contact:</b> ${telegramNotifier.escapeHtml(members[index].contact)}\n` +
+                                  `📅 <b>Updated:</b> ${new Date().toLocaleDateString('en-IN')}`;
+                    
+                    const idProofData = updatedMember.idProof;
+                    
+                    telegramNotifier.sendPhoto(idProofData, caption).then(result => {
+                        if (result.success && result.fileId) {
+                            const updatedMembers = this.getMembers();
+                            const memberIndex = updatedMembers.findIndex(m => m.id === id);
+                            if (memberIndex !== -1) {
+                                updatedMembers[memberIndex].idProofTelegramFileId = result.fileId;
+                                delete updatedMembers[memberIndex].idProof;
+                                this.saveMembers(updatedMembers);
+                                console.log('Updated ID proof sent to Telegram, only file ID saved locally');
+                            }
+                        } else {
+                            console.error('Failed to send updated ID proof to Telegram');
+                        }
+                    }).catch(err => {
+                        console.error('Failed to send updated ID proof to Telegram:', err);
+                    });
+                } else if (updatedMember.idProof && !telegramNotifier.isConfigured()) {
+                    const updatedMembers = this.getMembers();
+                    const memberIndex = updatedMembers.findIndex(m => m.id === id);
+                    if (memberIndex !== -1) {
+                        delete updatedMembers[memberIndex].idProof;
+                        this.saveMembers(updatedMembers);
+                        console.log('Telegram not configured, updated ID proof not saved');
+                    }
+                }
+            } else if (updatedMember.idProof) {
+                const updatedMembers = this.getMembers();
+                const memberIndex = updatedMembers.findIndex(m => m.id === id);
+                if (memberIndex !== -1) {
+                    delete updatedMembers[memberIndex].idProof;
+                    this.saveMembers(updatedMembers);
+                    console.log('Telegram notifier not available, updated ID proof not saved');
+                }
             }
             
             return true;
