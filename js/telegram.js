@@ -101,6 +101,47 @@ class TelegramNotifier {
         }
     }
 
+    async sendPhoto(photoDataUrl, caption = '') {
+        if (!this.isConfigured()) {
+            console.log('Telegram not configured. Skipping photo send.');
+            return { success: false, error: 'Not configured' };
+        }
+
+        const { botToken, chatId } = this.getSettings();
+        const url = `${this.apiUrl}${botToken}/sendPhoto`;
+
+        try {
+            const blob = await fetch(photoDataUrl).then(r => r.blob());
+            const file = new File([blob], 'id_proof.jpg', { type: 'image/jpeg' });
+
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('photo', file);
+            if (caption) {
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'HTML');
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.ok) {
+                console.log('Telegram photo sent successfully');
+                return { success: true };
+            } else {
+                console.error('Telegram API error:', data.description);
+                return { success: false, error: data.description };
+            }
+        } catch (error) {
+            console.error('Failed to send Telegram photo:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     formatMemberAddedMessage(member) {
         const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
         const libraryName = this.escapeHtml(settings.libraryName) || 'Library Management System';
