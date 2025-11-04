@@ -10,10 +10,19 @@ function loadMemberSelect() {
     
     const sortedMembers = members.sort((a, b) => a.name.localeCompare(b.name));
     
-    select.innerHTML = '<option value="">-- Select Member --</option>' +
-        sortedMembers.map(m => 
-            `<option value="${m.id}">${m.name} - Seat ${m.seat || 'N/A'} - ${m.contact}</option>`
-        ).join('');
+    select.innerHTML = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Select Member --';
+    select.appendChild(defaultOption);
+    
+    sortedMembers.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m.id;
+        option.textContent = `${m.name} - Seat ${m.seat || 'N/A'} - ${m.contact}`;
+        select.appendChild(option);
+    });
 }
 
 document.getElementById('memberSelect').addEventListener('change', (e) => {
