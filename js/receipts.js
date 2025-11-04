@@ -174,6 +174,16 @@ function clearDateFilter() {
     }
 }
 
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return '';
+    return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function generateReceiptHTML(payments, isAll = true) {
     const settings = storageManager.getSettings();
     const libraryName = settings.libraryName || 'Library Management System';
@@ -192,7 +202,7 @@ function generateReceiptHTML(payments, isAll = true) {
     return `
         <div style="max-width: 800px; margin: 0 auto; padding: 30px; font-family: Arial, sans-serif; background: white; color: #000;">
             <div style="text-align: center; border-bottom: 3px solid #f4c430; padding-bottom: 20px; margin-bottom: 20px;">
-                <h1 style="margin: 0; color: #1a1a1a; font-size: 28px;">📚 ${libraryName}</h1>
+                <h1 style="margin: 0; color: #1a1a1a; font-size: 28px;">📚 ${escapeHtml(libraryName)}</h1>
                 <p style="margin: 5px 0; color: #666; font-size: 14px;">Payment Receipt</p>
                 <p style="margin: 5px 0; color: #888; font-size: 12px;">Generated: ${receiptDate}</p>
             </div>
@@ -202,19 +212,19 @@ function generateReceiptHTML(payments, isAll = true) {
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                         <td style="padding: 5px 0; color: #666; width: 120px;">Name:</td>
-                        <td style="padding: 5px 0; color: #1a1a1a; font-weight: bold;">${currentMember.name}</td>
+                        <td style="padding: 5px 0; color: #1a1a1a; font-weight: bold;">${escapeHtml(currentMember.name)}</td>
                     </tr>
                     <tr>
                         <td style="padding: 5px 0; color: #666;">Contact:</td>
-                        <td style="padding: 5px 0; color: #1a1a1a;">${currentMember.contact}</td>
+                        <td style="padding: 5px 0; color: #1a1a1a;">${escapeHtml(currentMember.contact)}</td>
                     </tr>
                     <tr>
                         <td style="padding: 5px 0; color: #666;">Seat Number:</td>
-                        <td style="padding: 5px 0; color: #1a1a1a;">${currentMember.seat || 'N/A'}</td>
+                        <td style="padding: 5px 0; color: #1a1a1a;">${escapeHtml(currentMember.seat || 'N/A')}</td>
                     </tr>
                     <tr>
                         <td style="padding: 5px 0; color: #666;">Member ID:</td>
-                        <td style="padding: 5px 0; color: #1a1a1a;">#${currentMember.id.slice(-6)}</td>
+                        <td style="padding: 5px 0; color: #1a1a1a;">#${escapeHtml(currentMember.id.slice(-6))}</td>
                     </tr>
                 </table>
             </div>
@@ -234,10 +244,10 @@ function generateReceiptHTML(payments, isAll = true) {
                     <tbody>
                         ${paidPayments.map((payment, index) => `
                             <tr style="background: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
-                                <td style="padding: 10px; border: 1px solid #ddd;">${payment.month}</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">${storageManager.formatDate(payment.paymentDate)}</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">${payment.paymentMethod || 'N/A'}</td>
-                                <td style="padding: 10px; text-align: right; border: 1px solid #ddd; font-weight: bold;">${storageManager.formatCurrency(payment.amount)}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(payment.month)}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(storageManager.formatDate(payment.paymentDate))}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(payment.paymentMethod || 'N/A')}</td>
+                                <td style="padding: 10px; text-align: right; border: 1px solid #ddd; font-weight: bold;">${escapeHtml(storageManager.formatCurrency(payment.amount))}</td>
                                 <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
                                     <span style="background: #4caf50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Paid</span>
                                 </td>
@@ -245,7 +255,7 @@ function generateReceiptHTML(payments, isAll = true) {
                         `).join('')}
                         <tr style="background: #f4c430; font-weight: bold;">
                             <td colspan="3" style="padding: 12px; border: 1px solid #ddd; text-align: right;">TOTAL:</td>
-                            <td style="padding: 12px; text-align: right; border: 1px solid #ddd; font-size: 16px;">${storageManager.formatCurrency(totalAmount)}</td>
+                            <td style="padding: 12px; text-align: right; border: 1px solid #ddd; font-size: 16px;">${escapeHtml(storageManager.formatCurrency(totalAmount))}</td>
                             <td style="padding: 12px; border: 1px solid #ddd;"></td>
                         </tr>
                     </tbody>
