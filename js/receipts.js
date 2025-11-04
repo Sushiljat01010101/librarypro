@@ -306,17 +306,29 @@ async function generatePDF(htmlContent, filename) {
         container.innerHTML = htmlContent;
         container.style.display = 'block';
         
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         const canvas = await html2canvas(container, {
             scale: 2,
             backgroundColor: '#ffffff',
             logging: false,
             useCORS: true,
-            allowTaint: true
+            allowTaint: false,
+            imageTimeout: 0,
+            removeContainer: false
         });
         
         container.style.display = 'none';
+        
+        if (!canvas || canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Failed to generate canvas from content');
+        }
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        if (!imgData || imgData === 'data:,') {
+            throw new Error('Failed to convert canvas to image');
+        }
         
         const imgWidth = 210;
         const pageHeight = 297;
@@ -328,13 +340,13 @@ async function generatePDF(htmlContent, filename) {
         let heightLeft = imgHeight;
         let position = 0;
         
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
             pdf.addPage();
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
         }
         
