@@ -70,14 +70,31 @@ function loadRecentMembers() {
         return;
     }
     
-    tbody.innerHTML = members.map(member => `
-        <tr>
-            <td>${member.name}</td>
-            <td>Seat ${member.seat}</td>
-            <td><span class="badge ${member.status === 'active' ? 'success' : 'danger'}">${member.status}</span></td>
-            <td>${storageManager.formatDate(member.joiningDate)}</td>
-        </tr>
-    `).join('');
+    tbody.textContent = '';
+    members.forEach(member => {
+        const tr = document.createElement('tr');
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = member.name;
+        tr.appendChild(nameCell);
+        
+        const seatCell = document.createElement('td');
+        seatCell.textContent = `Seat ${member.seat}`;
+        tr.appendChild(seatCell);
+        
+        const statusCell = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `badge ${member.status === 'active' ? 'success' : 'danger'}`;
+        statusBadge.textContent = member.status;
+        statusCell.appendChild(statusBadge);
+        tr.appendChild(statusCell);
+        
+        const dateCell = document.createElement('td');
+        dateCell.textContent = storageManager.formatDate(member.joiningDate);
+        tr.appendChild(dateCell);
+        
+        tbody.appendChild(tr);
+    });
 }
 
 function loadOverdueBooks() {
@@ -92,17 +109,30 @@ function loadOverdueBooks() {
         return;
     }
     
-    tbody.innerHTML = overdueBooks.slice(0, 5).map(ib => {
+    tbody.textContent = '';
+    overdueBooks.slice(0, 5).forEach(ib => {
         const fine = storageManager.calculateFine(ib.dueDate);
-        return `
-            <tr>
-                <td>${ib.bookTitle}</td>
-                <td>${ib.memberName}</td>
-                <td>${storageManager.formatDate(ib.dueDate)}</td>
-                <td class="fine-amount">${storageManager.formatCurrency(fine)}</td>
-            </tr>
-        `;
-    }).join('');
+        const tr = document.createElement('tr');
+        
+        const bookCell = document.createElement('td');
+        bookCell.textContent = ib.bookTitle;
+        tr.appendChild(bookCell);
+        
+        const memberCell = document.createElement('td');
+        memberCell.textContent = ib.memberName;
+        tr.appendChild(memberCell);
+        
+        const dateCell = document.createElement('td');
+        dateCell.textContent = storageManager.formatDate(ib.dueDate);
+        tr.appendChild(dateCell);
+        
+        const fineCell = document.createElement('td');
+        fineCell.className = 'fine-amount';
+        fineCell.textContent = storageManager.formatCurrency(fine);
+        tr.appendChild(fineCell);
+        
+        tbody.appendChild(tr);
+    });
 }
 
 function loadPendingPayments() {
@@ -114,13 +144,24 @@ function loadPendingPayments() {
         return;
     }
     
-    tbody.innerHTML = fees.slice(0, 5).map(fee => `
-        <tr>
-            <td>${fee.memberName}</td>
-            <td>${fee.month}</td>
-            <td>${storageManager.formatCurrency(fee.amount)}</td>
-        </tr>
-    `).join('');
+    tbody.textContent = '';
+    fees.slice(0, 5).forEach(fee => {
+        const tr = document.createElement('tr');
+        
+        const memberCell = document.createElement('td');
+        memberCell.textContent = fee.memberName;
+        tr.appendChild(memberCell);
+        
+        const monthCell = document.createElement('td');
+        monthCell.textContent = fee.month;
+        tr.appendChild(monthCell);
+        
+        const amountCell = document.createElement('td');
+        amountCell.textContent = storageManager.formatCurrency(fee.amount);
+        tr.appendChild(amountCell);
+        
+        tbody.appendChild(tr);
+    });
 }
 
 function loadRecentActivity() {
@@ -132,12 +173,23 @@ function loadRecentActivity() {
         return;
     }
     
-    container.innerHTML = activities.map(activity => `
-        <div class="activity-item">
-            <div class="activity-text">${activity.text}</div>
-            <div class="activity-time">${storageManager.formatDateTime(activity.timestamp)}</div>
-        </div>
-    `).join('');
+    container.textContent = '';
+    activities.forEach(activity => {
+        const activityItem = document.createElement('div');
+        activityItem.className = 'activity-item';
+        
+        const activityText = document.createElement('div');
+        activityText.className = 'activity-text';
+        activityText.textContent = activity.text;
+        activityItem.appendChild(activityText);
+        
+        const activityTime = document.createElement('div');
+        activityTime.className = 'activity-time';
+        activityTime.textContent = storageManager.formatDateTime(activity.timestamp);
+        activityItem.appendChild(activityTime);
+        
+        container.appendChild(activityItem);
+    });
 }
 
 loadDashboardStats();

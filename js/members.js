@@ -18,6 +18,27 @@ function updateSeatDisplay(seatValue) {
     }
 }
 
+function createDetailRow(label, value, isHtml = false) {
+    const row = document.createElement('div');
+    row.className = 'detail-row';
+    
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'detail-label';
+    labelSpan.textContent = label;
+    row.appendChild(labelSpan);
+    
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'detail-value';
+    if (isHtml) {
+        valueSpan.innerHTML = value;
+    } else {
+        valueSpan.textContent = value;
+    }
+    row.appendChild(valueSpan);
+    
+    return row;
+}
+
 function loadMembers() {
     const members = storageManager.getMembers();
     const searchTerm = document.getElementById('searchMembers').value.toLowerCase();
@@ -44,73 +65,101 @@ function loadMembers() {
         return;
     }
     
-    container.innerHTML = filtered.map(member => {
-        const photoHtml = member.photo ? 
-            `<img src="${member.photo}" alt="${member.name}">` : 
-            '👤';
+    container.textContent = '';
+    filtered.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'member-card';
         
-        const aadharDisplay = member.aadhar ? 
-            `<span class="detail-value">XXXX XXXX ${member.aadhar.slice(-4)}</span>` : 
-            '<span class="detail-value text-muted">Not Provided</span>';
+        const header = document.createElement('div');
+        header.className = 'member-header';
         
-        const idProofDisplay = member.idProofTelegramFileId ? 
-            `<span style="color: var(--success); font-size: 13px;">✅ Stored on Telegram</span>` : 
-            '<span class="detail-value text-muted">Not Uploaded</span>';
+        const photo = document.createElement('div');
+        photo.className = 'member-photo';
+        if (member.photo) {
+            const img = document.createElement('img');
+            img.src = member.photo;
+            img.alt = member.name;
+            photo.appendChild(img);
+        } else {
+            photo.textContent = '👤';
+        }
+        header.appendChild(photo);
         
-        return `
-            <div class="member-card">
-                <div class="member-header">
-                    <div class="member-photo">${photoHtml}</div>
-                    <div class="member-basic">
-                        <h3>${member.name}</h3>
-                        <p>${member.contact}</p>
-                    </div>
-                </div>
-                <div class="member-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Seat Number</span>
-                        <span class="detail-value">${member.seat ? member.seat : 'No Seat'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Aadhar Number</span>
-                        ${aadharDisplay}
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">ID Proof</span>
-                        <span class="detail-value">${idProofDisplay}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Membership</span>
-                        <span class="detail-value">${member.membershipType}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Monthly Fee</span>
-                        <span class="detail-value">${storageManager.formatCurrency(member.fee)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Joining Date</span>
-                        <span class="detail-value">${storageManager.formatDate(member.joiningDate)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Next Payment Date</span>
-                        <span class="detail-value">${member.nextPaymentDate ? storageManager.formatDate(member.nextPaymentDate) : '-'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Status</span>
-                        <span class="detail-value">
-                            <span class="badge ${member.status === 'active' ? 'success' : 'danger'}">
-                                ${member.status}
-                            </span>
-                        </span>
-                    </div>
-                </div>
-                <div class="member-actions">
-                    <button class="btn-icon" onclick="editMember('${member.id}')">✏️ Edit</button>
-                    <button class="btn-icon delete" onclick="deleteMember('${member.id}')">🗑️ Delete</button>
-                </div>
-            </div>
-        `;
-    }).join('');
+        const basic = document.createElement('div');
+        basic.className = 'member-basic';
+        const nameH3 = document.createElement('h3');
+        nameH3.textContent = member.name;
+        basic.appendChild(nameH3);
+        const contactP = document.createElement('p');
+        contactP.textContent = member.contact;
+        basic.appendChild(contactP);
+        header.appendChild(basic);
+        
+        card.appendChild(header);
+        
+        const details = document.createElement('div');
+        details.className = 'member-details';
+        
+        details.appendChild(createDetailRow('Seat Number', member.seat ? member.seat : 'No Seat'));
+        
+        const aadharValue = member.aadhar ? 
+            `XXXX XXXX ${member.aadhar.slice(-4)}` : 
+            'Not Provided';
+        const aadharRow = createDetailRow('Aadhar Number', '');
+        const aadharSpan = aadharRow.querySelector('.detail-value');
+        aadharSpan.textContent = aadharValue;
+        if (!member.aadhar) {
+            aadharSpan.classList.add('text-muted');
+        }
+        details.appendChild(aadharRow);
+        
+        const idProofRow = createDetailRow('ID Proof', '', true);
+        const idProofSpan = idProofRow.querySelector('.detail-value');
+        if (member.idProofTelegramFileId) {
+            idProofSpan.innerHTML = '<span style="color: var(--success); font-size: 13px;">✅ Stored on Telegram</span>';
+        } else {
+            idProofSpan.innerHTML = '<span class="detail-value text-muted">Not Uploaded</span>';
+        }
+        details.appendChild(idProofRow);
+        
+        details.appendChild(createDetailRow('Membership', member.membershipType));
+        details.appendChild(createDetailRow('Monthly Fee', storageManager.formatCurrency(member.fee)));
+        details.appendChild(createDetailRow('Joining Date', storageManager.formatDate(member.joiningDate)));
+        details.appendChild(createDetailRow('Next Payment Date', member.nextPaymentDate ? storageManager.formatDate(member.nextPaymentDate) : '-'));
+        
+        const statusRow = document.createElement('div');
+        statusRow.className = 'detail-row';
+        const statusLabel = document.createElement('span');
+        statusLabel.className = 'detail-label';
+        statusLabel.textContent = 'Status';
+        statusRow.appendChild(statusLabel);
+        const statusValue = document.createElement('span');
+        statusValue.className = 'detail-value';
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `badge ${member.status === 'active' ? 'success' : 'danger'}`;
+        statusBadge.textContent = member.status;
+        statusValue.appendChild(statusBadge);
+        statusRow.appendChild(statusValue);
+        details.appendChild(statusRow);
+        
+        card.appendChild(details);
+        
+        const actions = document.createElement('div');
+        actions.className = 'member-actions';
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-icon';
+        editBtn.textContent = '✏️ Edit';
+        editBtn.onclick = () => editMember(member.id);
+        actions.appendChild(editBtn);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-icon delete';
+        deleteBtn.textContent = '🗑️ Delete';
+        deleteBtn.onclick = () => deleteMember(member.id);
+        actions.appendChild(deleteBtn);
+        card.appendChild(actions);
+        
+        container.appendChild(card);
+    });
 }
 
 function resetIdProofDisplay() {
