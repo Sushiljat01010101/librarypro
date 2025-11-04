@@ -1,100 +1,694 @@
+/* ===========================
+   BOOKS PAGE ANIMATIONS
+   =========================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shimmerLine {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes popScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ===========================
+   SECTION TITLE - ENHANCED
+   =========================== */
+
 .section-title {
-    margin: 30px 0 20px;
+    margin: 40px 0 25px;
+    animation: slideInFromLeft 0.6s ease-out;
+    position: relative;
 }
 
 .section-title h2 {
     color: var(--primary-gold);
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 12px;
 }
+
+.section-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-gold) 0%, transparent 100%);
+    border-radius: 2px;
+}
+
+/* ===========================
+   TABLE CONTAINER - ENHANCED
+   =========================== */
+
+.table-container {
+    animation: fadeInUp 0.6s ease-out;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.table-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--primary-gold) 0%, 
+        var(--light-gold) 50%, 
+        var(--primary-gold) 100%);
+    background-size: 200% 100%;
+    animation: shimmerLine 3s linear infinite;
+    border-radius: 8px 8px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.table-container:hover::before {
+    opacity: 1;
+}
+
+/* ===========================
+   DATA TABLE ENHANCEMENTS
+   =========================== */
+
+.data-table tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.data-table tbody tr::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary-gold);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.data-table tbody tr:hover::before {
+    transform: scaleY(1);
+}
+
+.data-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(244, 196, 48, 0.1) 0%, transparent 100%);
+    transform: translateX(6px);
+}
+
+.data-table tbody tr:hover td {
+    padding-left: 20px;
+}
+
+.data-table tbody tr td {
+    transition: padding 0.3s ease;
+}
+
+/* ===========================
+   ACTION BUTTONS - ADVANCED
+   =========================== */
 
 .action-btns {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .btn-sm {
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 12px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+.btn-sm::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.btn-sm:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.btn-sm:active {
+    transform: scale(0.95);
+}
+
+/* ===========================
+   SUCCESS BUTTON
+   =========================== */
+
 .btn-success {
-    background: var(--success);
+    background: linear-gradient(135deg, var(--success) 0%, #45a049 100%);
     color: white;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
 }
 
 .btn-success:hover {
-    background: #45a049;
+    background: linear-gradient(135deg, #45a049 0%, #388e3c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
 }
 
+/* ===========================
+   WARNING BUTTON
+   =========================== */
+
 .btn-warning {
-    background: var(--warning);
+    background: linear-gradient(135deg, var(--warning) 0%, #f57c00 100%);
     color: white;
+    box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
 }
 
 .btn-warning:hover {
-    background: #f57c00;
+    background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
 }
 
+/* ===========================
+   INFO BUTTON
+   =========================== */
+
 .btn-info {
-    background: var(--info);
+    background: linear-gradient(135deg, var(--info) 0%, #1976d2 100%);
     color: white;
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
 }
 
 .btn-info:hover {
-    background: #1976d2;
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
 }
 
+/* ===========================
+   EDIT BUTTON
+   =========================== */
+
 .btn-edit {
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(42, 42, 42, 0.8) 100%);
     color: var(--primary-gold);
-    border: 1px solid var(--primary-gold);
+    border: 2px solid var(--primary-gold);
+    box-shadow: 0 3px 10px rgba(244, 196, 48, 0.2);
 }
 
 .btn-edit:hover {
-    background: var(--primary-gold);
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
     color: var(--bg-primary);
+    border-color: var(--primary-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.4);
 }
 
+/* ===========================
+   DELETE BUTTON
+   =========================== */
+
 .btn-delete {
-    background: var(--danger);
+    background: linear-gradient(135deg, var(--danger) 0%, #d32f2f 100%);
     color: white;
+    box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
 }
 
 .btn-delete:hover {
-    background: #d32f2f;
+    background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
 }
+
+/* ===========================
+   STATUS BADGES - ENHANCED
+   =========================== */
 
 .status-available {
     color: var(--success);
-    font-weight: 600;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(76, 175, 80, 0.15);
+    border-radius: 6px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    font-size: 12px;
+}
+
+.status-available::before {
+    content: '✓';
+    font-size: 14px;
+}
+
+.status-available:hover {
+    background: rgba(76, 175, 80, 0.25);
+    transform: scale(1.05);
 }
 
 .status-issued {
     color: var(--warning);
-    font-weight: 600;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(255, 152, 0, 0.15);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    transition: all 0.3s ease;
+    font-size: 12px;
+}
+
+.status-issued::before {
+    content: '📤';
+    font-size: 12px;
+}
+
+.status-issued:hover {
+    background: rgba(255, 152, 0, 0.25);
+    transform: scale(1.05);
 }
 
 .status-overdue {
     color: var(--danger);
-    font-weight: 600;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(244, 67, 54, 0.15);
+    border-radius: 6px;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    transition: all 0.3s ease;
+    font-size: 12px;
+    animation: pulse 2s ease-in-out infinite;
 }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.status-overdue::before {
+    content: '⚠️';
+    font-size: 12px;
+}
+
+.status-overdue:hover {
+    background: rgba(244, 67, 54, 0.25);
+}
+
+/* ===========================
+   FINE AMOUNT - HIGHLIGHTED
+   =========================== */
 
 .fine-amount {
     color: var(--danger);
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    background: rgba(244, 67, 54, 0.15);
+    border-radius: 8px;
+    border: 2px solid rgba(244, 67, 54, 0.3);
+    transition: all 0.3s ease;
 }
 
+.fine-amount::before {
+    content: '₹';
+    font-size: 13px;
+}
+
+.fine-amount:hover {
+    background: rgba(244, 67, 54, 0.25);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+/* ===========================
+   BOOK CATEGORY BADGES
+   =========================== */
+
+.badge-category {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.badge-category.fiction {
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.2), rgba(156, 39, 176, 0.1));
+    color: #9c27b0;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+.badge-category.non-fiction {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.2), rgba(33, 150, 243, 0.1));
+    color: #2196f3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.badge-category.science {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.badge-category.technology {
+    background: linear-gradient(135deg, rgba(244, 196, 48, 0.2), rgba(244, 196, 48, 0.1));
+    color: var(--primary-gold);
+    border: 1px solid rgba(244, 196, 48, 0.3);
+}
+
+.badge-category.history {
+    background: linear-gradient(135deg, rgba(121, 85, 72, 0.2), rgba(121, 85, 72, 0.1));
+    color: #795548;
+    border: 1px solid rgba(121, 85, 72, 0.3);
+}
+
+.badge-category:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   QUANTITY INDICATORS
+   =========================== */
+
+.qty-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.qty-indicator.high {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.qty-indicator.medium {
+    background: linear-gradient(135deg, #ff9800, #ffa726);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.qty-indicator.low {
+    background: linear-gradient(135deg, #f44336, #ef5350);
+    color: white;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.qty-indicator:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+/* Tablet - Large (1024px and below) */
+@media (max-width: 1024px) {
+    .data-table {
+        font-size: 13px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 10px;
+    }
+    
+    .btn-sm {
+        padding: 7px 12px;
+        font-size: 11px;
+    }
+    
+    .section-title h2 {
+        font-size: 22px;
+    }
+}
+
+/* Tablet - Medium (768px and below) */
 @media (max-width: 768px) {
     .action-btns {
         flex-direction: column;
+        width: 100%;
     }
     
     .btn-sm {
         width: 100%;
+        padding: 10px 15px;
+        font-size: 12px;
     }
+    
+    .data-table {
+        font-size: 12px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+    }
+    
+    .section-title {
+        margin: 30px 0 20px;
+    }
+    
+    .section-title h2 {
+        font-size: 20px;
+    }
+    
+    .status-available,
+    .status-issued,
+    .status-overdue {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+    
+    .fine-amount {
+        font-size: 13px;
+        padding: 4px 10px;
+    }
+}
+
+/* Mobile - Large (576px and below) */
+@media (max-width: 576px) {
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .data-table {
+        min-width: 600px;
+        font-size: 11px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+    
+    .btn-sm {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+    
+    .section-title h2 {
+        font-size: 18px;
+    }
+    
+    .status-available::before,
+    .status-issued::before,
+    .status-overdue::before {
+        display: none;
+    }
+    
+    .badge-category {
+        font-size: 10px;
+        padding: 4px 10px;
+    }
+    
+    .qty-indicator {
+        min-width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+}
+
+/* Mobile - Small (420px and below) */
+@media (max-width: 420px) {
+    .data-table {
+        min-width: 550px;
+        font-size: 10px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 6px 4px;
+    }
+    
+    .btn-sm {
+        padding: 7px 10px;
+        font-size: 10px;
+    }
+    
+    .section-title h2 {
+        font-size: 16px;
+    }
+    
+    .fine-amount {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+}
+
+/* ===========================
+   ACCESSIBILITY & PERFORMANCE
+   =========================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+
+@media print {
+    .action-btns {
+        display: none;
+    }
+    
+    .data-table tbody tr:hover {
+        background: none;
+        transform: none;
+    }
+    
+    .btn-sm {
+        display: none;
+    }
+}
+
+/* ===========================
+   DARK MODE OPTIMIZATIONS
+   =========================== */
+
+[data-theme="light"] .data-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(212, 160, 23, 0.08) 0%, transparent 100%);
+}
+
+[data-theme="light"] .status-available {
+    background: rgba(76, 175, 80, 0.12);
+}
+
+[data-theme="light"] .status-issued {
+    background: rgba(255, 152, 0, 0.12);
+}
+
+[data-theme="light"] .status-overdue {
+    background: rgba(244, 67, 54, 0.12);
+}
+
+[data-theme="light"] .fine-amount {
+    background: rgba(244, 67, 54, 0.12);
+}
+
+[data-theme="light"] .btn-edit {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
 }
