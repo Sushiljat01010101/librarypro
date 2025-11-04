@@ -1,0 +1,401 @@
+/* ===========================
+   ACTIVITY PAGE ANIMATIONS
+   =========================== */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shimmerBorder {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+/* ===========================
+   FILTERS SECTION - ENHANCED
+   =========================== */
+
+.filters-section {
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(45, 45, 45, 0.9) 100%);
+    padding: 20px 25px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    animation: fadeInScale 0.6s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.filters-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+}
+
+.filters-section:hover {
+    border-color: var(--primary-gold);
+    box-shadow: 0 6px 18px rgba(244, 196, 48, 0.15);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-box input {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-box input:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.2);
+}
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-controls select {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-controls select:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-2px);
+}
+
+/* ===========================
+   ACTIVITY TIMELINE - ENHANCED
+   =========================== */
+
+.activity-timeline {
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(45, 45, 45, 0.9) 100%);
+    border-radius: 16px;
+    padding: 30px;
+    border: 2px solid var(--border-color);
+    animation: fadeInScale 0.6s ease-out 0.3s backwards;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+}
+
+/* ===========================
+   ACTIVITY ITEM - ENHANCED
+   =========================== */
+
+.activity-item {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(42, 42, 42, 0.9) 100%);
+    padding: 20px 25px;
+    border-radius: 14px;
+    border-left: 4px solid var(--border-color);
+    margin-bottom: 15px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInLeft 0.5s ease-out backwards;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, rgba(244, 196, 48, 0.1), transparent);
+    transition: width 0.4s ease;
+}
+
+.activity-item:hover::before {
+    width: 100%;
+}
+
+.activity-item:hover {
+    border-left-color: var(--primary-gold);
+    transform: translateX(8px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(244, 196, 48, 0.2);
+}
+
+/* Stagger animation */
+.activity-item:nth-child(1) { animation-delay: 0.05s; }
+.activity-item:nth-child(2) { animation-delay: 0.1s; }
+.activity-item:nth-child(3) { animation-delay: 0.15s; }
+.activity-item:nth-child(4) { animation-delay: 0.2s; }
+.activity-item:nth-child(5) { animation-delay: 0.25s; }
+.activity-item:nth-child(6) { animation-delay: 0.3s; }
+.activity-item:nth-child(7) { animation-delay: 0.35s; }
+.activity-item:nth-child(8) { animation-delay: 0.4s; }
+.activity-item:nth-child(9) { animation-delay: 0.45s; }
+.activity-item:nth-child(10) { animation-delay: 0.5s; }
+
+/* Activity types border colors */
+.activity-item.member {
+    border-left-color: #2196f3;
+}
+
+.activity-item.book {
+    border-left-color: #9c27b0;
+}
+
+.activity-item.fee {
+    border-left-color: #4caf50;
+}
+
+.activity-item.expense {
+    border-left-color: #ff9800;
+}
+
+.activity-item.member:hover {
+    border-left-color: #2196f3;
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+}
+
+.activity-item.book:hover {
+    border-left-color: #9c27b0;
+    box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+}
+
+.activity-item.fee:hover {
+    border-left-color: #4caf50;
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+}
+
+.activity-item.expense:hover {
+    border-left-color: #ff9800;
+    box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.activity-action {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover .activity-action {
+    color: var(--primary-gold);
+    transform: translateX(5px);
+}
+
+.activity-time {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.activity-item:hover .activity-time {
+    color: var(--text-secondary);
+}
+
+.activity-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover .activity-description {
+    color: var(--text-primary);
+}
+
+/* ===========================
+   NO DATA STATE
+   =========================== */
+
+.no-data {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 16px;
+    padding: 60px 20px;
+    font-weight: 600;
+    animation: fadeInScale 0.6s ease-out;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+/* Tablet - Medium (768px and below) */
+@media (max-width: 768px) {
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+    }
+    
+    .search-box {
+        min-width: 100%;
+    }
+    
+    .filter-controls {
+        width: 100%;
+    }
+    
+    .filter-controls select {
+        flex: 1;
+    }
+    
+    .activity-timeline {
+        padding: 20px;
+    }
+    
+    .activity-item {
+        padding: 15px 20px;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Mobile - Large (576px and below) */
+@media (max-width: 576px) {
+    .filters-section {
+        padding: 12px;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filter-controls select {
+        width: 100%;
+    }
+    
+    .activity-timeline {
+        padding: 15px;
+    }
+    
+    .activity-item {
+        padding: 12px 15px;
+    }
+    
+    .activity-action {
+        font-size: 14px;
+    }
+    
+    .activity-description {
+        font-size: 13px;
+    }
+}
+
+/* Mobile - Small (420px and below) */
+@media (max-width: 420px) {
+    .activity-item:hover {
+        transform: translateX(5px) scale(1.01);
+    }
+}
+
+/* ===========================
+   ACCESSIBILITY & PERFORMANCE
+   =========================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===========================
+   DARK MODE OPTIMIZATIONS
+   =========================== */
+
+[data-theme="light"] .filters-section,
+[data-theme="light"] .activity-timeline,
+[data-theme="light"] .activity-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .filters-section:hover,
+[data-theme="light"] .activity-item:hover {
+    box-shadow: 0 8px 25px rgba(212, 160, 23, 0.15),
+                0 5px 15px rgba(0, 0, 0, 0.1);
+}

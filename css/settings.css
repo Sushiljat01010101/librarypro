@@ -1,0 +1,505 @@
+/* ===========================
+   SETTINGS PAGE ANIMATIONS
+   =========================== */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmerBorder {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+/* ===========================
+   SETTINGS SECTION - ENHANCED
+   =========================== */
+
+.settings-section {
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(45, 45, 45, 0.9) 100%);
+    padding: 30px;
+    border-radius: 16px;
+    border: 2px solid var(--border-color);
+    margin-bottom: 30px;
+    animation: fadeInScale 0.6s ease-out backwards;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+}
+
+.settings-section:hover {
+    border-color: var(--primary-gold);
+    box-shadow: 0 8px 25px rgba(244, 196, 48, 0.15);
+}
+
+/* Stagger animation */
+.settings-section:nth-child(1) { animation-delay: 0.1s; }
+.settings-section:nth-child(2) { animation-delay: 0.2s; }
+.settings-section:nth-child(3) { animation-delay: 0.3s; }
+.settings-section:nth-child(4) { animation-delay: 0.4s; }
+.settings-section:nth-child(5) { animation-delay: 0.5s; }
+
+.settings-section h2 {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    animation: slideDown 0.4s ease-out;
+}
+
+/* ===========================
+   PREFERENCE CARD - ENHANCED
+   =========================== */
+
+.preference-card {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(42, 42, 42, 0.9) 100%);
+    padding: 25px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.preference-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-gold), var(--light-gold), var(--primary-gold));
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.preference-card:hover::before {
+    opacity: 1;
+}
+
+.preference-card:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(244, 196, 48, 0.2);
+}
+
+.preference-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preference-header h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+.preference-card:hover .preference-header h3 {
+    color: var(--primary-gold);
+}
+
+.preference-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.preference-card:hover .preference-header p {
+    color: var(--text-secondary);
+}
+
+/* ===========================
+   THEME SWITCH - ENHANCED
+   =========================== */
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 70px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 34px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-slider::before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 3px;
+    bottom: 2px;
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(244, 196, 48, 0.4);
+}
+
+.theme-switch input:checked + .theme-slider {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    border-color: var(--primary-gold);
+}
+
+.theme-switch input:checked + .theme-slider::before {
+    transform: translateX(36px);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme-slider:hover {
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.3);
+    transform: scale(1.05);
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+    position: absolute;
+    font-size: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+}
+
+.theme-icon-sun {
+    left: 8px;
+}
+
+.theme-icon-moon {
+    right: 8px;
+}
+
+/* ===========================
+   FORM ENHANCEMENTS
+   =========================== */
+
+.settings-section form {
+    animation: fadeInScale 0.5s ease-out 0.2s backwards;
+}
+
+.settings-section .form-group {
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.settings-section .form-group:hover {
+    transform: translateX(5px);
+}
+
+.settings-section .form-group label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.settings-section .form-group:hover label {
+    color: var(--primary-gold);
+}
+
+.settings-section input[type="text"],
+.settings-section input[type="number"],
+.settings-section input[type="password"] {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-section input:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.2);
+}
+
+.settings-section .btn-primary {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-section .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.settings-section .btn-primary:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.settings-section .btn-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(244, 196, 48, 0.4);
+}
+
+.settings-section .btn-secondary {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-section .btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   BUTTON GROUP
+   =========================== */
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    animation: popIn 0.5s ease-out 0.3s backwards;
+}
+
+/* ===========================
+   TELEGRAM INFO BOX
+   =========================== */
+
+.telegram-info {
+    animation: fadeInScale 0.6s ease-out 0.4s backwards;
+    transition: all 0.3s ease;
+}
+
+.telegram-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(244, 196, 48, 0.15);
+}
+
+.telegram-info code {
+    background: rgba(244, 196, 48, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--primary-gold);
+    font-weight: 600;
+}
+
+/* ===========================
+   FORM HINT
+   =========================== */
+
+.form-hint {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+.form-group:hover .form-hint {
+    color: var(--text-secondary);
+}
+
+/* ===========================
+   TELEGRAM STATUS
+   =========================== */
+
+.telegram-status {
+    padding: 15px;
+    border-radius: 10px;
+    animation: slideDown 0.4s ease-out;
+}
+
+.telegram-status.success {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid var(--success);
+}
+
+.telegram-status.error {
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid var(--danger);
+}
+
+.status-message {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+/* Tablet - Medium (768px and below) */
+@media (max-width: 768px) {
+    .settings-section {
+        padding: 20px;
+    }
+    
+    .preference-card {
+        padding: 20px;
+    }
+    
+    .preference-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .button-group button {
+        width: 100%;
+    }
+}
+
+/* Mobile - Large (576px and below) */
+@media (max-width: 576px) {
+    .settings-section {
+        padding: 15px;
+    }
+    
+    .settings-section h2 {
+        font-size: 18px;
+    }
+    
+    .preference-card {
+        padding: 15px;
+    }
+    
+    .preference-header h3 {
+        font-size: 16px;
+    }
+    
+    .preference-header p {
+        font-size: 13px;
+    }
+}
+
+/* Mobile - Small (420px and below) */
+@media (max-width: 420px) {
+    .settings-section {
+        padding: 12px;
+    }
+    
+    .settings-section h2 {
+        font-size: 16px;
+    }
+}
+
+/* ===========================
+   ACCESSIBILITY & PERFORMANCE
+   =========================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===========================
+   DARK MODE OPTIMIZATIONS
+   =========================== */
+
+[data-theme="light"] .settings-section,
+[data-theme="light"] .preference-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .settings-section:hover,
+[data-theme="light"] .preference-card:hover {
+    box-shadow: 0 15px 35px rgba(212, 160, 23, 0.15),
+                0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .telegram-info:hover {
+    box-shadow: 0 6px 18px rgba(212, 160, 23, 0.15);
+}
