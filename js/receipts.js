@@ -296,37 +296,54 @@ async function downloadSinglePDF(paymentId) {
 }
 
 async function generatePDF(htmlContent, filename) {
+    const container = document.getElementById('receiptContent');
+    const preview = document.getElementById('receiptPreview');
+    
     try {
         if (!window.jspdf || !window.html2canvas) {
             alert('PDF libraries not loaded yet. Please wait a moment and try again.');
             return;
         }
         
-        const container = document.getElementById('receiptContent');
         container.innerHTML = htmlContent;
-        container.style.display = 'block';
+        preview.style.display = 'block';
+        preview.style.position = 'absolute';
+        preview.style.left = '-9999px';
+        preview.style.top = '0';
+        container.style.width = '800px';
+        container.style.padding = '20px';
+        container.style.backgroundColor = '#ffffff';
         
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         const canvas = await html2canvas(container, {
             scale: 2,
             backgroundColor: '#ffffff',
-            logging: false,
+            logging: true,
             useCORS: true,
-            allowTaint: false,
-            imageTimeout: 0,
-            removeContainer: false
+            allowTaint: true,
+            foreignObjectRendering: false,
+            imageTimeout: 15000,
+            removeContainer: false,
+            width: container.scrollWidth,
+            height: container.scrollHeight,
+            windowWidth: container.scrollWidth,
+            windowHeight: container.scrollHeight
         });
         
-        container.style.display = 'none';
+        preview.style.display = 'none';
         
-        if (!canvas || canvas.width === 0 || canvas.height === 0) {
-            throw new Error('Failed to generate canvas from content');
+        if (!canvas) {
+            throw new Error('Canvas generation failed');
         }
         
-        const imgData = canvas.toDataURL('image/png', 1.0);
+        if (canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Canvas has invalid dimensions');
+        }
         
-        if (!imgData || imgData === 'data:,') {
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        
+        if (!imgData || imgData.length < 100) {
             throw new Error('Failed to convert canvas to image');
         }
         
@@ -340,24 +357,36 @@ async function generatePDF(htmlContent, filename) {
         let heightLeft = imgHeight;
         let position = 0;
         
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
             pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
         }
         
         pdf.save(filename);
-        
         container.innerHTML = '';
         
-        alert('PDF downloaded successfully!');
+        alert('PDF downloaded successfully! ✅');
+        
     } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Error generating PDF: ' + error.message + '. Please try again.');
+        console.error('PDF Generation Error:', error);
+        preview.style.display = 'none';
+        container.innerHTML = '';
+        
+        let errorMsg = 'Failed to generate PDF. ';
+        if (error.message.includes('Canvas')) {
+            errorMsg += 'Unable to create receipt image. Try refreshing the page.';
+        } else if (error.message.includes('dimensions')) {
+            errorMsg += 'Receipt content is empty or invalid.';
+        } else {
+            errorMsg += error.message;
+        }
+        
+        alert(errorMsg);
     }
 }
 
