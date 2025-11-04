@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Receipts - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/receipts.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="members.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span class="text">Members</span>
+                </a>
+                <a href="seats.html" class="nav-item">
+                    <span class="icon">🪑</span>
+                    <span class="text">Seats</span>
+                </a>
+                <a href="books.html" class="nav-item">
+                    <span class="icon">📚</span>
+                    <span class="text">Books</span>
+                </a>
+                <a href="fees.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span class="text">Fees</span>
+                </a>
+                <a href="receipts.html" class="nav-item active">
+                    <span class="icon">🧾</span>
+                    <span class="text">Payment Receipts</span>
+                </a>
+                <a href="expenses.html" class="nav-item">
+                    <span class="icon">💸</span>
+                    <span class="text">Expenses</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="activity.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="text">Activity Log</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span class="text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+            <header class="top-bar">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+                <h1>💳 Payment Receipts</h1>
+                <div class="user-section">
+                    <span class="current-date" id="currentDate"></span>
+                    <span class="username" id="currentUser"></span>
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h2>Member Payment Receipts</h2>
+                    <p>Search member और payment receipts download/share करें</p>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-card">
+                        <h3>🔍 Select Member</h3>
+                        <div class="search-controls">
+                            <select id="memberSelect" class="member-select">
+                                <option value="">-- Select Member --</option>
+                            </select>
+                            <button class="btn btn-secondary" onclick="clearSelection()">
+                                <span>🔄 Clear</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="memberInfoSection" class="member-info-section" style="display: none;">
+                    <div class="member-info-card">
+                        <div class="member-details">
+                            <h3 id="memberName">Member Name</h3>
+                            <div class="member-meta">
+                                <span id="memberPhone">📞 Phone</span>
+                                <span id="memberSeat">🪑 Seat</span>
+                                <span id="memberStatus">Status</span>
+                            </div>
+                        </div>
+                        <div class="payment-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Payments</span>
+                                <span class="stat-value" id="totalPayments">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Amount</span>
+                                <span class="stat-value" id="totalAmount">₹0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Pending</span>
+                                <span class="stat-value danger" id="pendingAmount">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="downloadAllPDF()">
+                            <span>📥 Download All PDF</span>
+                        </button>
+                        <button class="btn btn-success" onclick="sendAllWhatsApp()">
+                            <span>📱 Send All via WhatsApp</span>
+                        </button>
+                        <button class="btn btn-warning" onclick="downloadLastPDF()">
+                            <span>📄 Download Last Payment PDF</span>
+                        </button>
+                        <button class="btn btn-info" onclick="sendLastWhatsApp()">
+                            <span>💬 Send Last via WhatsApp</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="printReceipt()">
+                            <span>🖨️ Print</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportToExcel()">
+                            <span>📊 Export Excel</span>
+                        </button>
+                    </div>
+
+                    <div class="filter-section">
+                        <h4>🗓️ Filter by Date</h4>
+                        <div class="filter-controls">
+                            <input type="month" id="startMonth" class="date-input">
+                            <span>to</span>
+                            <input type="month" id="endMonth" class="date-input">
+                            <button class="btn btn-sm btn-primary" onclick="applyDateFilter()">Apply</button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearDateFilter()">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="payment-history">
+                        <h3>📋 Payment History</h3>
+                        <div class="timeline-container" id="paymentTimeline">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noSelectionMessage" class="no-selection">
+                    <div class="empty-state">
+                        <span class="empty-icon">🧾</span>
+                        <h3>No Member Selected</h3>
+                        <p>Please select a member from the dropdown above to view their payment receipts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div id="receiptPreview" style="display: none;">
+        <div class="receipt-container" id="receiptContent">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/receipts.js"></script>
+</body>
+</html>
