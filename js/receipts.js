@@ -390,7 +390,7 @@ async function generatePDF(htmlContent, filename) {
     }
 }
 
-function sendAllWhatsApp() {
+async function sendAllWhatsApp() {
     if (!currentMember || filteredPayments.length === 0) {
         alert('No payment records found');
         return;
@@ -406,30 +406,26 @@ function sendAllWhatsApp() {
     const settings = storageManager.getSettings();
     const libraryName = settings.libraryName || 'Library Management System';
     
+    const receiptHTML = generateReceiptHTML(paidPayments, true);
+    const filename = `${currentMember.name}_All_Payments.pdf`;
+    await generatePDF(receiptHTML, filename);
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     let message = `*${libraryName}*\n`;
-    message += `*Payment Receipt - All Payments*\n\n`;
-    message += `📋 *Member Details:*\n`;
-    message += `Name: ${currentMember.name}\n`;
-    message += `Seat: ${currentMember.seat || 'N/A'}\n`;
-    message += `Contact: ${currentMember.contact}\n\n`;
+    message += `*Payment Receipt*\n\n`;
+    message += `Dear ${currentMember.name},\n\n`;
+    message += `📄 Your payment receipt PDF has been generated.\n\n`;
     message += `💰 *Payment Summary:*\n`;
     message += `Total Payments: ${paidPayments.length}\n`;
     message += `Total Amount: ${storageManager.formatCurrency(totalAmount)}\n\n`;
-    message += `📝 *Payment Details:*\n`;
-    
-    paidPayments.forEach((payment, index) => {
-        message += `\n${index + 1}. ${payment.month}\n`;
-        message += `   Amount: ${storageManager.formatCurrency(payment.amount)}\n`;
-        message += `   Date: ${storageManager.formatDate(payment.paymentDate)}\n`;
-        message += `   Method: ${payment.paymentMethod || 'N/A'}\n`;
-    });
-    
-    message += `\n\nThank you for your payment! 🙏`;
+    message += `Please find the attached PDF file for complete payment details.\n\n`;
+    message += `Thank you for your payment! 🙏`;
     
     sendWhatsAppMessage(currentMember.contact, message);
 }
 
-function sendLastWhatsApp() {
+async function sendLastWhatsApp() {
     if (!currentMember || filteredPayments.length === 0) {
         alert('No payment records found');
         return;
@@ -442,10 +438,10 @@ function sendLastWhatsApp() {
     }
     
     const lastPayment = paidPayments[0];
-    sendSingleWhatsApp(lastPayment.id);
+    await sendSingleWhatsApp(lastPayment.id);
 }
 
-function sendSingleWhatsApp(paymentId) {
+async function sendSingleWhatsApp(paymentId) {
     const payment = allPayments.find(p => p.id === paymentId);
     if (!payment || payment.status !== 'paid') {
         alert('Payment not found or not paid');
@@ -455,23 +451,24 @@ function sendSingleWhatsApp(paymentId) {
     const settings = storageManager.getSettings();
     const libraryName = settings.libraryName || 'Library Management System';
     
+    const receiptHTML = generateReceiptHTML([payment], false);
+    const filename = `${currentMember.name}_${payment.month}_Payment.pdf`;
+    await generatePDF(receiptHTML, filename);
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     let message = `*${libraryName}*\n`;
     message += `*Payment Receipt*\n\n`;
-    message += `📋 *Member Details:*\n`;
-    message += `Name: ${currentMember.name}\n`;
-    message += `Seat: ${currentMember.seat || 'N/A'}\n`;
-    message += `Contact: ${currentMember.contact}\n\n`;
+    message += `Dear ${currentMember.name},\n\n`;
+    message += `📄 Your payment receipt PDF has been generated.\n\n`;
     message += `💰 *Payment Details:*\n`;
     message += `Month: ${payment.month}\n`;
     message += `Amount: ${storageManager.formatCurrency(payment.amount)}\n`;
     message += `Payment Date: ${storageManager.formatDate(payment.paymentDate)}\n`;
-    message += `Payment Method: ${payment.paymentMethod || 'N/A'}\n`;
-    
-    if (payment.notes) {
-        message += `Notes: ${payment.notes}\n`;
-    }
-    
-    message += `\n\nThank you for your payment! 🙏`;
+    message += `Payment Method: ${payment.paymentMethod || 'N/A'}\n\n`;
+    message += `Please find the attached PDF file: *${filename}*\n\n`;
+    message += `Kindly attach this PDF from your downloads folder and send.\n\n`;
+    message += `Thank you for your payment! 🙏`;
     
     sendWhatsAppMessage(currentMember.contact, message);
 }
