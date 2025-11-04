@@ -19,28 +19,67 @@ function loadExpenses() {
     });
     
     const tbody = document.querySelector('#expensesTable tbody');
+    tbody.innerHTML = '';
     
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="no-data">No expenses found.</td></tr>';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.setAttribute('colspan', '7');
+        cell.className = 'no-data';
+        cell.textContent = 'No expenses found.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
         return;
     }
     
-    tbody.innerHTML = filtered.map(expense => `
-        <tr>
-            <td>${storageManager.formatDate(expense.date)}</td>
-            <td>${expense.category}</td>
-            <td>${expense.description}</td>
-            <td>${storageManager.formatCurrency(expense.amount)}</td>
-            <td>${expense.paymentMethod}</td>
-            <td>${expense.addedBy}</td>
-            <td>
-                <div class="action-btns">
-                    <button class="btn-sm btn-edit" onclick="editExpense('${expense.id}')">Edit</button>
-                    <button class="btn-sm btn-delete" onclick="deleteExpense('${expense.id}')">Delete</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    filtered.forEach(expense => {
+        const row = document.createElement('tr');
+        
+        const dateCell = document.createElement('td');
+        dateCell.textContent = storageManager.formatDate(expense.date);
+        row.appendChild(dateCell);
+        
+        const categoryCell = document.createElement('td');
+        categoryCell.textContent = expense.category;
+        row.appendChild(categoryCell);
+        
+        const descCell = document.createElement('td');
+        descCell.textContent = expense.description;
+        row.appendChild(descCell);
+        
+        const amountCell = document.createElement('td');
+        amountCell.textContent = storageManager.formatCurrency(expense.amount);
+        row.appendChild(amountCell);
+        
+        const methodCell = document.createElement('td');
+        methodCell.textContent = expense.paymentMethod;
+        row.appendChild(methodCell);
+        
+        const addedByCell = document.createElement('td');
+        addedByCell.textContent = expense.addedBy;
+        row.appendChild(addedByCell);
+        
+        const actionsCell = document.createElement('td');
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'action-btns';
+        
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-sm btn-edit';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editExpense(expense.id);
+        actionsDiv.appendChild(editBtn);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-sm btn-delete';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteExpense(expense.id);
+        actionsDiv.appendChild(deleteBtn);
+        
+        actionsCell.appendChild(actionsDiv);
+        row.appendChild(actionsCell);
+        
+        tbody.appendChild(row);
+    });
     
     updateStats();
 }
@@ -76,8 +115,19 @@ function populateMonthFilter() {
     const months = [...new Set(expenses.map(e => e.date.slice(0, 7)))].sort().reverse();
     
     const select = document.getElementById('monthFilter');
-    select.innerHTML = '<option value="">All Time</option>' + 
-        months.map(m => `<option value="${m}">${m}</option>`).join('');
+    select.innerHTML = '';
+    
+    const allTimeOption = document.createElement('option');
+    allTimeOption.value = '';
+    allTimeOption.textContent = 'All Time';
+    select.appendChild(allTimeOption);
+    
+    months.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m;
+        option.textContent = m;
+        select.appendChild(option);
+    });
 }
 
 document.getElementById('addExpenseBtn').addEventListener('click', () => {
