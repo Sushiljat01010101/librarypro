@@ -337,7 +337,13 @@ class StorageManager {
                     const result = await telegramNotifier.sendPhoto(idProofData, caption);
                     if (result.success && result.fileId) {
                         member.idProofTelegramFileId = result.fileId;
-                        console.log('ID proof sent to Telegram, file ID will be saved');
+                        member.idProofTelegramMessageId = result.messageId;
+                        const { chatId } = telegramNotifier.getSettings();
+                        if (chatId && result.messageId) {
+                            const cleanChatId = chatId.toString().replace('-100', '');
+                            member.idProofTelegramLink = `https://t.me/c/${cleanChatId}/${result.messageId}`;
+                        }
+                        console.log('ID proof sent to Telegram, link and file ID saved');
                     } else {
                         console.error('Failed to send ID proof to Telegram, ID proof will not be saved');
                         alert('⚠️ Failed to upload ID proof to Telegram. Member will be added without ID proof.');
@@ -441,7 +447,13 @@ class StorageManager {
                         const result = await telegramNotifier.sendPhoto(idProofData, caption);
                         if (result.success && result.fileId) {
                             updatedMember.idProofTelegramFileId = result.fileId;
-                            console.log('Updated ID proof sent to Telegram, file ID will be saved');
+                            updatedMember.idProofTelegramMessageId = result.messageId;
+                            const { chatId } = telegramNotifier.getSettings();
+                            if (chatId && result.messageId) {
+                                const cleanChatId = chatId.toString().replace('-100', '');
+                                updatedMember.idProofTelegramLink = `https://t.me/c/${cleanChatId}/${result.messageId}`;
+                            }
+                            console.log('Updated ID proof sent to Telegram, link and file ID saved');
                         } else {
                             console.error('Failed to send updated ID proof to Telegram');
                             alert('⚠️ Failed to upload ID proof to Telegram. Member will be updated without ID proof.');

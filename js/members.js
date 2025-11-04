@@ -53,6 +53,10 @@ function loadMembers() {
             `<span class="detail-value">XXXX XXXX ${member.aadhar.slice(-4)}</span>` : 
             '<span class="detail-value text-muted">Not Provided</span>';
         
+        const idProofDisplay = member.idProofTelegramLink ? 
+            `<a href="${member.idProofTelegramLink}" target="_blank" style="color: var(--primary-gold); text-decoration: none; font-size: 13px;">📱 View ID Proof</a>` : 
+            '<span class="detail-value text-muted">Not Uploaded</span>';
+        
         return `
             <div class="member-card">
                 <div class="member-header">
@@ -70,6 +74,10 @@ function loadMembers() {
                     <div class="detail-row">
                         <span class="detail-label">Aadhar Number</span>
                         ${aadharDisplay}
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Proof</span>
+                        <span class="detail-value">${idProofDisplay}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Membership</span>
@@ -134,7 +142,7 @@ function displayIdProof(dataUrl) {
     removeBtn.style.display = 'inline-block';
 }
 
-function displayTelegramIdProofReference() {
+function displayTelegramIdProofReference(member) {
     currentIdProofData = null;
     const preview = document.getElementById('idProofPreview');
     const placeholder = document.querySelector('.id-proof-placeholder');
@@ -143,7 +151,13 @@ function displayTelegramIdProofReference() {
     
     preview.classList.add('has-image');
     placeholder.style.display = 'block';
-    placeholder.innerHTML = '✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>';
+    
+    let linkHtml = '';
+    if (member && member.idProofTelegramLink) {
+        linkHtml = `<a href="${member.idProofTelegramLink}" target="_blank" style="color: var(--primary-gold); text-decoration: underline; font-size: 13px; display: inline-block; margin-top: 8px;">📱 View on Telegram</a>`;
+    }
+    
+    placeholder.innerHTML = `✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>${linkHtml}`;
     image.style.display = 'none';
     image.src = '';
     removeBtn.style.display = 'none';
@@ -363,7 +377,7 @@ function editMember(id) {
         if (member.idProof) {
             displayIdProof(member.idProof);
         } else if (member.idProofTelegramFileId) {
-            displayTelegramIdProofReference();
+            displayTelegramIdProofReference(member);
         } else {
             resetIdProofDisplay();
         }
