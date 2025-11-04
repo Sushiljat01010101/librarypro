@@ -340,6 +340,32 @@ class StorageManager {
             }
         }
         
+        if (member.monthsPaidInAdvance && member.monthsPaidInAdvance > 0) {
+            const paymentResult = this.createAdvancePaymentRecords(
+                member.id, 
+                member.name, 
+                member.fee, 
+                member.joiningDate,
+                member.monthsPaidInAdvance,
+                member.paymentDate || member.joiningDate,
+                member.paymentMethod || 'cash'
+            );
+            
+            const nextDueDate = this.calculateNextDueDateFromLastPaid(
+                member.joiningDate,
+                paymentResult.lastPaidYear,
+                paymentResult.lastPaidMonth
+            );
+            member.nextPaymentDate = nextDueDate;
+            
+            const updatedMembers = this.getMembers();
+            const memberIndex = updatedMembers.findIndex(m => m.id === member.id);
+            if (memberIndex !== -1) {
+                updatedMembers[memberIndex].nextPaymentDate = nextDueDate;
+                this.saveMembers(updatedMembers);
+            }
+        }
+        
         if (typeof telegramNotifier !== 'undefined') {
             telegramNotifier.notifyMemberAdded(member);
         }
@@ -603,6 +629,118 @@ class StorageManager {
             return true;
         }
         return false;
+    }
+    
+    createAdvancePaymentRecords(memberId, memberName, monthlyFee, joiningDate, monthsPaid, paymentDate, paymentMethod) {
+        const allFees = this.getFees().filter(f => f.memberId === memberId);
+        const totalAmount = monthlyFee * monthsPaid;
+        
+        let startYear, startMonth;
+        
+        if (allFees.length > 0) {
+            const pendingFees = allFees.filter(f => f.status === 'pending');
+            
+            if (pendingFees.length > 0) {
+                const earliestPending = pendingFees.reduce((earliest, fee) => {
+                    const [feeYear, feeMonth] = fee.month.split('-').map(Number);
+                    const [earliestYear, earliestMonth] = earliest.month.split('-').map(Number);
+                    
+                    if (feeYear < earliestYear || (feeYear === earliestYear && feeMonth < earliestMonth)) {
+                        return fee;
+                    }
+                    return earliest;
+                });
+                
+                const [earliestYear, earliestMonth] = earliestPending.month.split('-').map(Number);
+                startYear = earliestYear;
+                startMonth = earliestMonth;
+            } else {
+                const latestPaidFee = allFees.reduce((latest, fee) => {
+                    const [feeYear, feeMonth] = fee.month.split('-').map(Number);
+                    const [latestYear, latestMonth] = latest.month.split('-').map(Number);
+                    
+                    if (feeYear > latestYear || (feeYear === latestYear && feeMonth > latestMonth)) {
+                        return fee;
+                    }
+                    return latest;
+                });
+                
+                const [latestYear, latestMonth] = latestPaidFee.month.split('-').map(Number);
+                startYear = latestYear;
+                startMonth = latestMonth + 1;
+                if (startMonth > 12) {
+                    startMonth = 1;
+                    startYear++;
+                }
+            }
+        } else {
+            const joiningDateObj = new Date(joiningDate);
+            startYear = joiningDateObj.getFullYear();
+            startMonth = joiningDateObj.getMonth() + 1;
+        }
+        
+        let currentYear = startYear;
+        let currentMonth = startMonth;
+        
+        for (let i = 0; i < monthsPaid; i++) {
+            const monthYear = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+            
+            const existingFee = allFees.find(f => f.month === monthYear);
+            
+            if (existingFee) {
+                if (existingFee.status === 'pending') {
+                    this.updateFee(existingFee.id, {
+                        status: 'paid',
+                        paymentDate: paymentDate,
+                        paymentMethod: paymentMethod,
+                        notes: i === 0 ? 
+                            `Advance payment for ${monthsPaid} month(s) - Total: ₹${totalAmount}` : 
+                            `Part of advance payment (${i + 1}/${monthsPaid})`
+                    });
+                }
+            } else {
+                this.addFee({
+                    memberId: memberId,
+                    memberName: memberName,
+                    month: monthYear,
+                    amount: monthlyFee,
+                    status: 'paid',
+                    paymentDate: paymentDate,
+                    paymentMethod: paymentMethod,
+                    notes: i === 0 ? 
+                        `Advance payment for ${monthsPaid} month(s) - Total: ₹${totalAmount}` : 
+                        `Part of advance payment (${i + 1}/${monthsPaid})`
+                });
+            }
+            
+            currentMonth++;
+            if (currentMonth > 12) {
+                currentMonth = 1;
+                currentYear++;
+            }
+        }
+        
+        this.addActivity(
+            `Advance payment recorded: ${memberName} - ${monthsPaid} month(s) - Total: ₹${totalAmount}`,
+            'fee'
+        );
+        
+        return { lastPaidYear: currentYear, lastPaidMonth: currentMonth };
+    }
+    
+    calculateNextDueDateFromLastPaid(joiningDate, lastPaidYear, lastPaidMonth) {
+        const startDate = new Date(joiningDate);
+        const desiredDay = startDate.getDate();
+        
+        const nextDueYear = lastPaidMonth > 12 ? lastPaidYear + 1 : lastPaidYear;
+        const nextDueMonthIndex = lastPaidMonth > 12 ? 0 : lastPaidMonth - 1;
+        
+        const lastDayOfNextMonth = new Date(nextDueYear, nextDueMonthIndex + 1, 0).getDate();
+        const actualDay = Math.min(desiredDay, lastDayOfNextMonth);
+        
+        const nextDueDate = new Date(nextDueYear, nextDueMonthIndex, actualDay);
+        
+        return nextDueDate.toISOString().split('T')[0];
     }
     
     generateMonthlyFees(month, year) {

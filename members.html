@@ -181,8 +181,27 @@
                         <input type="date" id="joiningDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="nextPaymentDate">Next Payment Date</label>
-                        <input type="date" id="nextPaymentDate">
+                        <label for="monthsPaidInAdvance">Months Paid in Advance *</label>
+                        <input type="number" id="monthsPaidInAdvance" required min="1" max="12" value="1">
+                        <small class="form-hint">Number of months payment received (1-12)</small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="paymentDate">Payment Date *</label>
+                        <input type="date" id="paymentDate" required>
+                        <small class="form-hint">Date when payment was received</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method *</label>
+                        <select id="paymentMethod" required>
+                            <option value="cash">Cash</option>
+                            <option value="upi">UPI</option>
+                            <option value="card">Card</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="cheque">Cheque</option>
+                        </select>
                     </div>
                 </div>
                 

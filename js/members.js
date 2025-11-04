@@ -109,7 +109,9 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Add Member';
     document.getElementById('memberForm').reset();
     document.getElementById('joiningDate').valueAsDate = new Date();
-    document.getElementById('nextPaymentDate').value = '';
+    document.getElementById('paymentDate').valueAsDate = new Date();
+    document.getElementById('monthsPaidInAdvance').value = 1;
+    document.getElementById('paymentMethod').value = 'cash';
     updateSeatDisplay(null);
     showModal('memberModal');
 });
@@ -123,7 +125,9 @@ document.getElementById('selectSeatBtn').addEventListener('click', () => {
         membershipType: document.getElementById('membershipType').value,
         fee: document.getElementById('memberFee').value,
         joiningDate: document.getElementById('joiningDate').value,
-        nextPaymentDate: document.getElementById('nextPaymentDate').value,
+        monthsPaidInAdvance: document.getElementById('monthsPaidInAdvance').value,
+        paymentDate: document.getElementById('paymentDate').value,
+        paymentMethod: document.getElementById('paymentMethod').value,
         status: document.getElementById('memberStatus').value,
         photo: document.getElementById('memberPhoto').value,
         address: document.getElementById('memberAddress').value,
@@ -159,7 +163,9 @@ function checkForSeatSelection() {
         document.getElementById('membershipType').value = data.membershipType || 'monthly';
         document.getElementById('memberFee').value = data.fee || '';
         document.getElementById('joiningDate').value = data.joiningDate || new Date().toISOString().split('T')[0];
-        document.getElementById('nextPaymentDate').value = data.nextPaymentDate || '';
+        document.getElementById('monthsPaidInAdvance').value = data.monthsPaidInAdvance || 1;
+        document.getElementById('paymentDate').value = data.paymentDate || new Date().toISOString().split('T')[0];
+        document.getElementById('paymentMethod').value = data.paymentMethod || 'cash';
         document.getElementById('memberStatus').value = data.status || 'active';
         document.getElementById('memberPhoto').value = data.photo || '';
         document.getElementById('memberAddress').value = data.address || '';
@@ -196,7 +202,9 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         membershipType: document.getElementById('membershipType').value,
         fee: parseFloat(document.getElementById('memberFee').value),
         joiningDate: document.getElementById('joiningDate').value,
-        nextPaymentDate: document.getElementById('nextPaymentDate').value,
+        monthsPaidInAdvance: parseInt(document.getElementById('monthsPaidInAdvance').value) || 1,
+        paymentDate: document.getElementById('paymentDate').value,
+        paymentMethod: document.getElementById('paymentMethod').value,
         status: document.getElementById('memberStatus').value,
         photo: document.getElementById('memberPhoto').value,
         address: document.getElementById('memberAddress').value
@@ -227,7 +235,9 @@ function editMember(id) {
         document.getElementById('membershipType').value = member.membershipType;
         document.getElementById('memberFee').value = member.fee;
         document.getElementById('joiningDate').value = member.joiningDate;
-        document.getElementById('nextPaymentDate').value = member.nextPaymentDate || '';
+        document.getElementById('monthsPaidInAdvance').value = member.monthsPaidInAdvance || 1;
+        document.getElementById('paymentDate').value = member.paymentDate || new Date().toISOString().split('T')[0];
+        document.getElementById('paymentMethod').value = member.paymentMethod || 'cash';
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberPhoto').value = member.photo || '';
         document.getElementById('memberAddress').value = member.address || '';
