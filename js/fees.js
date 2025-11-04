@@ -24,7 +24,7 @@ function loadFees() {
     }
     
     tbody.innerHTML = filtered.map(fee => {
-        const nextDue = storageManager.getNextDueDateForMember(fee.memberId);
+        const nextDue = storageManager.getNextMonthFromFeeMonth(fee.month, fee.memberId);
         const member = storageManager.getMembers().find(m => m.id === fee.memberId);
         
         return `<tr>

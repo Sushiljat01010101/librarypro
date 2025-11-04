@@ -940,6 +940,37 @@ class StorageManager {
         return feeDueDate < today;
     }
     
+    getNextMonthFromFeeMonth(feeMonth, memberId) {
+        if (!feeMonth) return null;
+        
+        const member = this.getMembers().find(m => m.id === memberId);
+        if (!member || !member.joiningDate) return null;
+        
+        const [year, month] = feeMonth.split('-').map(Number);
+        
+        let nextMonth = month + 1;
+        let nextYear = year;
+        
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextYear++;
+        }
+        
+        const joiningDate = new Date(member.joiningDate);
+        let desiredDay = joiningDate.getDate();
+        
+        if (member.nextPaymentDate && member.nextPaymentDate.trim() !== '') {
+            const customDate = new Date(member.nextPaymentDate);
+            desiredDay = customDate.getDate();
+        }
+        
+        const lastDayOfNextMonth = new Date(nextYear, nextMonth, 0).getDate();
+        const actualDay = Math.min(desiredDay, lastDayOfNextMonth);
+        
+        const nextDueDate = new Date(nextYear, nextMonth - 1, actualDay);
+        return nextDueDate.toISOString().split('T')[0];
+    }
+    
     getExpenses() {
         return JSON.parse(localStorage.getItem('libraryExpenses')) || [];
     }
