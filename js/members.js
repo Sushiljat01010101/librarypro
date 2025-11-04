@@ -12,7 +12,11 @@ function updateSeatDisplay(seatValue) {
         seatDisplay.classList.remove('has-seat');
         seatInput.value = '';
     } else {
-        seatDisplay.innerHTML = `<span class="seat-selected">🪑 Seat ${seatValue}</span>`;
+        seatDisplay.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'seat-selected';
+        span.textContent = `🪑 Seat ${seatValue}`;
+        seatDisplay.appendChild(span);
         seatDisplay.classList.add('has-seat');
         seatInput.value = seatValue;
     }
@@ -201,12 +205,21 @@ function displayTelegramIdProofReference(member) {
     preview.classList.add('has-image');
     placeholder.style.display = 'block';
     
-    let infoHtml = '<br><small style="opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;">💡 To view ID proof, open your Telegram app and check the bot chat where photos are sent</small>';
+    placeholder.textContent = '';
+    placeholder.innerHTML = '✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>';
+    
+    const infoSmall = document.createElement('small');
+    infoSmall.style.cssText = 'opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;';
+    
     if (member && member.idProofTelegramMessageId) {
-        infoHtml = `<br><small style="opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;">💡 Message ID: #${member.idProofTelegramMessageId}<br>View this photo in your Telegram bot chat</small>`;
+        infoSmall.textContent = `💡 Message ID: #${member.idProofTelegramMessageId} - View this photo in your Telegram bot chat`;
+    } else {
+        infoSmall.textContent = '💡 To view ID proof, open your Telegram app and check the bot chat where photos are sent';
     }
     
-    placeholder.innerHTML = `✅ ID Proof stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Upload a new photo to replace it</small>${infoHtml}`;
+    placeholder.appendChild(document.createElement('br'));
+    placeholder.appendChild(infoSmall);
+    
     image.style.display = 'none';
     image.src = '';
     removeBtn.style.display = 'none';
