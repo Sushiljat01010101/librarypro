@@ -1184,11 +1184,15 @@ body {
     
     .header-right {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
     }
     
-    .user-info {
-        align-items: flex-end;
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
     }
     
     .filters-section {
