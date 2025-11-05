@@ -254,13 +254,26 @@ class TelegramNotifier {
         const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
         const libraryName = this.escapeHtml(settings.libraryName) || 'Library Management System';
         
+        const members = JSON.parse(localStorage.getItem('libraryMembers')) || [];
+        const member = members.find(m => m.id === fee.memberId);
+        
         let message = `💰 <b>Payment Recorded</b>\n\n`;
         message += `📚 <b>${libraryName}</b>\n`;
         message += `━━━━━━━━━━━━━━━━━━\n\n`;
         message += `👤 <b>Member:</b> ${this.escapeHtml(fee.memberName)}\n`;
-        message += `💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
-        message += `📅 <b>Month:</b> ${this.escapeHtml(fee.month)}\n`;
-        message += `✅ <b>Status:</b> ${fee.status === 'paid' ? 'Paid' : 'Pending'}\n`;
+        
+        if (member) {
+            message += `📱 <b>Phone:</b> ${this.escapeHtml(member.contact)}\n`;
+            if (member.seat && member.seat > 0) {
+                message += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
+            } else {
+                message += `🪑 <b>Seat:</b> Not Assigned\n`;
+            }
+        }
+        
+        message += `\n💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
+        message += `📅 <b>For Month:</b> ${this.escapeHtml(fee.month)}\n`;
+        message += `✅ <b>Status:</b> ${fee.status === 'paid' ? '✅ Paid' : '⏳ Pending'}\n`;
         
         if (fee.paymentDate) {
             const date = new Date(fee.paymentDate);
@@ -268,7 +281,19 @@ class TelegramNotifier {
         }
         
         if (fee.paymentMethod) {
-            message += `💳 <b>Method:</b> ${this.escapeHtml(fee.paymentMethod)}\n`;
+            const methodEmoji = {
+                'cash': '💵',
+                'online': '💳',
+                'upi': '📱',
+                'card': '💳',
+                'cheque': '📝'
+            };
+            const emoji = methodEmoji[fee.paymentMethod.toLowerCase()] || '💳';
+            message += `${emoji} <b>Payment Method:</b> ${this.escapeHtml(fee.paymentMethod)}\n`;
+        }
+        
+        if (fee.notes) {
+            message += `📝 <b>Notes:</b> ${this.escapeHtml(fee.notes)}\n`;
         }
         
         message += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
@@ -280,26 +305,46 @@ class TelegramNotifier {
         const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
         const libraryName = this.escapeHtml(settings.libraryName) || 'Library Management System';
         
+        const members = JSON.parse(localStorage.getItem('libraryMembers')) || [];
+        const member = members.find(m => m.id === updatedFee.memberId);
+        
         let message = `✏️ <b>Payment Updated</b>\n\n`;
         message += `📚 <b>${libraryName}</b>\n`;
         message += `━━━━━━━━━━━━━━━━━━\n\n`;
         message += `👤 <b>Member:</b> ${this.escapeHtml(updatedFee.memberName)}\n`;
+        
+        if (member) {
+            message += `📱 <b>Phone:</b> ${this.escapeHtml(member.contact)}\n`;
+            if (member.seat && member.seat > 0) {
+                message += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
+            }
+        }
+        
         message += `📅 <b>Month:</b> ${this.escapeHtml(updatedFee.month)}\n\n`;
         
         const changes = [];
         
         if (oldFee.amount !== updatedFee.amount) {
-            changes.push(`<b>Amount:</b> ₹${this.escapeHtml(oldFee.amount)} → ₹${this.escapeHtml(updatedFee.amount)}`);
+            changes.push(`💵 <b>Amount:</b> ₹${this.escapeHtml(oldFee.amount)} → ₹${this.escapeHtml(updatedFee.amount)}`);
         }
         if (oldFee.status !== updatedFee.status) {
-            changes.push(`<b>Status:</b> ${this.escapeHtml(oldFee.status)} → ${this.escapeHtml(updatedFee.status)}`);
+            const oldStatus = oldFee.status === 'paid' ? '✅ Paid' : '⏳ Pending';
+            const newStatus = updatedFee.status === 'paid' ? '✅ Paid' : '⏳ Pending';
+            changes.push(`✅ <b>Status:</b> ${oldStatus} → ${newStatus}`);
         }
         if (oldFee.paymentMethod !== updatedFee.paymentMethod) {
-            changes.push(`<b>Method:</b> ${this.escapeHtml(oldFee.paymentMethod || 'None')} → ${this.escapeHtml(updatedFee.paymentMethod || 'None')}`);
+            changes.push(`💳 <b>Method:</b> ${this.escapeHtml(oldFee.paymentMethod || 'None')} → ${this.escapeHtml(updatedFee.paymentMethod || 'None')}`);
+        }
+        if (oldFee.paymentDate !== updatedFee.paymentDate) {
+            const oldDate = oldFee.paymentDate ? new Date(oldFee.paymentDate).toLocaleDateString('en-IN') : 'Not Set';
+            const newDate = updatedFee.paymentDate ? new Date(updatedFee.paymentDate).toLocaleDateString('en-IN') : 'Not Set';
+            changes.push(`📆 <b>Payment Date:</b> ${oldDate} → ${newDate}`);
         }
         
         if (changes.length > 0) {
             message += `📝 <b>Changes:</b>\n${changes.join('\n')}\n`;
+        } else {
+            message += `<i>Minor updates made</i>\n`;
         }
         
         message += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
@@ -311,13 +356,24 @@ class TelegramNotifier {
         const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
         const libraryName = this.escapeHtml(settings.libraryName) || 'Library Management System';
         
+        const members = JSON.parse(localStorage.getItem('libraryMembers')) || [];
+        const member = members.find(m => m.id === fee.memberId);
+        
         let message = `🗑️ <b>Payment Record Deleted</b>\n\n`;
         message += `📚 <b>${libraryName}</b>\n`;
         message += `━━━━━━━━━━━━━━━━━━\n\n`;
         message += `👤 <b>Member:</b> ${this.escapeHtml(fee.memberName)}\n`;
-        message += `💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
+        
+        if (member) {
+            message += `📱 <b>Phone:</b> ${this.escapeHtml(member.contact)}\n`;
+            if (member.seat && member.seat > 0) {
+                message += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
+            }
+        }
+        
+        message += `\n💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
         message += `📅 <b>Month:</b> ${this.escapeHtml(fee.month)}\n`;
-        message += `📊 <b>Status:</b> ${this.escapeHtml(fee.status)}\n`;
+        message += `📊 <b>Status:</b> ${fee.status === 'paid' ? '✅ Paid' : '⏳ Pending'}\n`;
         
         message += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
         
