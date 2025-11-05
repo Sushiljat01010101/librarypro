@@ -215,6 +215,99 @@
 }
 
 /* ===========================
+   MOBILE CARD VIEW FOR EXPENSES
+   =========================== */
+
+.expense-card {
+    display: none;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.expense-card:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.2);
+}
+
+.expense-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.expense-card-left {
+    flex: 1;
+}
+
+.expense-card-category {
+    display: inline-block;
+    background: rgba(244, 196, 48, 0.15);
+    color: var(--primary-gold);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.expense-card-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.expense-card-amount {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-gold);
+    text-align: right;
+}
+
+.expense-card-description {
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.expense-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.expense-card-method {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.expense-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.expense-card-actions button {
+    padding: 12px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+/* ===========================
    RESPONSIVE DESIGN
    =========================== */
 
@@ -233,24 +326,58 @@
 /* Tablet - Medium (768px and below) */
 @media (max-width: 768px) {
     .category-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
     
     .category-item {
-        padding: 16px 20px;
+        padding: 16px 18px;
     }
     
     .category-item:hover {
-        transform: translateY(-4px) scale(1.02);
+        transform: translateY(-3px) scale(1.02);
     }
     
     .category-summary {
         padding: 20px;
+        margin-bottom: 25px;
     }
     
     .category-summary h3 {
-        font-size: 18px;
+        font-size: 17px;
+        margin-bottom: 20px;
+    }
+    
+    /* Hide table, show cards */
+    .table-container {
+        border: none;
+        background: transparent;
+        padding: 0;
+    }
+    
+    .data-table {
+        display: none;
+    }
+    
+    .expense-card {
+        display: block;
+    }
+    
+    /* Make header buttons responsive */
+    .header-right {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .header-right .btn-primary,
+    .header-right .btn-secondary {
+        flex: 1;
+        min-width: 140px;
+        padding: 14px;
+        font-size: 13px;
+        white-space: nowrap;
     }
 }
 
@@ -258,10 +385,11 @@
 @media (max-width: 576px) {
     .category-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
     
     .category-item {
-        padding: 15px 18px;
+        padding: 14px 16px;
     }
     
     .category-name {
@@ -269,26 +397,148 @@
     }
     
     .category-amount {
-        font-size: 16px;
+        font-size: 15px;
     }
-}
-
-/* Mobile - Small (420px and below) */
-@media (max-width: 420px) {
+    
     .category-summary {
         padding: 15px;
+        margin-bottom: 20px;
     }
     
     .category-summary h3 {
         font-size: 16px;
     }
     
+    .expense-card {
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .expense-card-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .expense-card-amount {
+        text-align: left;
+        font-size: 22px;
+    }
+    
+    .expense-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .expense-card-actions {
+        width: 100%;
+    }
+    
+    .expense-card-actions button {
+        flex: 1;
+        padding: 10px;
+    }
+}
+
+/* Mobile - Small (420px and below) */
+@media (max-width: 420px) {
+    .category-summary {
+        padding: 12px;
+    }
+    
+    .category-summary h3 {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+    
     .category-item {
-        padding: 12px 15px;
+        padding: 12px 14px;
     }
     
     .category-amount {
-        font-size: 15px;
+        font-size: 14px;
+    }
+    
+    .expense-card {
+        padding: 14px;
+    }
+    
+    .expense-card-amount {
+        font-size: 20px;
+    }
+    
+    .header-right {
+        flex-direction: column;
+    }
+    
+    .header-right .btn-primary,
+    .header-right .btn-secondary {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* ===========================
+   MODAL IMPROVEMENTS FOR MOBILE
+   =========================== */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 500px;
+        margin: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+        padding: 14px;
+    }
+}
+
+/* ===========================
+   TOUCH-FRIENDLY IMPROVEMENTS
+   =========================== */
+
+@media (max-width: 768px) {
+    /* Larger touch targets */
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    /* Better input spacing */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+    
+    /* Prevent zoom on input focus */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        font-size: 16px !important;
     }
 }
 

@@ -459,6 +459,92 @@
 }
 
 /* ===========================
+   MOBILE CARD VIEW FOR TABLE
+   =========================== */
+
+.fee-card {
+    display: none;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fee-card:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.2);
+}
+
+.fee-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.fee-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-gold);
+}
+
+.fee-card-amount {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary-gold);
+}
+
+.fee-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.fee-card-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.fee-card-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.fee-card-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.fee-card-footer {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.fee-card-footer button {
+    flex: 1;
+    padding: 12px 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+/* ===========================
    RESPONSIVE DESIGN
    =========================== */
 
@@ -485,8 +571,9 @@
 /* Tablet - Medium (768px and below) */
 @media (max-width: 768px) {
     .stats-row {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+        margin-bottom: 25px;
     }
     
     .stat-box {
@@ -494,21 +581,22 @@
     }
     
     .stat-box .amount {
-        font-size: 28px;
+        font-size: 26px;
     }
     
     .stat-box h3 {
-        font-size: 12px;
+        font-size: 11px;
     }
     
     .stat-box:hover {
-        transform: translateY(-6px) scale(1.02);
+        transform: translateY(-4px) scale(1.02);
     }
     
     .filters-section {
         flex-direction: column;
         align-items: stretch;
         padding: 15px;
+        gap: 12px;
     }
     
     .search-box {
@@ -517,18 +605,42 @@
     
     .filter-controls {
         width: 100%;
+        gap: 10px;
     }
     
     .filter-controls select {
         flex: 1;
+        min-width: 140px;
     }
     
+    /* Hide table, show cards */
     .table-container {
-        overflow-x: auto;
+        border: none;
+        background: transparent;
+        padding: 0;
     }
     
     .data-table {
-        min-width: 800px;
+        display: none;
+    }
+    
+    .fee-card {
+        display: block;
+    }
+    
+    /* Make header buttons full width */
+    .header-right {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .header-right .btn-primary,
+    .header-right .btn-secondary {
+        flex: 1;
+        padding: 14px;
+        font-size: 14px;
+        white-space: nowrap;
     }
 }
 
@@ -537,26 +649,29 @@
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+        margin-bottom: 20px;
     }
     
     .stat-box {
-        padding: 15px;
+        padding: 15px 12px;
     }
     
     .stat-box .amount {
-        font-size: 24px;
+        font-size: 22px;
     }
     
     .stat-box h3 {
-        font-size: 11px;
+        font-size: 10px;
+        margin-bottom: 8px;
     }
     
     .stat-box:hover {
-        transform: translateY(-5px) scale(1.01);
+        transform: translateY(-3px) scale(1.01);
     }
     
     .filters-section {
         padding: 12px;
+        gap: 10px;
     }
     
     .filter-controls {
@@ -566,15 +681,40 @@
     
     .filter-controls select {
         width: 100%;
+        padding: 12px;
+        font-size: 14px;
     }
     
-    .data-table {
-        font-size: 13px;
+    .fee-card {
+        padding: 15px;
+        border-radius: 10px;
     }
     
-    .data-table th,
-    .data-table td {
-        padding: 12px 10px;
+    .fee-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .fee-card-name {
+        font-size: 15px;
+    }
+    
+    .fee-card-amount {
+        font-size: 20px;
+    }
+    
+    .fee-card-body {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .status-paid,
+    .status-pending {
+        font-size: 11px;
+        padding: 5px 12px;
+        display: inline-block;
+        text-align: center;
     }
 }
 
@@ -582,29 +722,98 @@
 @media (max-width: 420px) {
     .stats-row {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
     
     .stat-box .amount {
-        font-size: 22px;
+        font-size: 24px;
     }
     
     .stat-box h3 {
         font-size: 10px;
     }
     
-    .data-table {
+    .fee-card {
+        padding: 14px;
+    }
+    
+    .fee-card-footer button {
+        padding: 12px 8px;
         font-size: 12px;
     }
     
-    .data-table th,
-    .data-table td {
-        padding: 10px 8px;
+    .header-right {
+        flex-direction: column;
     }
     
-    .status-paid,
-    .status-pending {
-        font-size: 10px;
-        padding: 4px 10px;
+    .header-right .btn-primary,
+    .header-right .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   MODAL IMPROVEMENTS FOR MOBILE
+   =========================== */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 500px;
+        margin: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+        padding: 14px;
+    }
+}
+
+/* ===========================
+   TOUCH-FRIENDLY IMPROVEMENTS
+   =========================== */
+
+@media (max-width: 768px) {
+    /* Larger touch targets */
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    /* Better input spacing */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="month"],
+    select,
+    textarea {
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+    
+    /* Prevent zoom on input focus */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        font-size: 16px !important;
     }
 }
 

@@ -21,7 +21,12 @@ function loadFees() {
     });
     
     const tbody = document.querySelector('#feesTable tbody');
+    const container = document.querySelector('.table-container');
     tbody.innerHTML = '';
+    
+    // Remove existing mobile cards
+    const existingCards = container.querySelectorAll('.fee-card');
+    existingCards.forEach(card => card.remove());
     
     if (filtered.length === 0) {
         const tr = document.createElement('tr');
@@ -38,6 +43,7 @@ function loadFees() {
         const nextDue = storageManager.getNextMonthFromFeeMonth(fee.month, fee.memberId);
         const member = storageManager.getMembers().find(m => m.id === fee.memberId);
         
+        // Create table row
         const tr = document.createElement('tr');
         
         const tdName = document.createElement('td');
@@ -91,9 +97,63 @@ function loadFees() {
         tr.appendChild(tdAction);
         
         tbody.appendChild(tr);
+        
+        // Create mobile card
+        const card = createFeeCard(fee, member, nextDue);
+        container.appendChild(card);
     });
     
     updateStats();
+}
+
+function createFeeCard(fee, member, nextDue) {
+    const card = document.createElement('div');
+    card.className = 'fee-card';
+    
+    card.innerHTML = `
+        <div class="fee-card-header">
+            <div class="fee-card-name">${fee.memberName}</div>
+            <div class="fee-card-amount">${storageManager.formatCurrency(fee.amount)}</div>
+        </div>
+        <div class="fee-card-body">
+            <div class="fee-card-item">
+                <span class="fee-card-label">Seat</span>
+                <span class="fee-card-value">Seat ${member?.seat || '-'}</span>
+            </div>
+            <div class="fee-card-item">
+                <span class="fee-card-label">Month</span>
+                <span class="fee-card-value">${fee.month}</span>
+            </div>
+            <div class="fee-card-item">
+                <span class="fee-card-label">Status</span>
+                <span class="fee-card-value">
+                    <span class="${fee.status === 'paid' ? 'status-paid' : 'status-pending'}">
+                        ${fee.status === 'paid' ? 'Paid' : 'Pending'}
+                    </span>
+                </span>
+            </div>
+            <div class="fee-card-item">
+                <span class="fee-card-label">Payment Date</span>
+                <span class="fee-card-value">${fee.paymentDate ? storageManager.formatDate(fee.paymentDate) : '-'}</span>
+            </div>
+            <div class="fee-card-item">
+                <span class="fee-card-label">Payment Method</span>
+                <span class="fee-card-value">${fee.paymentMethod || '-'}</span>
+            </div>
+            <div class="fee-card-item">
+                <span class="fee-card-label">Next Due</span>
+                <span class="fee-card-value">${nextDue ? storageManager.formatDate(nextDue) : '-'}</span>
+            </div>
+        </div>
+        <div class="fee-card-footer">
+            ${fee.status === 'pending' ? 
+                `<button class="btn-primary" onclick="markAsPaid('${fee.id}')">Mark as Paid</button>` :
+                `<span class="badge success" style="flex: 1; text-align: center; padding: 10px;">✓ Paid</span>`
+            }
+        </div>
+    `;
+    
+    return card;
 }
 
 function updateStats() {

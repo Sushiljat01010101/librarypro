@@ -415,39 +415,22 @@
 @media (max-width: 768px) {
     .settings-section {
         padding: 20px;
-    }
-    
-    .preference-card {
-        padding: 20px;
-    }
-    
-    .preference-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-    
-    .button-group {
-        flex-direction: column;
-    }
-    
-    .button-group button {
-        width: 100%;
-    }
-}
-
-/* Mobile - Large (576px and below) */
-@media (max-width: 576px) {
-    .settings-section {
-        padding: 15px;
+        margin-bottom: 20px;
     }
     
     .settings-section h2 {
-        font-size: 18px;
+        font-size: 19px;
+        margin-bottom: 20px;
     }
     
     .preference-card {
-        padding: 15px;
+        padding: 18px;
+    }
+    
+    .preference-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
     }
     
     .preference-header h3 {
@@ -457,16 +440,354 @@
     .preference-header p {
         font-size: 13px;
     }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .button-group button {
+        width: 100%;
+        min-height: 44px;
+    }
+    
+    /* Form improvements */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    /* Backup cards */
+    .backup-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .backup-card {
+        padding: 18px;
+    }
+    
+    .backup-card h3 {
+        font-size: 17px;
+        margin-bottom: 10px;
+    }
+    
+    .backup-card p {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .backup-card button {
+        width: 100%;
+        min-height: 44px;
+    }
+    
+    /* Info grid */
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .info-item {
+        padding: 14px 18px;
+    }
+    
+    /* Seat management */
+    .seat-stats-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .seat-stat-card {
+        padding: 16px;
+    }
+    
+    .seat-stat-card .stat-value {
+        font-size: 32px;
+    }
+    
+    .seat-action-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .action-card {
+        padding: 18px;
+    }
+    
+    .action-card h3 {
+        font-size: 17px;
+    }
+    
+    .action-card p {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    
+    .action-controls {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .action-controls input,
+    .action-controls button {
+        width: 100%;
+        min-height: 44px;
+    }
+    
+    .bulk-action-card {
+        padding: 18px;
+    }
+    
+    .bulk-action-card .action-controls {
+        flex-direction: column;
+    }
+    
+    /* Telegram info */
+    .telegram-info {
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .telegram-info h4 {
+        font-size: 16px;
+    }
+    
+    .telegram-info ol {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+    
+    /* Backup frequency */
+    .backup-frequency {
+        margin-top: 15px;
+    }
+    
+    .backup-frequency .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .backup-select {
+        width: 100%;
+        min-height: 44px;
+    }
+    
+    .custom-schedule {
+        padding: 15px;
+        background: var(--bg-secondary);
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+    
+    .custom-schedule h4 {
+        font-size: 16px;
+    }
+    
+    .backup-info {
+        margin-top: 15px;
+        padding: 15px;
+        background: var(--bg-secondary);
+        border-radius: 10px;
+    }
+    
+    .backup-info p {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+}
+
+/* Mobile - Large (576px and below) */
+@media (max-width: 576px) {
+    .settings-section {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .settings-section h2 {
+        font-size: 17px;
+        margin-bottom: 18px;
+    }
+    
+    .preference-card {
+        padding: 15px;
+    }
+    
+    .preference-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .preference-header h3 {
+        font-size: 15px;
+    }
+    
+    .preference-header p {
+        font-size: 12px;
+    }
+    
+    .theme-switch {
+        align-self: flex-start;
+    }
+    
+    .backup-card {
+        padding: 15px;
+    }
+    
+    .backup-card h3 {
+        font-size: 16px;
+    }
+    
+    .backup-card p {
+        font-size: 13px;
+    }
+    
+    .seat-stat-card .stat-value {
+        font-size: 28px;
+    }
+    
+    .seat-stat-card .stat-label {
+        font-size: 13px;
+    }
+    
+    .action-card {
+        padding: 15px;
+    }
+    
+    .action-card h3 {
+        font-size: 16px;
+    }
+    
+    .bulk-action-card {
+        padding: 15px;
+    }
+    
+    .bulk-action-card h3 {
+        font-size: 16px;
+    }
+    
+    .telegram-info {
+        padding: 12px;
+    }
+    
+    .telegram-info h4 {
+        font-size: 15px;
+    }
+    
+    .telegram-info ol {
+        font-size: 13px;
+        padding-left: 18px;
+    }
+    
+    .info-item {
+        padding: 12px 15px;
+    }
 }
 
 /* Mobile - Small (420px and below) */
 @media (max-width: 420px) {
     .settings-section {
         padding: 12px;
+        margin-bottom: 12px;
     }
     
     .settings-section h2 {
         font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .preference-card {
+        padding: 12px;
+    }
+    
+    .preference-header h3 {
+        font-size: 14px;
+    }
+    
+    .backup-card {
+        padding: 12px;
+    }
+    
+    .backup-card h3 {
+        font-size: 15px;
+    }
+    
+    .seat-stat-card {
+        padding: 12px;
+    }
+    
+    .seat-stat-card .stat-value {
+        font-size: 26px;
+    }
+    
+    .action-card,
+    .bulk-action-card {
+        padding: 12px;
+    }
+    
+    .action-card h3,
+    .bulk-action-card h3 {
+        font-size: 15px;
+    }
+    
+    .telegram-info {
+        padding: 10px;
+    }
+    
+    .telegram-info h4 {
+        font-size: 14px;
+    }
+    
+    .telegram-info ol {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+}
+
+/* ===========================
+   TOUCH-FRIENDLY IMPROVEMENTS
+   =========================== */
+
+@media (max-width: 768px) {
+    /* Larger touch targets */
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        min-height: 44px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    /* Better input spacing */
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        min-height: 44px;
+        font-size: 16px !important;
+        padding: 12px 15px;
+    }
+    
+    /* Prevent zoom on input focus */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        font-size: 16px !important;
+    }
+    
+    /* Better checkbox/toggle touch targets */
+    input[type="checkbox"] {
+        min-width: 20px;
+        min-height: 20px;
     }
 }
 

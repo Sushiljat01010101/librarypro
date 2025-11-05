@@ -19,7 +19,12 @@ function loadExpenses() {
     });
     
     const tbody = document.querySelector('#expensesTable tbody');
+    const container = document.querySelector('.table-container');
     tbody.innerHTML = '';
+    
+    // Remove existing mobile cards
+    const existingCards = container.querySelectorAll('.expense-card');
+    existingCards.forEach(card => card.remove());
     
     if (filtered.length === 0) {
         const row = document.createElement('tr');
@@ -33,6 +38,7 @@ function loadExpenses() {
     }
     
     filtered.forEach(expense => {
+        // Create table row
         const row = document.createElement('tr');
         
         const dateCell = document.createElement('td');
@@ -79,9 +85,41 @@ function loadExpenses() {
         row.appendChild(actionsCell);
         
         tbody.appendChild(row);
+        
+        // Create mobile card
+        const card = createExpenseCard(expense);
+        container.appendChild(card);
     });
     
     updateStats();
+}
+
+function createExpenseCard(expense) {
+    const card = document.createElement('div');
+    card.className = 'expense-card';
+    
+    card.innerHTML = `
+        <div class="expense-card-header">
+            <div class="expense-card-left">
+                <div class="expense-card-category">${expense.category}</div>
+                <div class="expense-card-date">${storageManager.formatDate(expense.date)}</div>
+            </div>
+            <div class="expense-card-amount">${storageManager.formatCurrency(expense.amount)}</div>
+        </div>
+        <div class="expense-card-description">${expense.description}</div>
+        <div class="expense-card-footer">
+            <div class="expense-card-method">
+                <strong>Payment:</strong> ${expense.paymentMethod}<br>
+                <strong>By:</strong> ${expense.addedBy}
+            </div>
+            <div class="expense-card-actions">
+                <button class="btn-secondary" onclick="editExpense('${expense.id}')">Edit</button>
+                <button class="btn-danger" onclick="deleteExpense('${expense.id}')">Delete</button>
+            </div>
+        </div>
+    `;
+    
+    return card;
 }
 
 function updateStats() {
