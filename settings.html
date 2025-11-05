@@ -704,6 +704,8 @@
                 activities: storageManager.getActivities(),
                 seats: storageManager.getSeats(),
                 settings: storageManager.getSettings(),
+                user: storageManager.getUser(),
+                preferences: storageManager.getPreferences(),
                 exportDate: new Date().toISOString()
             };
             
@@ -773,6 +775,8 @@
                         if (data.activities) localStorage.setItem('libraryActivities', JSON.stringify(data.activities));
                         if (data.seats) localStorage.setItem('librarySeats', JSON.stringify(data.seats));
                         if (data.settings) localStorage.setItem('librarySettings', JSON.stringify(data.settings));
+                        if (data.user) localStorage.setItem('libraryUser', JSON.stringify(data.user));
+                        if (data.preferences) localStorage.setItem('libraryPreferences', JSON.stringify(data.preferences));
                         
                         alert('Data imported successfully! Reloading page...');
                         location.reload();

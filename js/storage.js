@@ -90,6 +90,8 @@ class StorageManager {
             activities: this.getActivities(),
             seats: this.getSeats(),
             settings: this.getSettings(),
+            user: this.getUser(),
+            preferences: this.getPreferences(),
             exportDate: new Date().toISOString(),
             backupType: isMissedBackup ? 'auto-missed' : 'auto'
         };
