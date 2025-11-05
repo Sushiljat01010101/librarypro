@@ -62,7 +62,16 @@ function loadDashboardStats() {
 }
 
 function loadRecentMembers() {
-    const members = storageManager.getMembers().slice(0, 5);
+    const allMembers = storageManager.getMembers();
+    
+    const members = allMembers
+        .sort((a, b) => {
+            const dateA = a.joiningDate ? new Date(a.joiningDate) : new Date(0);
+            const dateB = b.joiningDate ? new Date(b.joiningDate) : new Date(0);
+            return dateB - dateA;
+        })
+        .slice(0, 5);
+    
     const tbody = document.querySelector('#recentMembersTable tbody');
     
     if (members.length === 0) {
@@ -79,7 +88,7 @@ function loadRecentMembers() {
         tr.appendChild(nameCell);
         
         const seatCell = document.createElement('td');
-        seatCell.textContent = `Seat ${member.seat}`;
+        seatCell.textContent = member.seat ? `Seat ${member.seat}` : 'No Seat';
         tr.appendChild(seatCell);
         
         const statusCell = document.createElement('td');
@@ -136,7 +145,14 @@ function loadOverdueBooks() {
 }
 
 function loadPendingPayments() {
-    const fees = storageManager.getFees().filter(f => storageManager.isFeeOverdue(f));
+    const members = storageManager.getMembers();
+    const activeMembers = members.filter(m => m.status === 'active');
+    const activeMemberIds = new Set(activeMembers.map(m => m.id));
+    
+    const fees = storageManager.getFees()
+        .filter(f => activeMemberIds.has(f.memberId))
+        .filter(f => storageManager.isFeeOverdue(f));
+    
     const tbody = document.querySelector('#pendingPaymentsTable tbody');
     
     if (fees.length === 0) {
