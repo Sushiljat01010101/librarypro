@@ -107,6 +107,24 @@
     animation: fadeInUp 0.6s ease-out;
 }
 
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ===========================
    STAT CARDS - ENHANCED
    =========================== */
@@ -345,6 +363,12 @@
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 25px;
     animation: fadeInUp 0.8s ease-out 0.3s backwards;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===========================
@@ -627,6 +651,11 @@
         text-align: center;
         padding: 20px;
         gap: 15px;
+        border-radius: 16px;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px) scale(1.01);
     }
     
     .stat-icon {
@@ -644,10 +673,12 @@
     
     .stat-info h3 {
         font-size: 12px;
+        margin-bottom: 8px;
     }
     
     .stat-detail {
         font-size: 11px;
+        line-height: 1.4;
     }
     
     .dashboard-grid {
@@ -655,13 +686,24 @@
         gap: 20px;
     }
     
+    .dashboard-card {
+        border-radius: 14px;
+    }
+    
     .card-header {
         padding: 20px;
         flex-wrap: wrap;
+        gap: 10px;
     }
     
     .card-header h3 {
         font-size: 17px;
+        width: 100%;
+    }
+    
+    .card-header .btn-link {
+        font-size: 13px;
+        padding: 8px 16px;
     }
     
     .activity-list {
@@ -672,13 +714,8 @@
         padding: 12px 0 12px 15px;
     }
     
-    .data-table {
+    .activity-item .activity-text {
         font-size: 13px;
-    }
-    
-    .data-table th,
-    .data-table td {
-        padding: 12px 10px;
     }
 }
 
@@ -691,16 +728,19 @@
     
     .stat-card {
         padding: 18px;
-        border-radius: 16px;
+        border-radius: 14px;
         gap: 12px;
+        flex-direction: row;
+        text-align: left;
     }
     
     .stat-card:hover {
-        transform: translateY(-5px) scale(1.01);
+        transform: translateY(-2px) scale(1.005);
     }
     
     .stat-icon {
         font-size: 40px;
+        flex-shrink: 0;
     }
     
     .stat-icon::after {
@@ -708,12 +748,18 @@
         height: 60px;
     }
     
+    .stat-info {
+        flex: 1;
+    }
+    
     .stat-value {
         font-size: 26px;
+        margin-bottom: 5px;
     }
     
     .stat-info h3 {
         font-size: 11px;
+        margin-bottom: 8px;
     }
     
     .stat-detail {
@@ -725,19 +771,28 @@
     }
     
     .dashboard-card {
-        border-radius: 14px;
+        border-radius: 12px;
     }
     
     .card-header {
-        padding: 18px;
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
     
     .card-header h3 {
         font-size: 16px;
     }
     
+    .card-header .btn-link {
+        font-size: 12px;
+        padding: 6px 14px;
+        align-self: flex-end;
+    }
+    
     .activity-list {
-        padding: 18px;
+        padding: 16px;
     }
     
     .activity-item {
@@ -746,27 +801,21 @@
     
     .activity-item .activity-text {
         font-size: 13px;
+        margin-bottom: 4px;
     }
     
     .activity-item .activity-time {
         font-size: 11px;
     }
     
-    .data-table {
-        font-size: 12px;
-    }
-    
-    .data-table th,
-    .data-table td {
-        padding: 10px 8px;
-    }
-    
-    .data-table th {
-        font-size: 11px;
-    }
-    
     .card-body {
-        min-height: 200px;
+        min-height: auto;
+        padding: 0;
+    }
+    
+    .no-data {
+        padding: 30px 20px;
+        font-size: 13px;
     }
 }
 
@@ -963,115 +1012,96 @@
 }
 
 /* ===========================
-   MOBILE CARD VIEW FOR TABLES (Android App Style)
+   MOBILE TABLE OPTIMIZATION (Android App Style)
    =========================== */
 
-.mobile-table-card {
-    display: none;
-    background: var(--bg-card);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.mobile-table-card:hover {
-    border-color: var(--primary-gold);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.2);
-}
-
-.mobile-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.mobile-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--primary-gold);
-}
-
-.mobile-card-value {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--primary-gold);
-}
-
-.mobile-card-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.mobile-card-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-card-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 3px;
-    font-weight: 600;
-}
-
-.mobile-card-data {
-    font-size: 13px;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
+/* Make tables scroll horizontally on small screens */
 @media (max-width: 768px) {
-    .data-table {
-        display: none;
+    .card-body {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
-    .mobile-table-card {
+    .data-table {
+        min-width: 100%;
+        font-size: 13px;
         display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .data-table thead,
+    .data-table tbody,
+    .data-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .data-table th {
+        font-size: 11px;
+        white-space: nowrap;
+    }
+    
+    /* Make table responsive with card-like rows */
+    .data-table tbody tr {
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .data-table {
+        font-size: 12px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .data-table th {
+        font-size: 10px;
+    }
+    
+    /* Card style for table rows on mobile */
+    .data-table tbody tr {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border-color);
+        padding: 4px 0;
     }
 }
 
 @media (max-width: 420px) {
-    .mobile-table-card {
-        padding: 14px;
-        border-radius: 10px;
+    .data-table {
+        font-size: 11px;
     }
     
-    .mobile-card-title {
-        font-size: 14px;
+    .data-table th,
+    .data-table td {
+        padding: 6px 4px;
+        font-size: 10px;
     }
     
-    .mobile-card-value {
-        font-size: 15px;
-    }
-    
-    .mobile-card-label {
+    .data-table th {
         font-size: 9px;
-    }
-    
-    .mobile-card-data {
-        font-size: 12px;
     }
 }
 
-@media (max-width: 320px) {
-    .mobile-table-card {
-        padding: 12px;
-    }
-    
-    .mobile-card-body {
-        grid-template-columns: 1fr;
-        gap: 8px;
+@media (max-width: 360px) {
+    .data-table th,
+    .data-table td {
+        padding: 5px 3px;
+        font-size: 9px;
     }
 }
 
