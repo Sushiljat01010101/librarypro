@@ -775,6 +775,7 @@
     .stat-card {
         padding: 15px;
         gap: 10px;
+        border-radius: 14px;
     }
     
     .stat-icon {
@@ -806,11 +807,479 @@
         padding: 15px;
     }
     
+    .activity-item {
+        padding: 8px 0 8px 10px;
+    }
+    
     .data-table th,
     .data-table td {
         padding: 8px 6px;
         font-size: 11px;
     }
+}
+
+/* Mobile - Extra Small (360px and below) - Android App Style */
+@media (max-width: 360px) {
+    .stats-grid {
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+        gap: 8px;
+        border-radius: 12px;
+    }
+    
+    .stat-icon {
+        font-size: 32px;
+    }
+    
+    .stat-icon::after {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .stat-value {
+        font-size: 22px;
+    }
+    
+    .stat-info h3 {
+        font-size: 9px;
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-detail {
+        font-size: 8px;
+    }
+    
+    .dashboard-grid {
+        gap: 12px;
+    }
+    
+    .dashboard-card {
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        padding: 12px 15px;
+    }
+    
+    .card-header h3 {
+        font-size: 14px;
+    }
+    
+    .activity-list {
+        padding: 12px 15px;
+    }
+    
+    .activity-item {
+        padding: 8px 0 8px 8px;
+    }
+    
+    .activity-item .activity-text {
+        font-size: 12px;
+    }
+    
+    .activity-item .activity-time {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 6px 4px;
+        font-size: 10px;
+    }
+    
+    .card-body {
+        min-height: 180px;
+    }
+}
+
+/* Mobile - Tiny (320px and below) - Compact Android Style */
+@media (max-width: 320px) {
+    .stats-grid {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .stat-card {
+        padding: 10px;
+        gap: 6px;
+        border-radius: 10px;
+    }
+    
+    .stat-icon {
+        font-size: 28px;
+    }
+    
+    .stat-icon::after {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .stat-value {
+        font-size: 20px;
+    }
+    
+    .stat-info h3 {
+        font-size: 8px;
+    }
+    
+    .stat-detail {
+        font-size: 8px;
+        line-height: 1.4;
+    }
+    
+    .dashboard-grid {
+        gap: 10px;
+    }
+    
+    .card-header {
+        padding: 10px 12px;
+    }
+    
+    .card-header h3 {
+        font-size: 13px;
+    }
+    
+    .activity-list {
+        padding: 10px 12px;
+    }
+    
+    .activity-item {
+        padding: 6px 0 6px 6px;
+    }
+    
+    .activity-item .activity-text {
+        font-size: 11px;
+    }
+    
+    .activity-item .activity-time {
+        font-size: 9px;
+    }
+}
+
+/* ===========================
+   MOBILE CARD VIEW FOR TABLES (Android App Style)
+   =========================== */
+
+.mobile-table-card {
+    display: none;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-table-card:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.2);
+}
+
+.mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-gold);
+}
+
+.mobile-card-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--primary-gold);
+}
+
+.mobile-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.mobile-card-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-card-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    font-weight: 600;
+}
+
+.mobile-card-data {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .data-table {
+        display: none;
+    }
+    
+    .mobile-table-card {
+        display: block;
+    }
+}
+
+@media (max-width: 420px) {
+    .mobile-table-card {
+        padding: 14px;
+        border-radius: 10px;
+    }
+    
+    .mobile-card-title {
+        font-size: 14px;
+    }
+    
+    .mobile-card-value {
+        font-size: 15px;
+    }
+    
+    .mobile-card-label {
+        font-size: 9px;
+    }
+    
+    .mobile-card-data {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .mobile-table-card {
+        padding: 12px;
+    }
+    
+    .mobile-card-body {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+/* ===========================
+   TOUCH-FRIENDLY IMPROVEMENTS (Android Style)
+   =========================== */
+
+@media (max-width: 768px) {
+    /* Larger touch targets - Android standard is 48dp */
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        min-height: 48px;
+        padding: 12px 24px;
+        border-radius: 8px;
+    }
+    
+    /* Better input spacing */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        min-height: 48px;
+        font-size: 16px !important;
+        padding: 12px 16px;
+        border-radius: 8px;
+    }
+    
+    /* Prevent zoom on input focus (iOS/Android) */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        font-size: 16px !important;
+    }
+    
+    /* Better scrollable areas */
+    .card-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 420px) {
+    .btn-primary,
+    .btn-secondary {
+        min-height: 44px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* ===========================
+   HEADER RESPONSIVE IMPROVEMENTS
+   =========================== */
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+    
+    .header-right {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .page-header h1 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-header h1 {
+        font-size: 20px;
+    }
+    
+    .page-header {
+        padding: 10px;
+        gap: 10px;
+    }
+}
+
+/* ===========================
+   PULL-TO-REFRESH INDICATOR (Android Style)
+   =========================== */
+
+.pull-to-refresh {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    color: var(--primary-gold);
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .pull-to-refresh {
+        display: block;
+    }
+}
+
+/* ===========================
+   FLOATING ACTION BUTTON (FAB) - Android Style
+   =========================== */
+
+.fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-gold), var(--light-gold));
+    color: var(--bg-primary);
+    border: none;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+    display: none;
+}
+
+.fab:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.6);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .fab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+        bottom: 70px;
+        right: 16px;
+    }
+}
+
+/* ===========================
+   SWIPE INDICATOR (Android Style)
+   =========================== */
+
+.swipe-indicator {
+    display: none;
+    width: 40px;
+    height: 4px;
+    background: rgba(244, 196, 48, 0.3);
+    border-radius: 2px;
+    margin: 8px auto;
+}
+
+@media (max-width: 768px) {
+    .swipe-indicator {
+        display: block;
+    }
+}
+
+/* ===========================
+   RIPPLE EFFECT (Android Material Design)
+   =========================== */
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(244, 196, 48, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+    width: 300px;
+    height: 300px;
 }
 
 /* ===========================
@@ -847,6 +1316,178 @@
 }
 
 /* ===========================
+   MODAL IMPROVEMENTS FOR MOBILE (Android Style)
+   =========================== */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 500px;
+        margin: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 16px;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+        padding: 14px;
+    }
+}
+
+@media (max-width: 420px) {
+    .modal-content {
+        width: 98%;
+        margin: 5px;
+        padding: 15px;
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 15px;
+        margin: -15px -15px 15px -15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 16px;
+    }
+    
+    .modal-body {
+        padding: 0;
+    }
+    
+    .form-group label {
+        font-size: 13px;
+    }
+    
+    .modal-footer button {
+        padding: 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .modal-content {
+        border-radius: 10px;
+        padding: 12px;
+    }
+    
+    .modal-header h2 {
+        font-size: 15px;
+    }
+}
+
+/* ===========================
+   BOTTOM SHEET STYLE (Android)
+   =========================== */
+
+@media (max-width: 768px) {
+    .bottom-sheet {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-card);
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+    
+    .bottom-sheet.active {
+        transform: translateY(0);
+    }
+    
+    .bottom-sheet-handle {
+        width: 40px;
+        height: 4px;
+        background: var(--text-muted);
+        border-radius: 2px;
+        margin: 0 auto 15px;
+        opacity: 0.5;
+    }
+}
+
+/* ===========================
+   CARD ELEVATION LEVELS (Material Design)
+   =========================== */
+
+.elevation-1 {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.elevation-2 {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.elevation-3 {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .stat-card {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dashboard-card {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* ===========================
+   SAFE AREA INSETS (Notch Support)
+   =========================== */
+
+@media (max-width: 768px) {
+    .page-header {
+        padding-top: max(15px, env(safe-area-inset-top));
+    }
+    
+    .stats-grid {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    .dashboard-grid {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* ===========================
+   SMOOTH SCROLLING (Android Style)
+   =========================== */
+
+@media (max-width: 768px) {
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    * {
+        -webkit-tap-highlight-color: rgba(244, 196, 48, 0.2);
+    }
+}
+
+/* ===========================
    DARK MODE OPTIMIZATIONS
    =========================== */
 
@@ -868,4 +1509,28 @@
 [data-theme="light"] .dashboard-card:hover {
     box-shadow: 0 15px 35px rgba(212, 160, 23, 0.12),
                 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .mobile-table-card {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
+   LANDSCAPE ORIENTATION OPTIMIZATION
+   =========================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
