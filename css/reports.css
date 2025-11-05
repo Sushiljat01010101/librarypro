@@ -68,6 +68,43 @@
 }
 
 /* ===========================
+   HEADER RIGHT - EXPORT BUTTON
+   =========================== */
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    color: var(--text-dark);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(244, 196, 48, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244, 196, 48, 0.5);
+    background: linear-gradient(135deg, var(--light-gold) 0%, var(--primary-gold) 100%);
+}
+
+.btn-export:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(244, 196, 48, 0.3);
+}
+
+/* ===========================
    STATS OVERVIEW - ENHANCED
    =========================== */
 
