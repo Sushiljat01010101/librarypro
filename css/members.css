@@ -243,6 +243,43 @@
 }
 
 /* ===========================
+   MEMBER PHOTO BADGE ICON
+   =========================== */
+
+.member-photo-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--light-gold) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 2px 8px rgba(244, 196, 48, 0.4);
+    z-index: 10;
+    transition: all 0.3s ease;
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+.member-card:hover .member-photo-badge {
+    transform: scale(1.15) rotate(10deg);
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.6);
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(244, 196, 48, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(244, 196, 48, 0.7);
+    }
+}
+
+/* ===========================
    MEMBER BASIC INFO
    =========================== */
 

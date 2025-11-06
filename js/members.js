@@ -151,6 +151,20 @@ function loadMembers() {
         } else {
             photo.textContent = '👤';
         }
+        
+        // Add photo badge icon
+        const photoBadge = document.createElement('div');
+        photoBadge.className = 'member-photo-badge';
+        if (member.status === 'active') {
+            photoBadge.textContent = '✓';
+            photoBadge.title = 'Active Member';
+        } else {
+            photoBadge.textContent = '⏸';
+            photoBadge.style.background = 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)';
+            photoBadge.title = 'Inactive Member';
+        }
+        photo.appendChild(photoBadge);
+        
         header.appendChild(photo);
         
         const basic = document.createElement('div');
