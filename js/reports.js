@@ -36,7 +36,7 @@ function createRevenueExpenseChart() {
     const now = new Date();
     for (let i = 5; i >= 0; i--) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthKey = date.toISOString().slice(0, 7);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         const monthLabel = date.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
         
         const revenue = fees.filter(f => f.month === monthKey).reduce((sum, f) => sum + f.amount, 0);
@@ -138,7 +138,8 @@ function createRevenueExpenseChart() {
 
 function createExpenseCategoryChart() {
     const expenses = storageManager.getExpenses();
-    const currentMonth = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const monthlyExpenses = expenses.filter(e => e.date.startsWith(currentMonth));
     
     const categories = ['General', 'Utilities', 'Maintenance', 'Rent', 'Others'];
@@ -321,7 +322,8 @@ function createPaymentCollectionChart() {
     const activeMemberIds = new Set(activeMembers.map(m => m.id));
     
     const fees = storageManager.getFees();
-    const currentMonth = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const monthlyFees = fees.filter(f => f.month === currentMonth);
     
     const paid = monthlyFees.filter(f => f.status === 'paid').length;
@@ -416,7 +418,7 @@ function createMonthlyComparisonChart() {
     const now = new Date();
     for (let i = 11; i >= 0; i--) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthKey = date.toISOString().slice(0, 7);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         const monthLabel = date.toLocaleDateString('en-IN', { month: 'short' });
         
         const revenue = fees.filter(f => f.month === monthKey).reduce((sum, f) => sum + f.amount, 0);
@@ -491,9 +493,9 @@ function createMonthlyComparisonChart() {
 
 function loadComparison() {
     const now = new Date();
-    const currentMonth = now.toISOString().slice(0, 7);
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prevMonth = prevMonthDate.toISOString().slice(0, 7);
+    const prevMonth = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
     
     const fees = storageManager.getFees().filter(f => f.status === 'paid');
     const expenses = storageManager.getExpenses();
@@ -522,7 +524,7 @@ function loadComparison() {
 
 function exportReport() {
     const now = new Date();
-    const currentMonth = now.toISOString().slice(0, 7);
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     
     const fees = storageManager.getFees();
     const expenses = storageManager.getExpenses();
