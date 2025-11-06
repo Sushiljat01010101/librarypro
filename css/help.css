@@ -179,6 +179,16 @@
     justify-content: center;
     box-shadow: 0 8px 24px rgba(244, 196, 48, 0.4);
     animation: pulse 3s ease-in-out infinite;
+    padding: 4px;
+    overflow: hidden;
+}
+
+.developer-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bg-primary);
 }
 
 .developer-avatar i {
