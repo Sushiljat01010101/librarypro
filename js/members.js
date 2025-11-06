@@ -505,60 +505,112 @@ async function generateMemberPDF(member) {
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 20;
     
-    pdf.setFillColor(26, 26, 26);
+    const settings = storageManager.getSettings();
+    const libraryName = settings.libraryName || 'My Library';
+    
+    pdf.setFillColor(255, 255, 255);
     pdf.rect(0, 0, pageWidth, pageHeight, 'F');
     
     pdf.setFillColor(244, 196, 48);
-    pdf.rect(0, 0, pageWidth, 15, 'F');
+    pdf.rect(0, 0, pageWidth, 35, 'F');
+    
+    pdf.setDrawColor(212, 160, 23);
+    pdf.setLineWidth(0.5);
+    pdf.line(0, 35, pageWidth, 35);
+    
     pdf.setTextColor(26, 26, 26);
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(18);
-    pdf.text('MEMBER REGISTRATION', pageWidth / 2, 10, { align: 'center' });
+    pdf.setFontSize(24);
+    pdf.text(libraryName.toUpperCase(), pageWidth / 2, 12, { align: 'center' });
     
-    pdf.setFillColor(40, 40, 40);
-    pdf.roundedRect(margin, 25, pageWidth - 2 * margin, 40, 3, 3, 'F');
-    
-    pdf.setTextColor(244, 196, 48);
-    pdf.setFontSize(22);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(member.name, pageWidth / 2, 38, { align: 'center' });
-    
-    pdf.setTextColor(200, 200, 200);
-    pdf.setFontSize(12);
+    pdf.setFontSize(14);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Contact: ${member.contact}`, pageWidth / 2, 48, { align: 'center' });
+    pdf.text('MEMBER REGISTRATION FORM', pageWidth / 2, 21, { align: 'center' });
+    
+    pdf.setFontSize(9);
+    pdf.setTextColor(50, 50, 50);
+    const regDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    pdf.text(`Registration Date: ${regDate}`, pageWidth / 2, 30, { align: 'center' });
+    
+    pdf.setFillColor(250, 250, 250);
+    pdf.setDrawColor(244, 196, 48);
+    pdf.setLineWidth(1);
+    pdf.roundedRect(margin, 45, pageWidth - 2 * margin, 50, 4, 4, 'FD');
+    
+    pdf.setTextColor(212, 160, 23);
+    pdf.setFontSize(26);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(member.name, pageWidth / 2, 62, { align: 'center' });
+    
+    pdf.setTextColor(60, 60, 60);
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`📱 ${member.contact}`, pageWidth / 2, 73, { align: 'center' });
     if (member.email) {
-        pdf.text(`Email: ${member.email}`, pageWidth / 2, 56, { align: 'center' });
+        pdf.text(`📧 ${member.email}`, pageWidth / 2, 82, { align: 'center' });
     }
     
-    let yPos = 75;
+    if (member.seat && member.seat > 0) {
+        pdf.setFillColor(244, 196, 48);
+        pdf.roundedRect(pageWidth / 2 - 18, 87, 36, 6, 2, 2, 'F');
+        pdf.setTextColor(26, 26, 26);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`🪑 SEAT ${member.seat}`, pageWidth / 2, 91, { align: 'center' });
+    }
+    
+    let yPos = 110;
     
     const addSection = (title, details) => {
-        pdf.setFillColor(50, 50, 50);
-        pdf.roundedRect(margin, yPos, pageWidth - 2 * margin, 8, 2, 2, 'F');
-        pdf.setTextColor(244, 196, 48);
-        pdf.setFontSize(11);
+        pdf.setFillColor(244, 196, 48);
+        pdf.roundedRect(margin, yPos, pageWidth - 2 * margin, 10, 2, 2, 'F');
+        
+        pdf.setTextColor(26, 26, 26);
+        pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(title, margin + 5, yPos + 6);
-        yPos += 12;
+        pdf.text(title, margin + 5, yPos + 7);
+        yPos += 15;
         
-        pdf.setTextColor(220, 220, 220);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
+        pdf.setDrawColor(220, 220, 220);
+        pdf.setLineWidth(0.3);
         
-        details.forEach(detail => {
-            if (yPos > pageHeight - 30) {
+        details.forEach((detail, index) => {
+            if (yPos > pageHeight - 40) {
                 pdf.addPage();
+                pdf.setFillColor(255, 255, 255);
+                pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+                
+                pdf.setFillColor(244, 196, 48);
+                pdf.rect(0, 0, pageWidth, 8, 'F');
+                pdf.setTextColor(26, 26, 26);
+                pdf.setFontSize(10);
+                pdf.text(`${libraryName} - ${member.name}`, pageWidth / 2, 5, { align: 'center' });
+                
                 yPos = 20;
             }
-            pdf.text(`${detail.label}:`, margin + 5, yPos);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(detail.value, margin + 60, yPos);
+            
+            if (index % 2 === 0) {
+                pdf.setFillColor(248, 248, 248);
+                pdf.rect(margin, yPos - 4, pageWidth - 2 * margin, 8, 'F');
+            }
+            
+            pdf.setTextColor(80, 80, 80);
+            pdf.setFontSize(10);
             pdf.setFont('helvetica', 'normal');
-            yPos += 7;
+            pdf.text(`${detail.label}:`, margin + 5, yPos);
+            
+            pdf.setTextColor(26, 26, 26);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(detail.value, margin + 65, yPos);
+            
+            pdf.setDrawColor(230, 230, 230);
+            pdf.line(margin, yPos + 1, pageWidth - margin, yPos + 1);
+            
+            pdf.setFont('helvetica', 'normal');
+            yPos += 8;
         });
         
-        yPos += 5;
+        yPos += 8;
     };
     
     addSection('📋 PERSONAL INFORMATION', [
@@ -584,124 +636,214 @@ async function generateMemberPDF(member) {
         { label: 'Next Payment', value: member.nextPaymentDate ? new Date(member.nextPaymentDate).toLocaleDateString('en-IN') : 'Not Set' }
     ]);
     
-    pdf.setFillColor(40, 40, 40);
-    pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-    pdf.setTextColor(150, 150, 150);
+    pdf.setDrawColor(244, 196, 48);
+    pdf.setLineWidth(0.8);
+    pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+    
+    pdf.setFillColor(250, 250, 250);
+    pdf.rect(0, pageHeight - 18, pageWidth, 18, 'F');
+    
+    pdf.setTextColor(100, 100, 100);
     pdf.setFontSize(8);
-    pdf.text('Page 1 of 3 - Member Details', pageWidth / 2, pageHeight - 8, { align: 'center' });
-    pdf.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Page 1 of 3 - Member Details', pageWidth / 2, pageHeight - 11, { align: 'center' });
+    
+    pdf.setTextColor(120, 120, 120);
+    pdf.setFontSize(7);
+    const timestamp = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString('en-IN');
+    pdf.text(`Generated: ${timestamp}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+    
+    pdf.setTextColor(212, 160, 23);
+    pdf.setFontSize(7);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(libraryName, pageWidth / 2, pageHeight - 2, { align: 'center' });
     
     if (currentIdProofData || member.idProofTelegramFileId) {
         pdf.addPage();
-        pdf.setFillColor(26, 26, 26);
+        pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         
         pdf.setFillColor(244, 196, 48);
-        pdf.rect(0, 0, pageWidth, 15, 'F');
+        pdf.rect(0, 0, pageWidth, 28, 'F');
+        
+        pdf.setDrawColor(212, 160, 23);
+        pdf.setLineWidth(0.5);
+        pdf.line(0, 28, pageWidth, 28);
+        
         pdf.setTextColor(26, 26, 26);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(18);
-        pdf.text('ID PROOF DOCUMENT', pageWidth / 2, 10, { align: 'center' });
+        pdf.setFontSize(20);
+        pdf.text(libraryName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
         
-        pdf.setTextColor(244, 196, 48);
-        pdf.setFontSize(14);
-        pdf.text('🆔 Member ID Proof', pageWidth / 2, 30, { align: 'center' });
+        pdf.setFontSize(13);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('ID PROOF DOCUMENT', pageWidth / 2, 19, { align: 'center' });
+        
+        pdf.setTextColor(212, 160, 23);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`🆔 ${member.name}`, pageWidth / 2, 40, { align: 'center' });
         
         if (currentIdProofData) {
             try {
-                const imgWidth = pageWidth - 2 * margin;
-                const imgHeight = (imgWidth * 3) / 4;
-                const imgY = (pageHeight - imgHeight) / 2;
+                pdf.setFillColor(248, 248, 248);
+                pdf.roundedRect(margin - 3, 50, pageWidth - 2 * margin + 6, pageHeight - 80, 4, 4, 'F');
                 
-                pdf.addImage(currentIdProofData, 'JPEG', margin, imgY, imgWidth, imgHeight);
+                pdf.setDrawColor(244, 196, 48);
+                pdf.setLineWidth(2);
+                pdf.roundedRect(margin, 55, pageWidth - 2 * margin, pageHeight - 90, 3, 3, 'D');
+                
+                const imgWidth = pageWidth - 2 * margin - 8;
+                const imgHeight = (imgWidth * 3) / 4;
+                const imgY = 60;
+                
+                pdf.addImage(currentIdProofData, 'JPEG', margin + 4, imgY, imgWidth, imgHeight);
             } catch (error) {
                 console.error('Error adding ID proof to PDF:', error);
-                pdf.setTextColor(200, 200, 200);
+                pdf.setTextColor(200, 80, 80);
                 pdf.setFontSize(12);
-                pdf.text('ID Proof image could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+                pdf.text('⚠️ ID Proof image could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
             }
         } else if (member.idProofTelegramFileId) {
-            pdf.setTextColor(244, 196, 48);
-            pdf.setFontSize(16);
-            pdf.text('✅ ID Proof Stored Securely', pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
+            pdf.setFillColor(250, 250, 250);
+            pdf.roundedRect(margin, 60, pageWidth - 2 * margin, 60, 4, 4, 'F');
             
-            pdf.setTextColor(200, 200, 200);
-            pdf.setFontSize(12);
-            pdf.text('ID proof is securely stored on Telegram.', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            pdf.setTextColor(76, 175, 80);
+            pdf.setFontSize(18);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('✅ ID Proof Stored Securely', pageWidth / 2, 80, { align: 'center' });
+            
+            pdf.setTextColor(80, 80, 80);
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('ID proof is securely stored on Telegram cloud.', pageWidth / 2, 95, { align: 'center' });
+            pdf.text('Access it anytime from your Telegram account.', pageWidth / 2, 105, { align: 'center' });
             
             if (member.idProofTelegramLink) {
-                pdf.setTextColor(150, 150, 150);
-                pdf.setFontSize(10);
-                pdf.text('View in Telegram:', pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
-                pdf.setTextColor(244, 196, 48);
-                pdf.textWithLink(member.idProofTelegramLink, pageWidth / 2 - 30, pageHeight / 2 + 25, { url: member.idProofTelegramLink });
+                pdf.setTextColor(100, 100, 100);
+                pdf.setFontSize(9);
+                pdf.text('View in Telegram:', pageWidth / 2, 115, { align: 'center' });
             }
         }
         
-        pdf.setFillColor(40, 40, 40);
-        pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-        pdf.setTextColor(150, 150, 150);
+        pdf.setDrawColor(244, 196, 48);
+        pdf.setLineWidth(0.8);
+        pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+        
+        pdf.setFillColor(250, 250, 250);
+        pdf.rect(0, pageHeight - 18, pageWidth, 18, 'F');
+        
+        pdf.setTextColor(100, 100, 100);
         pdf.setFontSize(8);
-        pdf.text('Page 2 of 3 - ID Proof', pageWidth / 2, pageHeight - 8, { align: 'center' });
-        pdf.text(`Member: ${member.name}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Page 2 of 3 - ID Proof Document', pageWidth / 2, pageHeight - 11, { align: 'center' });
+        
+        pdf.setTextColor(120, 120, 120);
+        pdf.setFontSize(7);
+        pdf.text(`Member: ${member.name} | Contact: ${member.contact}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+        
+        pdf.setTextColor(212, 160, 23);
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(libraryName, pageWidth / 2, pageHeight - 2, { align: 'center' });
     }
     
     if (currentPhotoData || member.photoTelegramFileId) {
         pdf.addPage();
-        pdf.setFillColor(26, 26, 26);
+        pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         
         pdf.setFillColor(244, 196, 48);
-        pdf.rect(0, 0, pageWidth, 15, 'F');
+        pdf.rect(0, 0, pageWidth, 28, 'F');
+        
+        pdf.setDrawColor(212, 160, 23);
+        pdf.setLineWidth(0.5);
+        pdf.line(0, 28, pageWidth, 28);
+        
         pdf.setTextColor(26, 26, 26);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(18);
-        pdf.text('MEMBER PHOTOGRAPH', pageWidth / 2, 10, { align: 'center' });
+        pdf.setFontSize(20);
+        pdf.text(libraryName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
         
-        pdf.setTextColor(244, 196, 48);
-        pdf.setFontSize(14);
-        pdf.text(`📸 ${member.name}`, pageWidth / 2, 30, { align: 'center' });
+        pdf.setFontSize(13);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('MEMBER PHOTOGRAPH', pageWidth / 2, 19, { align: 'center' });
+        
+        pdf.setTextColor(212, 160, 23);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`📸 ${member.name}`, pageWidth / 2, 40, { align: 'center' });
         
         if (currentPhotoData) {
             try {
-                const photoSize = 120;
+                const photoSize = 130;
                 const photoX = (pageWidth - photoSize) / 2;
-                const photoY = (pageHeight - photoSize) / 2;
+                const photoY = (pageHeight - photoSize) / 2 - 10;
                 
-                pdf.setFillColor(50, 50, 50);
-                pdf.roundedRect(photoX - 5, photoY - 5, photoSize + 10, photoSize + 10, 5, 5, 'F');
+                pdf.setFillColor(248, 248, 248);
+                pdf.roundedRect(photoX - 8, photoY - 8, photoSize + 16, photoSize + 16, 6, 6, 'F');
+                
+                pdf.setDrawColor(244, 196, 48);
+                pdf.setLineWidth(3);
+                pdf.roundedRect(photoX - 3, photoY - 3, photoSize + 6, photoSize + 6, 4, 4, 'D');
                 
                 pdf.addImage(currentPhotoData, 'JPEG', photoX, photoY, photoSize, photoSize);
+                
+                pdf.setTextColor(80, 80, 80);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(`Contact: ${member.contact}`, pageWidth / 2, photoY + photoSize + 15, { align: 'center' });
+                if (member.seat && member.seat > 0) {
+                    pdf.text(`Seat Number: ${member.seat}`, pageWidth / 2, photoY + photoSize + 23, { align: 'center' });
+                }
             } catch (error) {
                 console.error('Error adding photo to PDF:', error);
-                pdf.setTextColor(200, 200, 200);
+                pdf.setTextColor(200, 80, 80);
                 pdf.setFontSize(12);
-                pdf.text('Member photo could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+                pdf.text('⚠️ Member photo could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
             }
         } else if (member.photoTelegramFileId) {
-            pdf.setTextColor(244, 196, 48);
-            pdf.setFontSize(16);
-            pdf.text('✅ Photo Stored Securely', pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
+            pdf.setFillColor(250, 250, 250);
+            pdf.roundedRect(margin, 60, pageWidth - 2 * margin, 60, 4, 4, 'F');
             
-            pdf.setTextColor(200, 200, 200);
-            pdf.setFontSize(12);
-            pdf.text('Member photo is securely stored on Telegram.', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            pdf.setTextColor(76, 175, 80);
+            pdf.setFontSize(18);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('✅ Photo Stored Securely', pageWidth / 2, 80, { align: 'center' });
+            
+            pdf.setTextColor(80, 80, 80);
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Member photo is securely stored on Telegram cloud.', pageWidth / 2, 95, { align: 'center' });
+            pdf.text('Access it anytime from your Telegram account.', pageWidth / 2, 105, { align: 'center' });
             
             if (member.photoTelegramLink) {
-                pdf.setTextColor(150, 150, 150);
-                pdf.setFontSize(10);
-                pdf.text('View in Telegram:', pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
-                pdf.setTextColor(244, 196, 48);
-                pdf.textWithLink(member.photoTelegramLink, pageWidth / 2 - 30, pageHeight / 2 + 25, { url: member.photoTelegramLink });
+                pdf.setTextColor(100, 100, 100);
+                pdf.setFontSize(9);
+                pdf.text('View in Telegram:', pageWidth / 2, 115, { align: 'center' });
             }
         }
         
-        pdf.setFillColor(40, 40, 40);
-        pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-        pdf.setTextColor(150, 150, 150);
+        pdf.setDrawColor(244, 196, 48);
+        pdf.setLineWidth(0.8);
+        pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+        
+        pdf.setFillColor(250, 250, 250);
+        pdf.rect(0, pageHeight - 18, pageWidth, 18, 'F');
+        
+        pdf.setTextColor(100, 100, 100);
         pdf.setFontSize(8);
-        pdf.text('Page 3 of 3 - Member Photo', pageWidth / 2, pageHeight - 8, { align: 'center' });
-        pdf.text(`Member: ${member.name} | Contact: ${member.contact}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Page 3 of 3 - Member Photograph', pageWidth / 2, pageHeight - 11, { align: 'center' });
+        
+        pdf.setTextColor(120, 120, 120);
+        pdf.setFontSize(7);
+        pdf.text(`Member: ${member.name} | Contact: ${member.contact}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+        
+        pdf.setTextColor(212, 160, 23);
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(libraryName, pageWidth / 2, pageHeight - 2, { align: 'center' });
     }
     
     return pdf;
