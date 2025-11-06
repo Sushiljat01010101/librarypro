@@ -819,12 +819,12 @@ document.getElementById('confirmSaveBtn').addEventListener('click', async () => 
             const pdfBlob = pdf.output('blob');
             const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
             
-            const escapedName = telegramNotifier.escapeHtml(savedMember.name);
-            const escapedContact = telegramNotifier.escapeHtml(savedMember.contact);
-            
             const message = currentEditId 
-                ? `📄 <b>Member Card Updated</b>\n\n👤 <b>Name:</b> ${escapedName}\n📱 <b>Contact:</b> ${escapedContact}`
-                : `📄 <b>Member Card</b>\n\n👤 <b>Name:</b> ${escapedName}\n📱 <b>Contact:</b> ${escapedContact}`;
+                ? telegramNotifier.formatMemberUpdatedMessage(
+                    storageManager.getMembers().find(m => m.id === currentEditId), 
+                    savedMember
+                  )
+                : telegramNotifier.formatMemberAddedMessage(savedMember);
             
             try {
                 const documentResult = await telegramNotifier.sendDocument(pdfFile, message);
