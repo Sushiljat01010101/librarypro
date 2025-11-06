@@ -434,10 +434,6 @@ class StorageManager {
             }
         }
         
-        if (typeof telegramNotifier !== 'undefined') {
-            telegramNotifier.notifyMemberAdded(member);
-        }
-        
         return member;
     }
     
@@ -476,6 +472,18 @@ class StorageManager {
             const idProofData = updatedMember.idProof;
             delete updatedMember.photo;
             delete updatedMember.idProof;
+            
+            if (!photoData || photoData === '') {
+                updatedMember.photoTelegramFileId = oldMember.photoTelegramFileId;
+                updatedMember.photoTelegramMessageId = oldMember.photoTelegramMessageId;
+                updatedMember.photoTelegramLink = oldMember.photoTelegramLink;
+            }
+            
+            if (!idProofData) {
+                updatedMember.idProofTelegramFileId = oldMember.idProofTelegramFileId;
+                updatedMember.idProofTelegramMessageId = oldMember.idProofTelegramMessageId;
+                updatedMember.idProofTelegramLink = oldMember.idProofTelegramLink;
+            }
             
             if (photoData && photoData.startsWith('data:image')) {
                 if (typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
@@ -553,10 +561,6 @@ class StorageManager {
                     members[index].seat = 0;
                     this.saveMembers(members);
                 }
-            }
-            
-            if (typeof telegramNotifier !== 'undefined') {
-                telegramNotifier.notifyMemberUpdated(oldMember, members[index]);
             }
             
             return true;

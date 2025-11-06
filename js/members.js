@@ -591,7 +591,7 @@ async function generateMemberPDF(member) {
     pdf.text('Page 1 of 3 - Member Details', pageWidth / 2, pageHeight - 8, { align: 'center' });
     pdf.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
     
-    if (currentIdProofData) {
+    if (currentIdProofData || member.idProofTelegramFileId) {
         pdf.addPage();
         pdf.setFillColor(26, 26, 26);
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -607,17 +607,35 @@ async function generateMemberPDF(member) {
         pdf.setFontSize(14);
         pdf.text('🆔 Member ID Proof', pageWidth / 2, 30, { align: 'center' });
         
-        try {
-            const imgWidth = pageWidth - 2 * margin;
-            const imgHeight = (imgWidth * 3) / 4;
-            const imgY = (pageHeight - imgHeight) / 2;
+        if (currentIdProofData) {
+            try {
+                const imgWidth = pageWidth - 2 * margin;
+                const imgHeight = (imgWidth * 3) / 4;
+                const imgY = (pageHeight - imgHeight) / 2;
+                
+                pdf.addImage(currentIdProofData, 'JPEG', margin, imgY, imgWidth, imgHeight);
+            } catch (error) {
+                console.error('Error adding ID proof to PDF:', error);
+                pdf.setTextColor(200, 200, 200);
+                pdf.setFontSize(12);
+                pdf.text('ID Proof image could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            }
+        } else if (member.idProofTelegramFileId) {
+            pdf.setTextColor(244, 196, 48);
+            pdf.setFontSize(16);
+            pdf.text('✅ ID Proof Stored Securely', pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
             
-            pdf.addImage(currentIdProofData, 'JPEG', margin, imgY, imgWidth, imgHeight);
-        } catch (error) {
-            console.error('Error adding ID proof to PDF:', error);
             pdf.setTextColor(200, 200, 200);
             pdf.setFontSize(12);
-            pdf.text('ID Proof image could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            pdf.text('ID proof is securely stored on Telegram.', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            
+            if (member.idProofTelegramLink) {
+                pdf.setTextColor(150, 150, 150);
+                pdf.setFontSize(10);
+                pdf.text('View in Telegram:', pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
+                pdf.setTextColor(244, 196, 48);
+                pdf.textWithLink(member.idProofTelegramLink, pageWidth / 2 - 30, pageHeight / 2 + 25, { url: member.idProofTelegramLink });
+            }
         }
         
         pdf.setFillColor(40, 40, 40);
@@ -628,7 +646,7 @@ async function generateMemberPDF(member) {
         pdf.text(`Member: ${member.name}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
     }
     
-    if (currentPhotoData) {
+    if (currentPhotoData || member.photoTelegramFileId) {
         pdf.addPage();
         pdf.setFillColor(26, 26, 26);
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -644,20 +662,38 @@ async function generateMemberPDF(member) {
         pdf.setFontSize(14);
         pdf.text(`📸 ${member.name}`, pageWidth / 2, 30, { align: 'center' });
         
-        try {
-            const photoSize = 120;
-            const photoX = (pageWidth - photoSize) / 2;
-            const photoY = (pageHeight - photoSize) / 2;
+        if (currentPhotoData) {
+            try {
+                const photoSize = 120;
+                const photoX = (pageWidth - photoSize) / 2;
+                const photoY = (pageHeight - photoSize) / 2;
+                
+                pdf.setFillColor(50, 50, 50);
+                pdf.roundedRect(photoX - 5, photoY - 5, photoSize + 10, photoSize + 10, 5, 5, 'F');
+                
+                pdf.addImage(currentPhotoData, 'JPEG', photoX, photoY, photoSize, photoSize);
+            } catch (error) {
+                console.error('Error adding photo to PDF:', error);
+                pdf.setTextColor(200, 200, 200);
+                pdf.setFontSize(12);
+                pdf.text('Member photo could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            }
+        } else if (member.photoTelegramFileId) {
+            pdf.setTextColor(244, 196, 48);
+            pdf.setFontSize(16);
+            pdf.text('✅ Photo Stored Securely', pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
             
-            pdf.setFillColor(50, 50, 50);
-            pdf.roundedRect(photoX - 5, photoY - 5, photoSize + 10, photoSize + 10, 5, 5, 'F');
-            
-            pdf.addImage(currentPhotoData, 'JPEG', photoX, photoY, photoSize, photoSize);
-        } catch (error) {
-            console.error('Error adding photo to PDF:', error);
             pdf.setTextColor(200, 200, 200);
             pdf.setFontSize(12);
-            pdf.text('Member photo could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            pdf.text('Member photo is securely stored on Telegram.', pageWidth / 2, pageHeight / 2, { align: 'center' });
+            
+            if (member.photoTelegramLink) {
+                pdf.setTextColor(150, 150, 150);
+                pdf.setFontSize(10);
+                pdf.text('View in Telegram:', pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
+                pdf.setTextColor(244, 196, 48);
+                pdf.textWithLink(member.photoTelegramLink, pageWidth / 2 - 30, pageHeight / 2 + 25, { url: member.photoTelegramLink });
+            }
         }
         
         pdf.setFillColor(40, 40, 40);
