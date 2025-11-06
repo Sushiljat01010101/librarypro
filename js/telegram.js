@@ -152,33 +152,25 @@ class TelegramNotifier {
         const libraryName = this.escapeHtml(settings.libraryName) || 'Library Management System';
         
         let message = `🎉 <b>New Member Added</b>\n\n`;
-        message += `📚 <b>${libraryName}</b>\n`;
+        message += `📚😂😂😂${libraryName}\n`;
         message += `━━━━━━━━━━━━━━━━━━\n\n`;
         message += `👤 <b>Name:</b> ${this.escapeHtml(member.name)}\n`;
         message += `📱 <b>Contact:</b> ${this.escapeHtml(member.contact)}\n`;
-        
-        if (member.email) {
-            message += `📧 <b>Email:</b> ${this.escapeHtml(member.email)}\n`;
-        }
-        
-        if (member.aadhar) {
-            message += `🆔 <b>Aadhar:</b> ${this.escapeHtml(member.aadhar)}\n`;
-        }
         
         if (member.seat && member.seat > 0) {
             message += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
         }
         
-        message += `💳 <b>Membership:</b> ${this.escapeHtml(member.membershipType || 'Standard')}\n`;
+        message += `🎫 <b>Membership:</b> ${this.escapeHtml(member.membershipType || 'monthly')}\n`;
         message += `💰 <b>Fee:</b> ₹${this.escapeHtml(member.fee || 0)}\n`;
         message += `📊 <b>Status:</b> ${member.status === 'active' ? '✅ Active' : '❌ Inactive'}\n`;
         
         if (member.joiningDate) {
             const date = new Date(member.joiningDate);
-            message += `📅 <b>Joined:</b> ${date.toLocaleDateString('en-IN')}\n`;
+            message += `🗓️ <b>Joined:</b> ${date.toLocaleDateString('en-IN')}\n`;
         }
         
-        message += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
+        message += `\n🕐 <i>${new Date().toLocaleString('en-IN')}</i>`;
         
         return message;
     }
