@@ -142,7 +142,7 @@ function loadMembers() {
         if (member.photoTelegramFileId) {
             const photoIcon = document.createElement('div');
             photoIcon.style.cssText = 'font-size: 32px; color: var(--primary-gold);';
-            photoIcon.textContent = '📸';
+            photoIcon.textContent = '👨';
             photo.appendChild(photoIcon);
             const photoLabel = document.createElement('div');
             photoLabel.style.cssText = 'font-size: 10px; color: var(--success); margin-top: 5px;';
