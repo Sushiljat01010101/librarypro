@@ -664,40 +664,39 @@ async function generateMemberPDF(member) {
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         
         pdf.setFillColor(244, 196, 48);
-        pdf.rect(0, 0, pageWidth, 28, 'F');
+        pdf.rect(0, 0, pageWidth, 15, 'F');
         
         pdf.setDrawColor(212, 160, 23);
         pdf.setLineWidth(0.5);
-        pdf.line(0, 28, pageWidth, 28);
+        pdf.line(0, 15, pageWidth, 15);
         
         pdf.setTextColor(26, 26, 26);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(20);
-        pdf.text(libraryName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+        pdf.setFontSize(11);
+        pdf.text(`${libraryName.toUpperCase()} - ID PROOF`, pageWidth / 2, 6, { align: 'center' });
         
-        pdf.setFontSize(13);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'normal');
-        pdf.text('ID PROOF DOCUMENT', pageWidth / 2, 19, { align: 'center' });
-        
-        pdf.setTextColor(212, 160, 23);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(`🆔 ${member.name}`, pageWidth / 2, 40, { align: 'center' });
+        pdf.text(`🆔 ${member.name}`, pageWidth / 2, 11, { align: 'center' });
         
         if (currentIdProofData) {
             try {
-                pdf.setFillColor(248, 248, 248);
-                pdf.roundedRect(margin - 3, 50, pageWidth - 2 * margin + 6, pageHeight - 80, 4, 4, 'F');
+                const headerHeight = 15;
+                const footerHeight = 18;
+                const availableHeight = pageHeight - headerHeight - footerHeight;
+                const imgWidth = availableHeight * (9 / 16);
+                const imgHeight = availableHeight;
+                const imgX = (pageWidth - imgWidth) / 2;
+                const imgY = headerHeight;
+                
+                pdf.setFillColor(245, 245, 245);
+                pdf.rect(0, imgY, pageWidth, imgHeight, 'F');
                 
                 pdf.setDrawColor(244, 196, 48);
-                pdf.setLineWidth(2);
-                pdf.roundedRect(margin, 55, pageWidth - 2 * margin, pageHeight - 90, 3, 3, 'D');
+                pdf.setLineWidth(4);
+                pdf.rect(imgX - 3, imgY - 3, imgWidth + 6, imgHeight + 6, 'D');
                 
-                const imgWidth = pageWidth - 2 * margin - 8;
-                const imgHeight = (imgWidth * 3) / 4;
-                const imgY = 60;
-                
-                pdf.addImage(currentIdProofData, 'JPEG', margin + 4, imgY, imgWidth, imgHeight);
+                pdf.addImage(currentIdProofData, 'JPEG', imgX, imgY, imgWidth, imgHeight);
             } catch (error) {
                 console.error('Error adding ID proof to PDF:', error);
                 pdf.setTextColor(200, 80, 80);
@@ -754,48 +753,39 @@ async function generateMemberPDF(member) {
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         
         pdf.setFillColor(244, 196, 48);
-        pdf.rect(0, 0, pageWidth, 28, 'F');
+        pdf.rect(0, 0, pageWidth, 15, 'F');
         
         pdf.setDrawColor(212, 160, 23);
         pdf.setLineWidth(0.5);
-        pdf.line(0, 28, pageWidth, 28);
+        pdf.line(0, 15, pageWidth, 15);
         
         pdf.setTextColor(26, 26, 26);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(20);
-        pdf.text(libraryName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+        pdf.setFontSize(11);
+        pdf.text(`${libraryName.toUpperCase()} - MEMBER PHOTO`, pageWidth / 2, 6, { align: 'center' });
         
-        pdf.setFontSize(13);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'normal');
-        pdf.text('MEMBER PHOTOGRAPH', pageWidth / 2, 19, { align: 'center' });
-        
-        pdf.setTextColor(212, 160, 23);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(`📸 ${member.name}`, pageWidth / 2, 40, { align: 'center' });
+        pdf.text(`📸 ${member.name}`, pageWidth / 2, 11, { align: 'center' });
         
         if (currentPhotoData) {
             try {
-                const photoSize = 130;
-                const photoX = (pageWidth - photoSize) / 2;
-                const photoY = (pageHeight - photoSize) / 2 - 10;
+                const headerHeight = 15;
+                const footerHeight = 18;
+                const availableHeight = pageHeight - headerHeight - footerHeight;
+                const imgWidth = availableHeight * (9 / 16);
+                const imgHeight = availableHeight;
+                const imgX = (pageWidth - imgWidth) / 2;
+                const imgY = headerHeight;
                 
-                pdf.setFillColor(248, 248, 248);
-                pdf.roundedRect(photoX - 8, photoY - 8, photoSize + 16, photoSize + 16, 6, 6, 'F');
+                pdf.setFillColor(245, 245, 245);
+                pdf.rect(0, imgY, pageWidth, imgHeight, 'F');
                 
                 pdf.setDrawColor(244, 196, 48);
-                pdf.setLineWidth(3);
-                pdf.roundedRect(photoX - 3, photoY - 3, photoSize + 6, photoSize + 6, 4, 4, 'D');
+                pdf.setLineWidth(4);
+                pdf.rect(imgX - 3, imgY - 3, imgWidth + 6, imgHeight + 6, 'D');
                 
-                pdf.addImage(currentPhotoData, 'JPEG', photoX, photoY, photoSize, photoSize);
-                
-                pdf.setTextColor(80, 80, 80);
-                pdf.setFontSize(10);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(`Contact: ${member.contact}`, pageWidth / 2, photoY + photoSize + 15, { align: 'center' });
-                if (member.seat && member.seat > 0) {
-                    pdf.text(`Seat Number: ${member.seat}`, pageWidth / 2, photoY + photoSize + 23, { align: 'center' });
-                }
+                pdf.addImage(currentPhotoData, 'JPEG', imgX, imgY, imgWidth, imgHeight);
             } catch (error) {
                 console.error('Error adding photo to PDF:', error);
                 pdf.setTextColor(200, 80, 80);
