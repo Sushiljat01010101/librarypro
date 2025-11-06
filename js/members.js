@@ -139,11 +139,15 @@ function loadMembers() {
         
         const photo = document.createElement('div');
         photo.className = 'member-photo';
-        if (member.photo) {
-            const img = document.createElement('img');
-            img.src = member.photo;
-            img.alt = member.name;
-            photo.appendChild(img);
+        if (member.photoTelegramFileId) {
+            const photoIcon = document.createElement('div');
+            photoIcon.style.cssText = 'font-size: 32px; color: var(--primary-gold);';
+            photoIcon.textContent = '📸';
+            photo.appendChild(photoIcon);
+            const photoLabel = document.createElement('div');
+            photoLabel.style.cssText = 'font-size: 10px; color: var(--success); margin-top: 5px;';
+            photoLabel.textContent = 'On Telegram';
+            photo.appendChild(photoLabel);
         } else {
             photo.textContent = '👤';
         }
@@ -312,12 +316,41 @@ document.getElementById('removeIdProofBtn').addEventListener('click', () => {
 function resetPhotoDisplay() {
     currentPhotoData = null;
     const preview = document.getElementById('photoPreview');
-    const placeholder = document.querySelector('.photo-placeholder');
+    const placeholder = preview.querySelector('.photo-placeholder');
     const image = document.getElementById('photoImage');
     const removeBtn = document.getElementById('removePhotoBtn');
     
     preview.classList.remove('has-image');
-    if (placeholder) placeholder.style.display = 'block';
+    if (placeholder) {
+        placeholder.style.display = 'block';
+        placeholder.textContent = '📷 No photo captured';
+    }
+    image.style.display = 'none';
+    image.src = '';
+    removeBtn.style.display = 'none';
+}
+
+function displayTelegramPhotoReference(member) {
+    currentPhotoData = null;
+    const preview = document.getElementById('photoPreview');
+    const placeholder = preview.querySelector('.photo-placeholder');
+    const image = document.getElementById('photoImage');
+    const removeBtn = document.getElementById('removePhotoBtn');
+    
+    preview.classList.add('has-image');
+    if (placeholder) {
+        placeholder.style.display = 'block';
+        placeholder.textContent = '';
+        placeholder.innerHTML = '✅ Photo stored securely on Telegram<br><small style="opacity: 0.7; font-size: 12px;">Capture a new photo to replace it</small>';
+        
+        if (member && member.photoTelegramMessageId) {
+            const infoSmall = document.createElement('small');
+            infoSmall.style.cssText = 'opacity: 0.7; font-size: 11px; display: block; margin-top: 8px; line-height: 1.4;';
+            infoSmall.textContent = `💡 Message ID: #${member.photoTelegramMessageId} - View this photo in your Telegram bot chat`;
+            placeholder.appendChild(document.createElement('br'));
+            placeholder.appendChild(infoSmall);
+        }
+    }
     image.style.display = 'none';
     image.src = '';
     removeBtn.style.display = 'none';
@@ -926,8 +959,8 @@ function editMember(id) {
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberAddress').value = member.address || '';
         
-        if (member.photo) {
-            displayPhoto(member.photo);
+        if (member.photoTelegramFileId) {
+            displayTelegramPhotoReference(member);
         } else {
             resetPhotoDisplay();
         }
