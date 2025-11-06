@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support Center - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/help.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <div class="mobile-header-content">
+            <span class="mobile-library-name" id="mobileLibraryName">My Library</span>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 id="libraryNameSidebar">My Library</h2>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Members</span>
+            </a>
+            <a href="seats.html" class="nav-item">
+                <i class="fas fa-chair"></i>
+                <span>Seats</span>
+            </a>
+            <a href="books.html" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Books</span>
+            </a>
+            <a href="fees.html" class="nav-item">
+                <i class="fas fa-rupee-sign"></i>
+                <span>Fees</span>
+            </a>
+            <a href="expenses.html" class="nav-item">
+                <i class="fas fa-receipt"></i>
+                <span>Expenses</span>
+            </a>
+            <a href="receipts.html" class="nav-item">
+                <i class="fas fa-file-invoice"></i>
+                <span>Receipts</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="activity.html" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Activity</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="help.html" class="nav-item active">
+                <i class="fas fa-question-circle"></i>
+                <span>Help & Support</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="help-banner">
+            <div class="banner-content">
+                <h1 class="banner-title">Help & Support Center</h1>
+                <p class="banner-subtitle">Get instant guidance and troubleshoot your Library Management System</p>
+            </div>
+            <div class="banner-decoration">
+                <i class="fas fa-question-circle"></i>
+            </div>
+        </div>
+
+        <div class="help-container">
+            <div class="developer-section glass-card">
+                <div class="developer-header">
+                    <div class="developer-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="developer-info">
+                        <h2 class="developer-name">Sushil Choudhary</h2>
+                        <p class="developer-title">Full Stack Developer</p>
+                        <p class="developer-tagline">Built with <i class="fas fa-heart heart-icon"></i> to simplify library operations using HTML, CSS, and JS.</p>
+                    </div>
+                </div>
+                
+                <div class="contact-grid">
+                    <a href="tel:8239913685" class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Phone</h3>
+                            <p>+91 8239913685</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://wa.me/918239913685" target="_blank" class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>WhatsApp</h3>
+                            <p>Chat Now</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/+918239913685" target="_blank" class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Telegram</h3>
+                            <p>Message Me</p>
+                        </div>
+                    </a>
+                    
+                    <a href="mailto:sushil6311jat@gmail.com" class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p>sushil6311jat@gmail.com</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="features-guide glass-card">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open"></i>
+                    Feature Guides
+                </h2>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Members Management</h3>
+                            <p>Add, edit, and manage library members. Upload photos and ID proofs for secure record-keeping.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chair"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Seat Allocation</h3>
+                            <p>Assign and manage seats efficiently. Track availability and member assignments in real-time.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Book Management</h3>
+                            <p>Maintain book inventory, track issues and returns, and manage due dates with automated fines.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Fee Collection</h3>
+                            <p>Record payments, track dues, and generate receipts automatically for members.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Reports & Analytics</h3>
+                            <p>View comprehensive reports and charts to track revenue, expenses, and library performance.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Export Data</h3>
+                            <p>Export member lists, fee records, and reports to CSV or PDF formats for offline use.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Telegram Integration</h3>
+                            <p>Connect with Telegram to receive notifications and backup your data securely to the cloud.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Backup & Restore</h3>
+                            <p>Create automatic backups and restore data anytime to prevent data loss.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-tips glass-card">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Quick Tips
+                </h2>
+                
+                <div class="tips-list">
+                    <div class="tip-item">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Use the search feature to quickly find members, books, or transactions.</p>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Set up Telegram notifications in Settings to receive instant alerts for important events.</p>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Enable automatic backups to secure your data without manual intervention.</p>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Use filters in the Fees section to track pending payments and due dates.</p>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Export reports regularly to maintain offline records of your library operations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comments"></i>
+        <span class="chat-badge">Ask AI</span>
+    </button>
+
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-header-left">
+                <i class="fas fa-robot"></i>
+                <h3>Library Assistant</h3>
+            </div>
+            <div class="chatbot-header-right">
+                <button class="chatbot-lang-btn" id="langToggle" title="Change Language">
+                    <i class="fas fa-globe"></i>
+                </button>
+                <button class="chatbot-close" id="chatbotClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p class="welcome-message">Welcome! I'm your Library Assistant. Choose your preferred language to get started.</p>
+                    <div class="language-selector">
+                        <button class="lang-option" data-lang="en">
+                            <i class="fas fa-flag"></i>
+                            English
+                        </button>
+                        <button class="lang-option" data-lang="hi">
+                            <i class="fas fa-flag"></i>
+                            हिन्दी
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbotInput" placeholder="Type your question..." disabled>
+            <button id="chatbotSend" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/telegram.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/help.js"></script>
+</body>
+</html>
