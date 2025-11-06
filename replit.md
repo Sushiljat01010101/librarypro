@@ -41,6 +41,19 @@ The system encompasses several core features:
     -   **Backup Monitoring**: Displays last backup time and next scheduled backup time
     -   **Automatic Checks**: System checks for scheduled backups every hour and executes them when due
     -   **Toggle Control**: Enable/disable auto backup and Telegram backup delivery independently
+-   **Help & Support Center**: Modern, comprehensive help page with developer information and AI-powered chatbot assistant:
+    -   **Developer Information**: Professional card displaying developer details with contact options (Phone, WhatsApp, Telegram, Email) featuring hover animations and glassmorphism effects
+    -   **Feature Guides**: Visual grid showcasing all library features with icons and descriptions for easy reference
+    -   **Quick Tips**: Curated list of helpful tips for efficient library management
+    -   **Multilingual AI Chatbot**: Intelligent chatbot supporting both English and Hindi languages with:
+        -   Language selection (English/Hindi) at startup
+        -   Quick question buttons for common queries
+        -   Comprehensive knowledge base covering all library features (member management, seat allocation, book management, fee collection, reports, backup/restore, Telegram integration, PDF generation, data export, etc.)
+        -   Smart keyword matching for natural language queries
+        -   Animated chat interface with user and bot message distinction
+        -   Floating chat button accessible from any page
+        -   Language toggle option to switch between Hindi and English during conversation
+    -   **Design**: Golden-yellow dark theme with gradient banner, glassmorphism cards, smooth animations, and fully responsive layout for desktop and mobile devices
 
 ### System Design Choices
 -   **No Backend Dependency**: Relies entirely on client-side technologies and LocalStorage for data persistence, making it highly portable and easy to deploy.
