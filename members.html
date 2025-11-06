@@ -116,6 +116,32 @@
         </main>
     </div>
     
+    <div id="previewModal" class="modal">
+        <div class="modal-content preview-modal-content">
+            <div class="modal-header">
+                <h2>📋 Preview Member Details</h2>
+                <button class="close-btn" id="closePreviewBtn">&times;</button>
+            </div>
+            <div class="preview-container">
+                <div class="preview-photo-section">
+                    <h3>Member Photo</h3>
+                    <div class="preview-photo-display" id="previewPhotoDisplay">
+                        <span class="photo-placeholder">No photo captured</span>
+                    </div>
+                    <button type="button" class="btn-retake" id="retakePhotoBtn">🔄 Retake Photo</button>
+                </div>
+                <div class="preview-details-section">
+                    <h3>Member Information</h3>
+                    <div id="previewDetailsContent"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelPreviewBtn">Cancel</button>
+                <button type="button" class="btn-primary" id="confirmSaveBtn">✅ Confirm & Save</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="memberModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -222,8 +248,21 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="memberPhoto">Profile Photo URL</label>
-                    <input type="url" id="memberPhoto" placeholder="https://example.com/photo.jpg">
+                    <label for="memberPhoto">Member Photo 📸</label>
+                    <div class="photo-capture-container">
+                        <input type="hidden" id="memberPhoto" value="">
+                        <div class="photo-preview" id="photoPreview">
+                            <span class="photo-placeholder">📷 No photo captured</span>
+                            <img id="photoImage" style="display: none; max-width: 100%; max-height: 200px; border-radius: 8px;">
+                        </div>
+                        <div class="photo-buttons">
+                            <button type="button" class="btn-camera" id="capturePhotoBtn">📷 Capture Photo</button>
+                            <button type="button" class="btn-upload" id="uploadPhotoBtn">📁 Upload Photo</button>
+                            <button type="button" class="btn-remove" id="removePhotoBtn" style="display: none;">🗑️ Remove</button>
+                        </div>
+                    </div>
+                    <small class="form-hint">Capture member's photo using webcam or phone camera</small>
+                    <input type="file" id="memberPhotoFile" accept="image/*" style="display: none;">
                 </div>
                 
                 <div class="form-group">
@@ -256,6 +295,7 @@
         </div>
     </div>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>

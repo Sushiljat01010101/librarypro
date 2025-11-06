@@ -2,6 +2,66 @@ storageManager.checkAuth();
 
 let currentEditId = null;
 let currentIdProofData = null;
+let currentPhotoData = null;
+let pendingMemberData = null;
+
+function showToast(message, type = 'info') {
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        font-size: 14px;
+        font-weight: 600;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
 
 function updateSeatDisplay(seatValue) {
     const seatDisplay = document.getElementById('seatDisplay');
@@ -240,60 +300,497 @@ document.getElementById('memberIdProof').addEventListener('change', (e) => {
     }
 });
 
-document.getElementById('captureIdProofBtn').addEventListener('click', async () => {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'environment' } 
-        });
-        
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.autoplay = true;
-        video.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10001; max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 10px 50px rgba(0,0,0,0.5);';
-        
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;';
-        
-        const captureBtn = document.createElement('button');
-        captureBtn.textContent = '📸 Capture Photo';
-        captureBtn.style.cssText = 'margin-top: 20px; padding: 15px 30px; font-size: 16px; background: var(--primary-gold); color: var(--bg-primary); border: none; border-radius: 8px; cursor: pointer; z-index: 10002; position: relative;';
-        
-        const cancelBtn = document.createElement('button');
-        cancelBtn.textContent = '❌ Cancel';
-        cancelBtn.style.cssText = 'margin-top: 10px; padding: 12px 25px; font-size: 14px; background: var(--danger); color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 10002; position: relative;';
-        
-        overlay.appendChild(video);
-        overlay.appendChild(captureBtn);
-        overlay.appendChild(cancelBtn);
-        document.body.appendChild(overlay);
-        
-        captureBtn.addEventListener('click', () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            
-            displayIdProof(dataUrl);
-            
-            stream.getTracks().forEach(track => track.stop());
-            document.body.removeChild(overlay);
-        });
-        
-        cancelBtn.addEventListener('click', () => {
-            stream.getTracks().forEach(track => track.stop());
-            document.body.removeChild(overlay);
-        });
-        
-    } catch (error) {
-        console.error('Camera access error:', error);
-        alert('Camera access denied or not available. Please use file upload instead.');
-    }
+document.getElementById('captureIdProofBtn').addEventListener('click', () => {
+    showCameraCapture('idProof');
 });
 
 document.getElementById('removeIdProofBtn').addEventListener('click', () => {
     resetIdProofDisplay();
     document.getElementById('memberIdProof').value = '';
+});
+
+function resetPhotoDisplay() {
+    currentPhotoData = null;
+    const preview = document.getElementById('photoPreview');
+    const placeholder = document.querySelector('.photo-placeholder');
+    const image = document.getElementById('photoImage');
+    const removeBtn = document.getElementById('removePhotoBtn');
+    
+    preview.classList.remove('has-image');
+    if (placeholder) placeholder.style.display = 'block';
+    image.style.display = 'none';
+    image.src = '';
+    removeBtn.style.display = 'none';
+}
+
+function displayPhoto(dataUrl) {
+    currentPhotoData = dataUrl;
+    const preview = document.getElementById('photoPreview');
+    const placeholder = document.querySelector('.photo-placeholder');
+    const image = document.getElementById('photoImage');
+    const removeBtn = document.getElementById('removePhotoBtn');
+    
+    preview.classList.add('has-image');
+    if (placeholder) placeholder.style.display = 'none';
+    image.src = dataUrl;
+    image.style.display = 'block';
+    removeBtn.style.display = 'inline-block';
+    document.getElementById('memberPhoto').value = dataUrl;
+}
+
+function showCameraCapture(targetType = 'photo') {
+    navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+    }).then(stream => {
+        const overlay = document.createElement('div');
+        overlay.className = 'camera-overlay';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s ease-out;';
+        
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.style.cssText = 'max-width: 90%; max-height: 70vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(244, 196, 48, 0.3); animation: zoomIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);';
+        
+        const instructions = document.createElement('div');
+        instructions.style.cssText = 'color: white; margin-top: 20px; text-align: center; font-size: 16px; opacity: 0.9;';
+        instructions.innerHTML = `<p>📸 Position ${targetType === 'photo' ? 'yourself' : 'the ID proof'} in the frame</p>`;
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = 'display: flex; gap: 15px; margin-top: 25px;';
+        
+        const captureBtn = document.createElement('button');
+        captureBtn.textContent = '📸 Capture';
+        captureBtn.className = 'btn-camera-capture';
+        captureBtn.style.cssText = 'padding: 15px 35px; font-size: 18px; background: linear-gradient(135deg, var(--primary-gold), #f4d060); color: var(--bg-primary); border: none; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(244, 196, 48, 0.4); transition: all 0.3s; animation: bounceIn 0.5s ease-out 0.3s backwards;';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '❌ Cancel';
+        cancelBtn.style.cssText = 'padding: 15px 35px; font-size: 18px; background: rgba(255, 255, 255, 0.1); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 12px; cursor: pointer; font-weight: 600; backdrop-filter: blur(10px); transition: all 0.3s; animation: bounceIn 0.5s ease-out 0.4s backwards;';
+        
+        captureBtn.addEventListener('mouseenter', () => {
+            captureBtn.style.transform = 'scale(1.05)';
+            captureBtn.style.boxShadow = '0 6px 20px rgba(244, 196, 48, 0.6)';
+        });
+        
+        captureBtn.addEventListener('mouseleave', () => {
+            captureBtn.style.transform = 'scale(1)';
+            captureBtn.style.boxShadow = '0 4px 15px rgba(244, 196, 48, 0.4)';
+        });
+        
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.background = 'rgba(255, 59, 48, 0.2)';
+            cancelBtn.style.borderColor = 'rgba(255, 59, 48, 0.5)';
+        });
+        
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+            cancelBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+        });
+        
+        const cleanupOverlay = () => {
+            stream.getTracks().forEach(track => track.stop());
+            overlay.style.animation = 'fadeOut 0.2s ease-out';
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 200);
+        };
+        
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            
+            if (targetType === 'photo') {
+                displayPhoto(dataUrl);
+            } else {
+                displayIdProof(dataUrl);
+            }
+            
+            cleanupOverlay();
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            cleanupOverlay();
+        });
+        
+        buttonContainer.appendChild(captureBtn);
+        buttonContainer.appendChild(cancelBtn);
+        
+        overlay.appendChild(video);
+        overlay.appendChild(instructions);
+        overlay.appendChild(buttonContainer);
+        document.body.appendChild(overlay);
+        
+    }).catch(error => {
+        console.error('Camera access error:', error);
+        showToast('❌ Camera access denied or not available. Please use file upload instead.', 'error');
+        alert('Camera access was denied or is not available on this device. Please use the file upload option instead.');
+    });
+}
+
+document.getElementById('capturePhotoBtn').addEventListener('click', () => {
+    showCameraCapture('photo');
+});
+
+document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
+    document.getElementById('memberPhotoFile').click();
+});
+
+document.getElementById('memberPhotoFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            displayPhoto(event.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('removePhotoBtn').addEventListener('click', () => {
+    resetPhotoDisplay();
+    document.getElementById('memberPhotoFile').value = '';
+});
+
+async function generateMemberPDF(member) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    
+    pdf.setFillColor(26, 26, 26);
+    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+    
+    pdf.setFillColor(244, 196, 48);
+    pdf.rect(0, 0, pageWidth, 15, 'F');
+    pdf.setTextColor(26, 26, 26);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(18);
+    pdf.text('MEMBER REGISTRATION', pageWidth / 2, 10, { align: 'center' });
+    
+    pdf.setFillColor(40, 40, 40);
+    pdf.roundedRect(margin, 25, pageWidth - 2 * margin, 40, 3, 3, 'F');
+    
+    pdf.setTextColor(244, 196, 48);
+    pdf.setFontSize(22);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(member.name, pageWidth / 2, 38, { align: 'center' });
+    
+    pdf.setTextColor(200, 200, 200);
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Contact: ${member.contact}`, pageWidth / 2, 48, { align: 'center' });
+    if (member.email) {
+        pdf.text(`Email: ${member.email}`, pageWidth / 2, 56, { align: 'center' });
+    }
+    
+    let yPos = 75;
+    
+    const addSection = (title, details) => {
+        pdf.setFillColor(50, 50, 50);
+        pdf.roundedRect(margin, yPos, pageWidth - 2 * margin, 8, 2, 2, 'F');
+        pdf.setTextColor(244, 196, 48);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, margin + 5, yPos + 6);
+        yPos += 12;
+        
+        pdf.setTextColor(220, 220, 220);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        details.forEach(detail => {
+            if (yPos > pageHeight - 30) {
+                pdf.addPage();
+                yPos = 20;
+            }
+            pdf.text(`${detail.label}:`, margin + 5, yPos);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(detail.value, margin + 60, yPos);
+            pdf.setFont('helvetica', 'normal');
+            yPos += 7;
+        });
+        
+        yPos += 5;
+    };
+    
+    addSection('📋 PERSONAL INFORMATION', [
+        { label: 'Full Name', value: member.name },
+        { label: 'Contact Number', value: member.contact },
+        { label: 'Email Address', value: member.email || 'Not Provided' },
+        { label: 'Aadhar Number', value: member.aadhar || 'Not Provided' },
+        { label: 'Address', value: member.address || 'Not Provided' }
+    ]);
+    
+    addSection('🪑 MEMBERSHIP DETAILS', [
+        { label: 'Seat Number', value: member.seat ? `Seat ${member.seat}` : 'No Seat Assigned' },
+        { label: 'Membership Type', value: member.membershipType || 'Monthly' },
+        { label: 'Monthly Fee', value: `₹${member.fee}` },
+        { label: 'Status', value: member.status === 'active' ? 'Active ✅' : 'Inactive ❌' }
+    ]);
+    
+    addSection('📅 PAYMENT INFORMATION', [
+        { label: 'Joining Date', value: new Date(member.joiningDate).toLocaleDateString('en-IN') },
+        { label: 'Payment Date', value: new Date(member.paymentDate).toLocaleDateString('en-IN') },
+        { label: 'Months Paid', value: `${member.monthsPaidInAdvance} month(s)` },
+        { label: 'Payment Method', value: member.paymentMethod || 'Cash' },
+        { label: 'Next Payment', value: member.nextPaymentDate ? new Date(member.nextPaymentDate).toLocaleDateString('en-IN') : 'Not Set' }
+    ]);
+    
+    pdf.setFillColor(40, 40, 40);
+    pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+    pdf.setTextColor(150, 150, 150);
+    pdf.setFontSize(8);
+    pdf.text('Page 1 of 3 - Member Details', pageWidth / 2, pageHeight - 8, { align: 'center' });
+    pdf.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+    
+    if (currentIdProofData) {
+        pdf.addPage();
+        pdf.setFillColor(26, 26, 26);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        
+        pdf.setFillColor(244, 196, 48);
+        pdf.rect(0, 0, pageWidth, 15, 'F');
+        pdf.setTextColor(26, 26, 26);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(18);
+        pdf.text('ID PROOF DOCUMENT', pageWidth / 2, 10, { align: 'center' });
+        
+        pdf.setTextColor(244, 196, 48);
+        pdf.setFontSize(14);
+        pdf.text('🆔 Member ID Proof', pageWidth / 2, 30, { align: 'center' });
+        
+        try {
+            const imgWidth = pageWidth - 2 * margin;
+            const imgHeight = (imgWidth * 3) / 4;
+            const imgY = (pageHeight - imgHeight) / 2;
+            
+            pdf.addImage(currentIdProofData, 'JPEG', margin, imgY, imgWidth, imgHeight);
+        } catch (error) {
+            console.error('Error adding ID proof to PDF:', error);
+            pdf.setTextColor(200, 200, 200);
+            pdf.setFontSize(12);
+            pdf.text('ID Proof image could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+        }
+        
+        pdf.setFillColor(40, 40, 40);
+        pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+        pdf.setTextColor(150, 150, 150);
+        pdf.setFontSize(8);
+        pdf.text('Page 2 of 3 - ID Proof', pageWidth / 2, pageHeight - 8, { align: 'center' });
+        pdf.text(`Member: ${member.name}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+    }
+    
+    if (currentPhotoData) {
+        pdf.addPage();
+        pdf.setFillColor(26, 26, 26);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        
+        pdf.setFillColor(244, 196, 48);
+        pdf.rect(0, 0, pageWidth, 15, 'F');
+        pdf.setTextColor(26, 26, 26);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(18);
+        pdf.text('MEMBER PHOTOGRAPH', pageWidth / 2, 10, { align: 'center' });
+        
+        pdf.setTextColor(244, 196, 48);
+        pdf.setFontSize(14);
+        pdf.text(`📸 ${member.name}`, pageWidth / 2, 30, { align: 'center' });
+        
+        try {
+            const photoSize = 120;
+            const photoX = (pageWidth - photoSize) / 2;
+            const photoY = (pageHeight - photoSize) / 2;
+            
+            pdf.setFillColor(50, 50, 50);
+            pdf.roundedRect(photoX - 5, photoY - 5, photoSize + 10, photoSize + 10, 5, 5, 'F');
+            
+            pdf.addImage(currentPhotoData, 'JPEG', photoX, photoY, photoSize, photoSize);
+        } catch (error) {
+            console.error('Error adding photo to PDF:', error);
+            pdf.setTextColor(200, 200, 200);
+            pdf.setFontSize(12);
+            pdf.text('Member photo could not be embedded', pageWidth / 2, pageHeight / 2, { align: 'center' });
+        }
+        
+        pdf.setFillColor(40, 40, 40);
+        pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+        pdf.setTextColor(150, 150, 150);
+        pdf.setFontSize(8);
+        pdf.text('Page 3 of 3 - Member Photo', pageWidth / 2, pageHeight - 8, { align: 'center' });
+        pdf.text(`Member: ${member.name} | Contact: ${member.contact}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+    }
+    
+    return pdf;
+}
+
+function showPreviewModal(memberData) {
+    pendingMemberData = memberData;
+    
+    const photoDisplay = document.getElementById('previewPhotoDisplay');
+    if (currentPhotoData) {
+        photoDisplay.innerHTML = `<img src="${currentPhotoData}" style="max-width: 100%; max-height: 250px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">`;
+    } else {
+        photoDisplay.innerHTML = '<span class="photo-placeholder">📷 No photo captured</span>';
+    }
+    
+    const detailsContent = document.getElementById('previewDetailsContent');
+    detailsContent.innerHTML = `
+        <div class="preview-detail-row">
+            <span class="preview-label">👤 Name:</span>
+            <span class="preview-value">${memberData.name}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">📱 Contact:</span>
+            <span class="preview-value">${memberData.contact}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">📧 Email:</span>
+            <span class="preview-value">${memberData.email || 'Not Provided'}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">🆔 Aadhar:</span>
+            <span class="preview-value">${memberData.aadhar || 'Not Provided'}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">🪑 Seat:</span>
+            <span class="preview-value">${memberData.seat ? `Seat ${memberData.seat}` : 'No Seat'}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">💳 Membership:</span>
+            <span class="preview-value">${memberData.membershipType}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">💰 Fee:</span>
+            <span class="preview-value">₹${memberData.fee}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">📅 Joining Date:</span>
+            <span class="preview-value">${new Date(memberData.joiningDate).toLocaleDateString('en-IN')}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">📊 Status:</span>
+            <span class="preview-value">${memberData.status === 'active' ? '✅ Active' : '❌ Inactive'}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">🏠 Address:</span>
+            <span class="preview-value">${memberData.address || 'Not Provided'}</span>
+        </div>
+    `;
+    
+    hideModal('memberModal');
+    showModal('previewModal');
+}
+
+document.getElementById('closePreviewBtn').addEventListener('click', () => {
+    hideModal('previewModal');
+    showModal('memberModal');
+});
+
+document.getElementById('cancelPreviewBtn').addEventListener('click', () => {
+    hideModal('previewModal');
+    showModal('memberModal');
+});
+
+document.getElementById('retakePhotoBtn').addEventListener('click', () => {
+    hideModal('previewModal');
+    showModal('memberModal');
+    showCameraCapture('photo');
+});
+
+document.getElementById('confirmSaveBtn').addEventListener('click', async () => {
+    if (!pendingMemberData) return;
+    
+    const confirmBtn = document.getElementById('confirmSaveBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = '⏳ Saving...';
+    
+    try {
+        let savedMember;
+        if (currentEditId) {
+            const success = await storageManager.updateMember(currentEditId, pendingMemberData);
+            if (success) {
+                const members = storageManager.getMembers();
+                savedMember = members.find(m => m.id === currentEditId);
+            }
+        } else {
+            savedMember = await storageManager.addMember(pendingMemberData);
+        }
+        
+        if (!savedMember) {
+            throw new Error('Failed to save member data');
+        }
+        
+        confirmBtn.textContent = '📄 Generating PDF...';
+        const pdf = await generateMemberPDF(savedMember);
+        
+        const date = new Date().toISOString().split('T')[0];
+        const seatInfo = savedMember.seat ? `_S${savedMember.seat}` : '';
+        const filename = `Member_${savedMember.name.replace(/\s+/g, '_')}${seatInfo}_${date}.pdf`;
+        
+        pdf.save(filename);
+        
+        if (typeof telegramNotifier !== 'undefined' && telegramNotifier.isConfigured()) {
+            confirmBtn.textContent = '📤 Sending to Telegram...';
+            
+            const pdfBlob = pdf.output('blob');
+            const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+            
+            const message = telegramNotifier.formatMemberAddedMessage(savedMember);
+            
+            try {
+                const documentResult = await telegramNotifier.sendDocument(pdfFile, message);
+                
+                if (documentResult.success) {
+                    showToast('✅ Member saved and PDF sent to Telegram successfully!', 'success');
+                } else {
+                    throw new Error(documentResult.error || 'Failed to send PDF');
+                }
+            } catch (telegramError) {
+                console.error('Telegram sending error:', telegramError);
+                showToast(`⚠️ Member saved but Telegram failed. Retry?`, 'warning');
+                
+                if (confirm(`PDF was saved locally but Telegram sending failed.\n\nError: ${telegramError.message}\n\nWould you like to retry sending to Telegram?`)) {
+                    confirmBtn.textContent = '🔄 Retrying Telegram...';
+                    try {
+                        const retryResult = await telegramNotifier.sendDocument(pdfFile, message);
+                        if (retryResult.success) {
+                            showToast('✅ PDF successfully sent to Telegram on retry!', 'success');
+                        } else {
+                            throw new Error(retryResult.error || 'Retry failed');
+                        }
+                    } catch (retryError) {
+                        console.error('Retry failed:', retryError);
+                        showToast('❌ Telegram sending failed again. PDF is saved locally.', 'error');
+                        alert('Telegram sending failed. The PDF has been downloaded to your device and the member has been saved successfully.');
+                    }
+                }
+            }
+        } else {
+            showToast('✅ Member saved and PDF downloaded successfully!', 'success');
+        }
+        
+        hideModal('previewModal');
+        loadMembers();
+        pendingMemberData = null;
+        currentPhotoData = null;
+        currentIdProofData = null;
+        
+    } catch (error) {
+        console.error('Error saving member:', error);
+        showToast('❌ Error saving member. Please try again.', 'error');
+        alert(`Error: ${error.message}\n\nPlease try again or contact support if the issue persists.`);
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = '✅ Confirm & Save';
+    }
 });
 
 document.getElementById('addMemberBtn').addEventListener('click', () => {
@@ -306,6 +803,7 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('paymentMethod').value = 'cash';
     updateSeatDisplay(null);
     resetIdProofDisplay();
+    resetPhotoDisplay();
     showModal('memberModal');
 });
 
@@ -381,7 +879,7 @@ function checkForSeatSelection() {
 
 window.addEventListener('DOMContentLoaded', checkForSeatSelection);
 
-document.getElementById('memberForm').addEventListener('submit', async (e) => {
+document.getElementById('memberForm').addEventListener('submit', (e) => {
     e.preventDefault();
     
     const seatValue = document.getElementById('memberSeat').value;
@@ -399,19 +897,12 @@ document.getElementById('memberForm').addEventListener('submit', async (e) => {
         paymentDate: document.getElementById('paymentDate').value,
         paymentMethod: document.getElementById('paymentMethod').value,
         status: document.getElementById('memberStatus').value,
-        photo: document.getElementById('memberPhoto').value,
+        photo: currentPhotoData || '',
         address: document.getElementById('memberAddress').value,
         idProof: currentIdProofData || null
     };
     
-    if (currentEditId) {
-        await storageManager.updateMember(currentEditId, member);
-    } else {
-        await storageManager.addMember(member);
-    }
-    
-    hideModal('memberModal');
-    loadMembers();
+    showPreviewModal(member);
 });
 
 function editMember(id) {
@@ -433,8 +924,13 @@ function editMember(id) {
         document.getElementById('paymentDate').value = member.paymentDate || new Date().toISOString().split('T')[0];
         document.getElementById('paymentMethod').value = member.paymentMethod || 'cash';
         document.getElementById('memberStatus').value = member.status;
-        document.getElementById('memberPhoto').value = member.photo || '';
         document.getElementById('memberAddress').value = member.address || '';
+        
+        if (member.photo) {
+            displayPhoto(member.photo);
+        } else {
+            resetPhotoDisplay();
+        }
         
         if (member.idProof) {
             displayIdProof(member.idProof);
