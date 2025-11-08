@@ -9,68 +9,43 @@ None specified yet
 ## System Architecture
 
 ### UI/UX Decisions
-The system employs a modern, professional golden-yellow theme. It features a responsive design with a mobile-responsive hamburger navigation for smaller screens (≤768px) and a fixed sidebar for desktop. A dark/light theme toggle is available, with preferences persisting across sessions. UI elements include preference cards, professional toggle switches, and smooth animations and transitions for an enhanced user experience.
+The system employs a modern, professional golden-yellow theme with a responsive design, featuring a mobile-responsive hamburger navigation and a fixed sidebar for desktop. It includes a dark/light theme toggle with preference persistence, preference cards, professional toggle switches, and smooth animations/transitions for an enhanced user experience.
 
 ### Technical Implementations
 The system is implemented as a Single-Page Application (SPA) using:
 -   **HTML5**: For semantic structure.
 -   **CSS3**: For custom theming, responsive layouts, and animations.
--   **Vanilla JavaScript (ES6+)**: For all core business logic, interactions, and dynamic content.
--   **Chart.js**: Integrated for data visualization in reports and analytics.
--   **LocalStorage API**: Used for client-side data persistence, enabling offline functionality and eliminating backend dependencies.
+-   **Vanilla JavaScript (ES6+)**: For all core business logic and dynamic content.
+-   **Chart.js**: Integrated for data visualization.
+-   **LocalStorage API**: Used for client-side data persistence, enabling offline functionality.
 
 ### Feature Specifications
 The system encompasses several core features:
 -   **Authentication**: Admin login with session management and password change.
--   **Member Management**: CRUD operations for members, including seat assignment, membership types, status tracking, multi-month advance payment support, and CSV export. Features cascade deletion for related data (seats, fees, books). Members can have an optional next payment date field to track upcoming payment deadlines. **Inactive Member Handling**: When a member's status is changed from 'active' to 'inactive', the system automatically frees their assigned seat (making it available for other members) and hides their pending fee payments from the fees page and statistics. This ensures that inactive members don't occupy seats or clutter the pending payments view, while their paid payment history is preserved. **Camera Capture & Photo Management with Secure Storage**: Members can have their photo captured directly from webcam or mobile camera with smooth zoom-in animations, or uploaded from a file. For security and privacy, member photos are automatically sent to Telegram (if configured) and only the Telegram reference (file_id and message_id) is stored locally - the actual photo data is NOT stored in LocalStorage. This ensures sensitive member photos are not stored on the client side. The system provides a preview modal before saving, allowing admins to review and retake photos if needed. To view member photos, users must access their Telegram bot chat where all photos are stored with message IDs for easy reference. If Telegram is not configured, the photo is NOT saved. **ID Proof Upload with Secure Storage**: Members can upload their ID proof (Aadhar, License, etc.) either by uploading a file or capturing directly from camera. For security and privacy, the ID proof photo is automatically sent to Telegram (if configured) and only the Telegram reference (file_id and message_id) is stored locally - the actual photo data is NOT stored in LocalStorage. This ensures sensitive ID documents are not stored on the client side. To view uploaded ID proofs, users must access their Telegram bot chat where all photos are stored with message IDs for easy reference. If Telegram is not configured, the ID proof is not saved at all. **Professional PDF Generation**: When saving a new member, the system automatically generates a professional 3-page PDF document containing: (1) Complete member details with personal information, membership details, and payment information, (2) ID Proof document image (if uploaded), and (3) Member photograph (if captured). The PDF features a modern dark theme with golden accents matching the system's color scheme, and is automatically downloaded with the naming format `Member_Name_SeatNo_Date.pdf`. The PDF generation uses in-memory photo data (captured during the session) to include photos in the document, even though the actual photo data is not stored in LocalStorage. If Telegram is configured, the PDF is automatically sent to the Telegram chat along with the standard member registration notification message. Comprehensive error handling ensures graceful fallback when Telegram sending fails, with automatic retry options and clear user feedback via toast notifications. **Multi-Month Advance Payment**: When adding or updating a member, the system allows recording advance payments for multiple months (1-12 months). The system automatically creates or updates fee records for all paid months, properly handles existing pending fees by marking them as paid, and calculates the next due date based on the last paid month. This ensures accurate billing ledger and proper payment tracking for members who pay for multiple months at once.
--   **Seat Management**: A visual grid layout with color-coded seat statuses (Available, Occupied, Reserved). Supports individual or bulk seat additions, safe removal of trailing seats, and real-time statistics. Automatic synchronization with member assignments.
--   **Book Management**: CRUD operations for books, issue/return functionality, overdue tracking with fine calculation, and stock alerts.
--   **Fee Management**: Automated fee generation based on member joining dates, smart due date checking using member's custom next payment date (if set) or calculated from joining date, tracking of payments (paid/pending), and comprehensive multi-month advance payment handling. The system intelligently starts from the earliest unpaid month when processing advance payments, updates existing pending fees to paid status, creates new fee records as needed, and automatically calculates the correct next payment date based on the billing cursor. This ensures accurate reconciliation of outstanding dues and proper tracking of advance payments.
--   **Payment Receipts**: Comprehensive payment receipt management system with member search, complete payment history display, PDF generation for receipts, WhatsApp sharing functionality, date range filtering, CSV export, and print capabilities. Features include: member selection dropdown with search, visual payment timeline with status indicators, download PDF for all payments or individual payments, direct WhatsApp share with formatted payment details, date-based filtering, print receipt functionality, and CSV export for record-keeping. The page integrates jsPDF and html2canvas libraries for client-side PDF generation. **Modern UI Design**: The receipts page features a completely redesigned modern interface with smooth animations, gradient backgrounds, glassmorphism effects, and interactive hover states. The timeline uses animated markers with color-coded status indicators, member info cards showcase stats with elegant hover effects, and all buttons feature ripple animations and smooth transitions. The responsive design ensures optimal viewing across all device sizes with mobile-optimized layouts.
--   **Professional Member PDF Generation**: Advanced multi-page PDF generation system for member registration documents with white background (printing-ready), library name integration on all pages, and modern professional UI:
-    -   **Page 1**: Member details with golden headers, clean sections with alternating row colors, professional borders, timestamp, and library branding
-    -   **Page 2**: ID Proof document displayed in **9:16 aspect ratio as full-page element** with minimal header/footer, golden border frame, and library name branding
-    -   **Page 3**: Member photograph displayed in **9:16 aspect ratio as full-page element** with minimal header/footer, golden border frame, and library name branding
-    -   All pages feature white background for professional printing, golden color scheme (#F4C430) for branding, and comprehensive footer with library name, timestamp, and member information
--   **Expense Management**: Recording and categorization of expenses, tracking by month/year, and CSV export.
--   **Dashboard**: Provides real-time summaries of members, seat occupancy, book inventory, revenue, expenses, and profit, along with recent activity.
--   **Reports & Analytics**: Visualizations for revenue vs. expense trends, category-wise expense distribution, book status, and payment collection rates using Chart.js.
--   **Activity Log**: Tracks all key actions with timestamps, user attribution, and filtering capabilities.
--   **Settings & Backup**: Configurable library settings (name, total seats, fines), password management, dynamic seat management, complete data export/import (JSON), and data clearing options.
--   **Telegram Notifications**: Real-time notifications sent to Telegram when members are added/updated/deleted and when payments are recorded/updated. Configurable via Settings page with Bot Token and Chat ID. Includes a test notification feature to verify the setup. When a member is added or updated with an ID proof, the system automatically sends the ID proof photo to Telegram and stores only the Telegram message reference (file_id and message_id) locally, ensuring sensitive ID documents are not stored in LocalStorage for enhanced security and privacy. Users can view all ID proof photos by opening their Telegram app and navigating to the bot chat. Each photo is labeled with member details and a message ID for easy identification.
--   **Auto Backup System**: Comprehensive automatic backup system with multiple scheduling options:
-    -   **Backup Intervals**: Daily (every 24 hours), Weekly (every 7 days), Monthly (every 30 days), or Custom schedule
-    -   **Custom Scheduling**: Allows users to schedule one-time backups at specific date and time
-    -   **JSON Export**: All backups are exported as JSON files containing complete library data (members, books, fees, expenses, activities, seats, settings)
-    -   **Telegram Integration**: Optional feature to automatically send backup files to Telegram bot when auto backups run
-    -   **Backup Monitoring**: Displays last backup time and next scheduled backup time
-    -   **Automatic Checks**: System checks for scheduled backups every hour and executes them when due
-    -   **Toggle Control**: Enable/disable auto backup and Telegram backup delivery independently
--   **Help & Support Center**: Modern, comprehensive help page with developer information and AI-powered chatbot assistant:
-    -   **Developer Information**: Professional card displaying developer details with contact options (Phone, WhatsApp, Telegram, Email) featuring hover animations and glassmorphism effects
-    -   **Feature Guides**: Visual grid showcasing all library features with icons and descriptions for easy reference
-    -   **Quick Tips**: Curated list of helpful tips for efficient library management
-    -   **Multilingual AI Chatbot**: Intelligent chatbot supporting both English and Hindi languages with:
-        -   Language selection (English/Hindi) at startup
-        -   Quick question buttons for common queries
-        -   Comprehensive knowledge base covering all library features (member management, seat allocation, book management, fee collection, reports, backup/restore, Telegram integration, PDF generation, data export, etc.)
-        -   Smart keyword matching for natural language queries
-        -   Animated chat interface with user and bot message distinction
-        -   Floating chat button accessible from any page
-        -   Language toggle option to switch between Hindi and English during conversation
-    -   **Design**: Golden-yellow dark theme with gradient banner, glassmorphism cards, smooth animations, and fully responsive layout for desktop and mobile devices
+-   **Member Management**: CRUD operations including seat assignment, membership types, status tracking (active/inactive), multi-month advance payments, CSV export, and cascade deletion. Features include half-day/full-day admission types with real-time check-in/check-out status, secure camera capture/upload for photos and ID proofs (stored via Telegram reference only), and professional multi-page PDF generation for member details, ID proof, and photo.
+-   **Seat Management**: Visual grid layout with color-coded statuses, bulk additions, safe removal, and real-time statistics.
+-   **Book Management**: CRUD for books, issue/return, overdue tracking, and stock alerts.
+-   **Fee Management**: Automated fee generation, smart due date checking, tracking payments, and comprehensive multi-month advance payment handling.
+-   **Payment Receipts**: Comprehensive system with member search, payment history, PDF generation, WhatsApp sharing, date filtering, CSV export, and print capabilities. Features a modern UI with animations and glassmorphism effects.
+-   **Expense Management**: Recording, categorization, monthly/yearly tracking, and CSV export.
+-   **Dashboard**: Real-time summaries of members, seat occupancy, book inventory, revenue, expenses, profit, and recent activity.
+-   **Reports & Analytics**: Visualizations for trends, expense distribution, book status, and payment collection rates using Chart.js.
+-   **Activity Log**: Tracks key actions with timestamps and filtering.
+-   **Settings & Backup**: Configurable library settings, password management, dynamic seat management, complete data export/import (JSON), data clearing, and an auto backup system with customizable schedules (Daily, Weekly, Monthly, Custom) and optional Telegram integration for backup file delivery.
+-   **Telegram Notifications**: Real-time notifications for member and payment events, with secure handling of photos and ID proofs by sending to Telegram and storing only references locally. Includes a test notification feature.
+-   **Help & Support Center**: Modern page with developer information, feature guides, quick tips, and a multilingual (English/Hindi) AI-powered chatbot assistant with a comprehensive knowledge base.
 
 ### System Design Choices
--   **No Backend Dependency**: Relies entirely on client-side technologies and LocalStorage for data persistence, making it highly portable and easy to deploy.
--   **Single-Page Application (SPA)**: All functionality is contained within a set of interconnected HTML pages, with navigation handled client-side for a fluid user experience.
--   **Responsive Design**: Optimized for various screen sizes, from mobile to desktop, ensuring accessibility across devices.
--   **Dynamic Content**: JavaScript handles all dynamic updates, form validations, and interactive elements.
--   **Modular Structure**: Code is organized into dedicated JavaScript files for different modules (e.g., `members.js`, `books.js`, `seats.js`) and CSS files for specific page styling.
+-   **No Backend Dependency**: Relies entirely on client-side technologies and LocalStorage.
+-   **Single-Page Application (SPA)**: All functionality within interconnected HTML pages for a fluid user experience.
+-   **Responsive Design**: Optimized for various screen sizes.
+-   **Dynamic Content**: JavaScript handles all dynamic updates and interactions.
+-   **Modular Structure**: Code organized into dedicated JavaScript and CSS files.
 
 ## External Dependencies
 
--   **Chart.js**: JavaScript charting library for data visualization in reports.
--   **jsPDF**: JavaScript library for client-side PDF generation used in payment receipts and member registration documents.
+-   **Chart.js**: JavaScript charting library for data visualization.
+-   **jsPDF**: JavaScript library for client-side PDF generation.
 -   **html2canvas**: JavaScript library for converting HTML elements to canvas for PDF generation.
--   **Python HTTP Server**: Used for local development and deployment to serve static files.
--   **MediaDevices API**: Browser API for camera access to capture member photos and ID proofs directly from device cameras.
+-   **Python HTTP Server**: Used for local development and deployment.
+-   **MediaDevices API**: Browser API for camera access.
