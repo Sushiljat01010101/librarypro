@@ -103,11 +103,47 @@ function createDetailRow(label, value, isHtml = false) {
     return row;
 }
 
+function getAttendanceStatus(member) {
+    if (!member.admissionType || member.admissionType === 'full_day') {
+        return { type: 'full_day', status: 'Full Day', badgeClass: 'info' };
+    }
+    
+    if (member.admissionType === 'half_day' && member.startTime && member.endTime) {
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        
+        const [startHour, startMin] = member.startTime.split(':').map(Number);
+        const [endHour, endMin] = member.endTime.split(':').map(Number);
+        
+        const startTimeMinutes = startHour * 60 + startMin;
+        const endTimeMinutes = endHour * 60 + endMin;
+        
+        if (currentTime >= startTimeMinutes && currentTime <= endTimeMinutes) {
+            return { 
+                type: 'half_day', 
+                status: `✓ Checked In (${member.startTime} - ${member.endTime})`, 
+                badgeClass: 'success',
+                time: `${member.startTime} - ${member.endTime}`
+            };
+        } else {
+            return { 
+                type: 'half_day', 
+                status: `⏸ Checked Out (${member.startTime} - ${member.endTime})`, 
+                badgeClass: 'warning',
+                time: `${member.startTime} - ${member.endTime}`
+            };
+        }
+    }
+    
+    return { type: 'full_day', status: 'Full Day', badgeClass: 'info' };
+}
+
 function loadMembers() {
     const members = storageManager.getMembers();
     const searchTerm = document.getElementById('searchMembers').value.toLowerCase();
     const statusFilter = document.getElementById('statusFilter').value;
     const membershipFilter = document.getElementById('membershipFilter').value;
+    const admissionTypeFilter = document.getElementById('admissionTypeFilter').value;
     
     let filtered = members.filter(member => {
         const seatValue = member.seat ? member.seat.toString() : '';
@@ -118,8 +154,9 @@ function loadMembers() {
         
         const matchesStatus = statusFilter === 'all' || member.status === statusFilter;
         const matchesMembership = membershipFilter === 'all' || member.membershipType === membershipFilter;
+        const matchesAdmissionType = admissionTypeFilter === 'all' || (member.admissionType || 'full_day') === admissionTypeFilter;
         
-        return matchesSearch && matchesStatus && matchesMembership;
+        return matchesSearch && matchesStatus && matchesMembership && matchesAdmissionType;
     });
     
     const container = document.getElementById('membersGrid');
@@ -216,6 +253,22 @@ function loadMembers() {
         statusValue.appendChild(statusBadge);
         statusRow.appendChild(statusValue);
         details.appendChild(statusRow);
+        
+        const attendanceStatus = getAttendanceStatus(member);
+        const attendanceRow = document.createElement('div');
+        attendanceRow.className = 'detail-row';
+        const attendanceLabel = document.createElement('span');
+        attendanceLabel.className = 'detail-label';
+        attendanceLabel.textContent = 'Admission Type';
+        attendanceRow.appendChild(attendanceLabel);
+        const attendanceValue = document.createElement('span');
+        attendanceValue.className = 'detail-value';
+        const attendanceBadge = document.createElement('span');
+        attendanceBadge.className = `badge ${attendanceStatus.badgeClass} attendance-badge`;
+        attendanceBadge.textContent = attendanceStatus.status;
+        attendanceValue.appendChild(attendanceBadge);
+        attendanceRow.appendChild(attendanceValue);
+        details.appendChild(attendanceRow);
         
         card.appendChild(details);
         
@@ -850,6 +903,13 @@ function showPreviewModal(memberData) {
     }
     
     const detailsContent = document.getElementById('previewDetailsContent');
+    let admissionInfo = '';
+    if (memberData.admissionType === 'half_day' && memberData.startTime && memberData.endTime) {
+        admissionInfo = `Half Day (${memberData.startTime} - ${memberData.endTime})`;
+    } else {
+        admissionInfo = 'Full Day';
+    }
+    
     detailsContent.innerHTML = `
         <div class="preview-detail-row">
             <span class="preview-label">👤 Name:</span>
@@ -886,6 +946,10 @@ function showPreviewModal(memberData) {
         <div class="preview-detail-row">
             <span class="preview-label">📊 Status:</span>
             <span class="preview-value">${memberData.status === 'active' ? '✅ Active' : '❌ Inactive'}</span>
+        </div>
+        <div class="preview-detail-row">
+            <span class="preview-label">⏰ Admission Type:</span>
+            <span class="preview-value">${admissionInfo}</span>
         </div>
         <div class="preview-detail-row">
             <span class="preview-label">🏠 Address:</span>
@@ -1014,6 +1078,10 @@ document.getElementById('addMemberBtn').addEventListener('click', () => {
     document.getElementById('paymentDate').valueAsDate = new Date();
     document.getElementById('monthsPaidInAdvance').value = 1;
     document.getElementById('paymentMethod').value = 'cash';
+    document.getElementById('admissionType').value = 'full_day';
+    document.getElementById('timeDurationRow').style.display = 'none';
+    document.getElementById('startTime').value = '';
+    document.getElementById('endTime').value = '';
     updateSeatDisplay(null);
     resetIdProofDisplay();
     resetPhotoDisplay();
@@ -1096,6 +1164,7 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
     e.preventDefault();
     
     const seatValue = document.getElementById('memberSeat').value;
+    const admissionType = document.getElementById('admissionType').value;
     
     const member = {
         name: document.getElementById('memberName').value,
@@ -1112,7 +1181,10 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         status: document.getElementById('memberStatus').value,
         photo: currentPhotoData || '',
         address: document.getElementById('memberAddress').value,
-        idProof: currentIdProofData || null
+        idProof: currentIdProofData || null,
+        admissionType: admissionType,
+        startTime: admissionType === 'half_day' ? document.getElementById('startTime').value : '',
+        endTime: admissionType === 'half_day' ? document.getElementById('endTime').value : ''
     };
     
     showPreviewModal(member);
@@ -1138,6 +1210,22 @@ function editMember(id) {
         document.getElementById('paymentMethod').value = member.paymentMethod || 'cash';
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberAddress').value = member.address || '';
+        document.getElementById('admissionType').value = member.admissionType || 'full_day';
+        
+        const timeDurationRow = document.getElementById('timeDurationRow');
+        if (member.admissionType === 'half_day') {
+            timeDurationRow.style.display = 'flex';
+            document.getElementById('startTime').value = member.startTime || '';
+            document.getElementById('endTime').value = member.endTime || '';
+            document.getElementById('startTime').required = true;
+            document.getElementById('endTime').required = true;
+        } else {
+            timeDurationRow.style.display = 'none';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('startTime').required = false;
+            document.getElementById('endTime').required = false;
+        }
         
         if (member.photoTelegramFileId) {
             displayTelegramPhotoReference(member);
@@ -1186,5 +1274,21 @@ document.getElementById('exportMembersBtn').addEventListener('click', () => {
 document.getElementById('searchMembers').addEventListener('input', loadMembers);
 document.getElementById('statusFilter').addEventListener('change', loadMembers);
 document.getElementById('membershipFilter').addEventListener('change', loadMembers);
+document.getElementById('admissionTypeFilter').addEventListener('change', loadMembers);
+
+document.getElementById('admissionType').addEventListener('change', function() {
+    const timeDurationRow = document.getElementById('timeDurationRow');
+    if (this.value === 'half_day') {
+        timeDurationRow.style.display = 'flex';
+        document.getElementById('startTime').required = true;
+        document.getElementById('endTime').required = true;
+    } else {
+        timeDurationRow.style.display = 'none';
+        document.getElementById('startTime').required = false;
+        document.getElementById('endTime').required = false;
+        document.getElementById('startTime').value = '';
+        document.getElementById('endTime').value = '';
+    }
+});
 
 loadMembers();
