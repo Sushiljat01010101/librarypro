@@ -25,7 +25,7 @@ The system encompasses several core features:
 -   **Member Management**: CRUD operations including seat assignment, membership types, status tracking (active/inactive), multi-month advance payments, CSV export, and cascade deletion. Features include half-day/full-day admission types with real-time check-in/check-out status, secure camera capture/upload for photos and ID proofs (stored via Telegram reference only), and professional multi-page PDF generation for member details, ID proof, and photo.
 -   **Seat Management**: Visual grid layout with color-coded statuses, bulk additions, safe removal, and real-time statistics.
 -   **Book Management**: CRUD for books, issue/return, overdue tracking, and stock alerts.
--   **Fee Management**: Automated fee generation, smart due date checking, tracking payments, and comprehensive multi-month advance payment handling.
+-   **Fee Management**: Automated fee generation, smart due date checking, tracking payments, comprehensive multi-month advance payment handling, and WhatsApp payment reminders with one-click integration to send pending payment notifications directly to members' phones with formatted payment details.
 -   **Payment Receipts**: Comprehensive system with member search, payment history, PDF generation, WhatsApp sharing, date filtering, CSV export, and print capabilities. Features a modern UI with animations and glassmorphism effects.
 -   **Expense Management**: Recording, categorization, monthly/yearly tracking, and CSV export.
 -   **Dashboard**: Real-time summaries of members, seat occupancy, book inventory, revenue, expenses, profit, and recent activity.
