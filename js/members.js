@@ -105,7 +105,7 @@ function createDetailRow(label, value, isHtml = false) {
 
 function getAttendanceStatus(member) {
     if (!member.admissionType || member.admissionType === 'full_day') {
-        return { type: 'full_day', status: 'Full Day', badgeClass: 'info' };
+        return { type: 'full_day', status: 'Full Day', badgeClass: 'info', showTime: false };
     }
     
     if (member.admissionType === 'half_day' && member.startTime && member.endTime) {
@@ -118,24 +118,36 @@ function getAttendanceStatus(member) {
         const startTimeMinutes = startHour * 60 + startMin;
         const endTimeMinutes = endHour * 60 + endMin;
         
+        const formattedStartTime = formatTime12Hour(member.startTime);
+        const formattedEndTime = formatTime12Hour(member.endTime);
+        
         if (currentTime >= startTimeMinutes && currentTime <= endTimeMinutes) {
             return { 
                 type: 'half_day', 
-                status: `✓ Checked In (${member.startTime} - ${member.endTime})`, 
+                status: '✓ Checked In', 
                 badgeClass: 'success',
-                time: `${member.startTime} - ${member.endTime}`
+                time: `${formattedStartTime} - ${formattedEndTime}`,
+                showTime: true
             };
         } else {
             return { 
                 type: 'half_day', 
-                status: `⏸ Checked Out (${member.startTime} - ${member.endTime})`, 
+                status: '⏸ Checked Out', 
                 badgeClass: 'warning',
-                time: `${member.startTime} - ${member.endTime}`
+                time: `${formattedStartTime} - ${formattedEndTime}`,
+                showTime: true
             };
         }
     }
     
-    return { type: 'full_day', status: 'Full Day', badgeClass: 'info' };
+    return { type: 'full_day', status: 'Full Day', badgeClass: 'info', showTime: false };
+}
+
+function formatTime12Hour(time24) {
+    const [hours, minutes] = time24.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
 function loadMembers() {
@@ -267,6 +279,14 @@ function loadMembers() {
         attendanceBadge.className = `badge ${attendanceStatus.badgeClass} attendance-badge`;
         attendanceBadge.textContent = attendanceStatus.status;
         attendanceValue.appendChild(attendanceBadge);
+        
+        if (attendanceStatus.showTime) {
+            const timeDisplay = document.createElement('div');
+            timeDisplay.className = 'time-display';
+            timeDisplay.innerHTML = `<span class="time-icon">🕐</span> <span class="time-text">${attendanceStatus.time}</span>`;
+            attendanceValue.appendChild(timeDisplay);
+        }
+        
         attendanceRow.appendChild(attendanceValue);
         details.appendChild(attendanceRow);
         
