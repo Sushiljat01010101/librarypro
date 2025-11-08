@@ -2,6 +2,63 @@ storageManager.checkAuth();
 
 let currentEditId = null;
 
+function sendWhatsAppReminder(feeId) {
+    const fee = storageManager.getFees().find(f => f.id === feeId);
+    if (!fee) {
+        storageManager.showNotification('Fee record not found!', 'error');
+        return;
+    }
+    
+    const member = storageManager.getMembers().find(m => m.id === fee.memberId);
+    if (!member) {
+        storageManager.showNotification('Member not found!', 'error');
+        return;
+    }
+    
+    if (!member.contact) {
+        storageManager.showNotification('Member phone number not available!', 'error');
+        return;
+    }
+    
+    let phoneNumber = member.contact.replace(/\D/g, '');
+    
+    if (phoneNumber.length < 10) {
+        storageManager.showNotification('Invalid phone number! Must be at least 10 digits.', 'error');
+        return;
+    }
+    
+    if (!phoneNumber.startsWith('91') && phoneNumber.length === 10) {
+        phoneNumber = '91' + phoneNumber;
+    }
+    
+    const monthYear = fee.month;
+    const amount = storageManager.formatCurrency(fee.amount);
+    const memberName = fee.memberName;
+    const seat = member.seat || 'N/A';
+    
+    const message = `नमस्ते ${memberName} जी,
+
+📚 *Library Membership Fee Reminder*
+
+आपकी library membership की pending payment की जानकारी:
+
+👤 *Member:* ${memberName}
+🪑 *Seat Number:* ${seat}
+📅 *Month:* ${monthYear}
+💰 *Amount:* ${amount}
+📌 *Status:* Pending
+
+कृपया जल्द से जल्द payment कर दें।
+
+धन्यवाद!`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    storageManager.showNotification('Opening WhatsApp...', 'success');
+}
+
 function loadFees() {
     const fees = storageManager.getFees();
     const members = storageManager.getMembers();
@@ -83,11 +140,25 @@ function loadFees() {
         
         const tdAction = document.createElement('td');
         if (fee.status === 'pending') {
+            const btnContainer = document.createElement('div');
+            btnContainer.style.display = 'flex';
+            btnContainer.style.gap = '5px';
+            btnContainer.style.flexWrap = 'wrap';
+            
+            const whatsappBtn = document.createElement('button');
+            whatsappBtn.className = 'btn-sm btn-whatsapp';
+            whatsappBtn.innerHTML = '💬 WhatsApp';
+            whatsappBtn.title = 'Send payment reminder via WhatsApp';
+            whatsappBtn.addEventListener('click', () => sendWhatsAppReminder(fee.id));
+            btnContainer.appendChild(whatsappBtn);
+            
             const btn = document.createElement('button');
             btn.className = 'btn-sm btn-success';
             btn.textContent = 'Mark Paid';
             btn.addEventListener('click', () => markAsPaid(fee.id));
-            tdAction.appendChild(btn);
+            btnContainer.appendChild(btn);
+            
+            tdAction.appendChild(btnContainer);
         } else {
             const badge = document.createElement('span');
             badge.className = 'badge success';
@@ -147,7 +218,8 @@ function createFeeCard(fee, member, nextDue) {
         </div>
         <div class="fee-card-footer">
             ${fee.status === 'pending' ? 
-                `<button class="btn-primary" onclick="markAsPaid('${fee.id}')">Mark as Paid</button>` :
+                `<button class="btn-whatsapp" onclick="sendWhatsAppReminder('${fee.id}')" style="flex: 1;">💬 WhatsApp</button>
+                <button class="btn-primary" onclick="markAsPaid('${fee.id}')" style="flex: 1;">Mark as Paid</button>` :
                 `<span class="badge success" style="flex: 1; text-align: center; padding: 10px;">✓ Paid</span>`
             }
         </div>
