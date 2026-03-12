@@ -52,6 +52,30 @@ function loadSeats() {
         return;
     }
     
+    const totalCount = filtered.length;
+    const allSeats = storageManager.getSeats();
+    const totalSeatCount = allSeats.length;
+
+    const grid = container;
+    grid.classList.remove('compact-mode', 'mini-mode', 'micro-mode');
+
+    const badge = document.getElementById('seatsViewBadge');
+    if (totalSeatCount >= 150) {
+        grid.classList.add('micro-mode');
+        badge.style.display = 'inline-flex';
+        badge.textContent = `⚡ Micro View — ${totalSeatCount} seats`;
+    } else if (totalSeatCount >= 70) {
+        grid.classList.add('mini-mode');
+        badge.style.display = 'inline-flex';
+        badge.textContent = `🔹 Compact View — ${totalSeatCount} seats`;
+    } else if (totalSeatCount >= 30) {
+        grid.classList.add('compact-mode');
+        badge.style.display = 'inline-flex';
+        badge.textContent = `📐 Compact View — ${totalSeatCount} seats`;
+    } else {
+        badge.style.display = 'none';
+    }
+
     filtered.forEach(seat => {
         const icon = seat.status === 'occupied' ? '👤' : 
                      seat.status === 'reserved' ? '🔒' : '🪑';

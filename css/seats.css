@@ -391,6 +391,25 @@
    SEATS GRID - ENHANCED
    =========================== */
 
+.seats-grid-wrapper {
+    width: 100%;
+}
+
+.seats-view-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(244, 196, 48, 0.12);
+    border: 1px solid rgba(244, 196, 48, 0.3);
+    color: var(--primary-gold);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+}
+
 .seats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -398,6 +417,139 @@
     padding: 10px 0;
     animation: fadeInScale 0.6s ease-out 0.4s backwards;
 }
+
+/* === COMPACT MODE (30-69 seats) === */
+
+.seats-grid.compact-mode {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
+}
+
+.compact-mode .seat-card {
+    padding: 14px 10px;
+    border-radius: 12px;
+}
+
+.compact-mode .seat-icon {
+    font-size: 26px;
+    margin-bottom: 6px;
+}
+
+.compact-mode .seat-number {
+    font-size: 13px !important;
+}
+
+.compact-mode .seat-status {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+}
+
+.compact-mode .seat-member {
+    font-size: 9px !important;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.compact-mode .seat-card:hover {
+    transform: translateY(-5px) scale(1.03);
+}
+
+/* === MINI MODE (70+ seats) === */
+
+.seats-grid.mini-mode {
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+    gap: 8px;
+}
+
+.mini-mode .seat-card {
+    padding: 10px 6px;
+    border-radius: 10px;
+    border-width: 1.5px;
+}
+
+.mini-mode .seat-card::before {
+    height: 3px;
+}
+
+.mini-mode .seat-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+    animation: none;
+}
+
+.mini-mode .seat-number {
+    font-size: 12px !important;
+    font-weight: 700;
+}
+
+.mini-mode .seat-status {
+    font-size: 8px !important;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+}
+
+.mini-mode .seat-member {
+    display: none;
+}
+
+.mini-mode .seat-card:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 20px rgba(244, 196, 48, 0.2);
+}
+
+/* === MICRO MODE (150+ seats) === */
+
+.seats-grid.micro-mode {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 6px;
+}
+
+.micro-mode .seat-card {
+    padding: 8px 4px;
+    border-radius: 8px;
+    border-width: 1px;
+    box-shadow: none;
+}
+
+.micro-mode .seat-card::before {
+    height: 2px;
+    animation: none;
+}
+
+.micro-mode .seat-card::after {
+    display: none;
+}
+
+.micro-mode .seat-icon {
+    display: none;
+}
+
+.micro-mode .seat-number {
+    font-size: 13px !important;
+    font-weight: 700;
+    margin: 0;
+}
+
+.micro-mode .seat-status {
+    font-size: 7px !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
+}
+
+.micro-mode .seat-member {
+    display: none;
+}
+
+.micro-mode .seat-card:hover {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 4px 12px rgba(244, 196, 48, 0.2);
+}
+
+.micro-mode .seat-card.available:hover { border-color: #4caf50; }
+.micro-mode .seat-card.occupied:hover { border-color: #f44336; }
+.micro-mode .seat-card.reserved:hover { border-color: #ff9800; }
 
 /* ===========================
    SEAT CARDS - ADVANCED DESIGN
