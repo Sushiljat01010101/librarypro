@@ -401,6 +401,279 @@ class TelegramNotifier {
         const message = this.formatPaymentDeletedMessage(fee);
         return await this.sendMessage(message);
     }
+
+    getBotToken() {
+        const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
+        return settings.telegramBotToken || '';
+    }
+
+    async sendMessageToChat(chatId, message) {
+        const botToken = this.getBotToken();
+        if (!botToken || !chatId || chatId.trim() === '') {
+            console.log('Bot token or member chat ID not available. Skipping member notification.');
+            return { success: false, error: 'Not configured' };
+        }
+
+        const url = `${this.apiUrl}${botToken}/sendMessage`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.ok) {
+                console.log('Member Telegram notification sent successfully');
+                return { success: true };
+            } else {
+                console.error('Telegram API error (member):', data.description);
+                return { success: false, error: data.description };
+            }
+        } catch (error) {
+            console.error('Failed to send member Telegram notification:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendDocumentToChat(chatId, file, caption = '') {
+        const botToken = this.getBotToken();
+        if (!botToken || !chatId || chatId.trim() === '') {
+            console.log('Bot token or member chat ID not available. Skipping document send.');
+            return { success: false, error: 'Not configured' };
+        }
+
+        const url = `${this.apiUrl}${botToken}/sendDocument`;
+
+        try {
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('document', file);
+            if (caption) {
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'HTML');
+            }
+
+            const response = await fetch(url, { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.ok) {
+                console.log('Member document sent successfully');
+                return { success: true };
+            } else {
+                console.error('Telegram API error (document):', data.description);
+                return { success: false, error: data.description };
+            }
+        } catch (error) {
+            console.error('Failed to send document to member:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    generateReceiptPDFBlob(member, fee) {
+        try {
+            if (!window.jspdf) return null;
+            const { jsPDF } = window.jspdf;
+            const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
+            const libraryName = settings.libraryName || 'Library Management System';
+
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            doc.setFillColor(244, 196, 48);
+            doc.rect(0, 0, pageWidth, 40, 'F');
+
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(26, 26, 26);
+            doc.text(libraryName, pageWidth / 2, 20, { align: 'center' });
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Payment Receipt', pageWidth / 2, 32, { align: 'center' });
+
+            doc.setTextColor(0, 0, 0);
+
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Member Details', 20, 55);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(11);
+            doc.text(`Name: ${member.name}`, 20, 65);
+            doc.text(`Contact: ${member.contact}`, 20, 73);
+            doc.text(`Seat: ${member.seat || 'N/A'}`, 20, 81);
+            doc.text(`Member ID: #${String(member.id).slice(-6)}`, 20, 89);
+
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Payment Details', 20, 105);
+
+            doc.setFillColor(244, 196, 48);
+            doc.rect(20, 110, pageWidth - 40, 10, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Month', 22, 117);
+            doc.text('Amount', 80, 117);
+            doc.text('Payment Date', 115, 117);
+            doc.text('Method', 165, 117);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFillColor(255, 255, 255);
+            doc.rect(20, 120, pageWidth - 40, 10, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(20, 120, pageWidth - 40, 10);
+
+            const payDate = fee.paymentDate ? new Date(fee.paymentDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
+            doc.text(String(fee.month || ''), 22, 127);
+            doc.text(`Rs. ${fee.amount}`, 80, 127);
+            doc.text(payDate, 115, 127);
+            doc.text(fee.paymentMethod || 'N/A', 165, 127);
+
+            doc.setFillColor(244, 196, 48);
+            doc.rect(20, 130, pageWidth - 40, 10, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.text('Total:', 80, 137);
+            doc.text(`Rs. ${fee.amount}`, 120, 137);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(76, 175, 80);
+            doc.text('STATUS: PAID', pageWidth / 2, 155, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+
+            if (fee.notes) {
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`Notes: ${fee.notes}`, 20, 170);
+            }
+
+            doc.setFillColor(240, 240, 240);
+            doc.rect(20, 185, pageWidth - 40, 20, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Thank you for your payment!', pageWidth / 2, 194, { align: 'center' });
+            doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, 201, { align: 'center' });
+
+            return doc.output('blob');
+        } catch (err) {
+            console.error('Error generating receipt PDF:', err);
+            return null;
+        }
+    }
+
+    formatPaymentCompleteForMember(member, fee, libraryName) {
+        const lib = this.escapeHtml(libraryName || 'Library Management System');
+        let msg = `✅ <b>Payment Confirmed!</b>\n\n`;
+        msg += `📚 <b>${lib}</b>\n`;
+        msg += `━━━━━━━━━━━━━━━━━━\n\n`;
+        msg += `नमस्ते <b>${this.escapeHtml(member.name)}</b> जी,\n\n`;
+        msg += `आपका payment सफलतापूर्वक दर्ज हो गया है। 🎉\n\n`;
+        msg += `📅 <b>Month:</b> ${this.escapeHtml(fee.month)}\n`;
+        msg += `💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
+        const payDate = fee.paymentDate ? new Date(fee.paymentDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
+        msg += `📆 <b>Payment Date:</b> ${payDate}\n`;
+        msg += `💳 <b>Method:</b> ${this.escapeHtml(fee.paymentMethod || 'N/A')}\n`;
+        if (member.seat && member.seat > 0) {
+            msg += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
+        }
+        msg += `\n📄 Receipt PDF इस message के साथ attached है।\n`;
+        msg += `\nधन्यवाद! 🙏\n`;
+        msg += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
+        return msg;
+    }
+
+    formatPendingReminderForMember(member, fee, libraryName) {
+        const lib = this.escapeHtml(libraryName || 'Library Management System');
+        let msg = `⏰ <b>Payment Reminder</b>\n\n`;
+        msg += `📚 <b>${lib}</b>\n`;
+        msg += `━━━━━━━━━━━━━━━━━━\n\n`;
+        msg += `नमस्ते <b>${this.escapeHtml(member.name)}</b> जी,\n\n`;
+        msg += `आपकी library membership की <b>payment pending</b> है।\n\n`;
+        msg += `📅 <b>Month:</b> ${this.escapeHtml(fee.month)}\n`;
+        msg += `💵 <b>Amount:</b> ₹${this.escapeHtml(fee.amount)}\n`;
+        msg += `📊 <b>Status:</b> ⏳ Pending\n`;
+        if (member.seat && member.seat > 0) {
+            msg += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
+        }
+        msg += `\nकृपया जल्द से जल्द payment कर दें।\n`;
+        msg += `धन्यवाद! 🙏\n`;
+        msg += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
+        return msg;
+    }
+
+    async notifyMemberPaymentComplete(member, fee) {
+        if (!member || !member.telegramChatId || member.telegramChatId.trim() === '') {
+            console.log('Member has no Telegram Chat ID. Skipping member notification.');
+            return { success: false, error: 'No member chat ID' };
+        }
+
+        const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
+        const libraryName = settings.libraryName || 'Library Management System';
+
+        const message = this.formatPaymentCompleteForMember(member, fee, libraryName);
+        await this.sendMessageToChat(member.telegramChatId, message);
+
+        const pdfBlob = this.generateReceiptPDFBlob(member, fee);
+        if (pdfBlob) {
+            const fileName = `Receipt_${member.name.replace(/\s+/g, '_')}_${fee.month}.pdf`;
+            const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            await this.sendDocumentToChat(member.telegramChatId, pdfFile, `📄 Payment Receipt - ${fee.month}`);
+        }
+
+        return { success: true };
+    }
+
+    async notifyMemberPendingReminder(member, fee) {
+        if (!member || !member.telegramChatId || member.telegramChatId.trim() === '') {
+            return { success: false, error: 'No member chat ID' };
+        }
+
+        const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
+        const libraryName = settings.libraryName || 'Library Management System';
+
+        const message = this.formatPendingReminderForMember(member, fee, libraryName);
+        return await this.sendMessageToChat(member.telegramChatId, message);
+    }
+
+    async sendAllPendingReminders() {
+        const fees = JSON.parse(localStorage.getItem('libraryFees')) || [];
+        const members = JSON.parse(localStorage.getItem('libraryMembers')) || [];
+
+        const pendingFees = fees.filter(f => f.status === 'pending');
+
+        if (pendingFees.length === 0) {
+            return { sent: 0, skipped: 0, total: 0 };
+        }
+
+        let sent = 0, skipped = 0;
+
+        for (const fee of pendingFees) {
+            const member = members.find(m => m.id === fee.memberId);
+            if (!member || !member.telegramChatId || member.telegramChatId.trim() === '') {
+                skipped++;
+                continue;
+            }
+            if (member.status === 'inactive') {
+                skipped++;
+                continue;
+            }
+            const result = await this.notifyMemberPendingReminder(member, fee);
+            if (result.success) {
+                sent++;
+            } else {
+                skipped++;
+            }
+            await new Promise(r => setTimeout(r, 300));
+        }
+
+        return { sent, skipped, total: pendingFees.length };
+    }
 }
 
 const telegramNotifier = new TelegramNotifier();

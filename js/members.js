@@ -1204,7 +1204,8 @@ document.getElementById('memberForm').addEventListener('submit', (e) => {
         idProof: currentIdProofData || null,
         admissionType: admissionType,
         startTime: admissionType === 'half_day' ? document.getElementById('startTime').value : '',
-        endTime: admissionType === 'half_day' ? document.getElementById('endTime').value : ''
+        endTime: admissionType === 'half_day' ? document.getElementById('endTime').value : '',
+        telegramChatId: (document.getElementById('memberTelegramChatId').value || '').trim()
     };
     
     showPreviewModal(member);
@@ -1230,6 +1231,7 @@ function editMember(id) {
         document.getElementById('paymentMethod').value = member.paymentMethod || 'cash';
         document.getElementById('memberStatus').value = member.status;
         document.getElementById('memberAddress').value = member.address || '';
+        document.getElementById('memberTelegramChatId').value = member.telegramChatId || '';
         document.getElementById('admissionType').value = member.admissionType || 'full_day';
         
         const timeDurationRow = document.getElementById('timeDurationRow');

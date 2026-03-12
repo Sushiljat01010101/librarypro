@@ -338,6 +338,8 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
         f.month === fee.month
     );
     
+    let savedFee = fee;
+
     if (existing && existing.status === 'pending') {
         storageManager.updateFee(existing.id, {
             status: 'paid',
@@ -345,12 +347,16 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
             paymentMethod: fee.paymentMethod,
             notes: fee.notes
         });
+        savedFee = { ...existing, status: 'paid', paymentDate: fee.paymentDate, paymentMethod: fee.paymentMethod, notes: fee.notes };
     } else if (!existing) {
         storageManager.addFee(fee);
+        savedFee = fee;
     } else {
         alert('Payment already recorded for this month!');
         return;
     }
+
+    telegramNotifier.notifyMemberPaymentComplete(member, savedFee).catch(err => console.error('Member notification error:', err));
     
     hideModal('paymentModal');
     populateMonthFilter();
@@ -383,6 +389,52 @@ function markAsPaid(id) {
 document.getElementById('searchFees').addEventListener('input', loadFees);
 document.getElementById('monthFilter').addEventListener('change', loadFees);
 document.getElementById('statusFilter').addEventListener('change', loadFees);
+
+document.getElementById('pendingRemindersBtn').addEventListener('click', async () => {
+    const fees = storageManager.getFees();
+    const members = storageManager.getMembers();
+
+    const pendingFees = fees.filter(f => {
+        const member = members.find(m => m.id === f.memberId);
+        return f.status === 'pending' && member && member.status === 'active';
+    });
+
+    if (pendingFees.length === 0) {
+        storageManager.showNotification('कोई pending fees नहीं मिली।', 'info');
+        return;
+    }
+
+    const membersWithChatId = pendingFees.filter(f => {
+        const member = members.find(m => m.id === f.memberId);
+        return member && member.telegramChatId && member.telegramChatId.trim() !== '';
+    });
+
+    if (membersWithChatId.length === 0) {
+        storageManager.showNotification(`${pendingFees.length} pending fees हैं, लेकिन किसी member का Telegram Chat ID नहीं है। Members में जाकर Chat ID add करें।`, 'warning');
+        return;
+    }
+
+    const confirmed = confirm(`${membersWithChatId.length} members को pending payment reminder भेजा जाएगा। Continue करें?`);
+    if (!confirmed) return;
+
+    const btn = document.getElementById('pendingRemindersBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Sending...';
+
+    try {
+        const result = await telegramNotifier.sendAllPendingReminders();
+        storageManager.showNotification(
+            `✅ Reminders भेजे गए: ${result.sent} | ⏭️ Skipped (no Chat ID): ${result.skipped}`,
+            result.sent > 0 ? 'success' : 'warning'
+        );
+    } catch (err) {
+        console.error('Pending reminders error:', err);
+        storageManager.showNotification('Reminders भेजने में error आई।', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '📢 Pending Reminders';
+    }
+});
 
 autoGenerateFees();
 populateMonthFilter();
