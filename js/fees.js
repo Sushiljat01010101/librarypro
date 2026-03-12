@@ -319,8 +319,17 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
     e.preventDefault();
     
     const memberId = document.getElementById('paymentMember').value;
+    if (!memberId) {
+        storageManager.showNotification('Please select a member.', 'error');
+        return;
+    }
+
     const member = storageManager.getMembers().find(m => m.id === memberId);
-    
+    if (!member) {
+        storageManager.showNotification('Member not found. Please refresh and try again.', 'error');
+        return;
+    }
+
     const fee = {
         memberId,
         memberName: member.name,
@@ -343,11 +352,12 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
     if (existing && existing.status === 'pending') {
         storageManager.updateFee(existing.id, {
             status: 'paid',
+            amount: fee.amount,
             paymentDate: fee.paymentDate,
             paymentMethod: fee.paymentMethod,
             notes: fee.notes
         });
-        savedFee = { ...existing, status: 'paid', paymentDate: fee.paymentDate, paymentMethod: fee.paymentMethod, notes: fee.notes };
+        savedFee = { ...existing, status: 'paid', amount: fee.amount, paymentDate: fee.paymentDate, paymentMethod: fee.paymentMethod, notes: fee.notes };
     } else if (!existing) {
         storageManager.addFee(fee);
         savedFee = fee;
@@ -356,7 +366,9 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
         return;
     }
 
-    telegramNotifier.notifyMemberPaymentComplete(member, savedFee).catch(err => console.error('Member notification error:', err));
+    if (member) {
+        telegramNotifier.notifyMemberPaymentComplete(member, savedFee).catch(err => console.error('Member Telegram notification error:', err));
+    }
     
     hideModal('paymentModal');
     populateMonthFilter();

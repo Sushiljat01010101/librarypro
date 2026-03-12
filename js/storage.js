@@ -180,28 +180,74 @@ class StorageManager {
     }
     
     showBackupNotification(message) {
-        if (typeof window !== 'undefined') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: var(--success);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 10000;
-                animation: slideInUp 0.3s ease-out;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
+        this.showNotification(message, 'success');
+    }
+
+    showNotification(message, type = 'success') {
+        if (typeof window === 'undefined') return;
+
+        const colors = {
+            success: '#4caf50',
+            error: '#f44336',
+            warning: '#ff9800',
+            info: '#2196f3'
+        };
+
+        const icons = {
+            success: '✓',
+            error: '✕',
+            warning: '⚠',
+            info: 'ℹ'
+        };
+
+        const bg = colors[type] || colors.success;
+        const icon = icons[type] || icons.success;
+
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: ${bg};
+            color: white;
+            padding: 14px 20px 14px 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+            z-index: 10001;
+            max-width: 380px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: slideInUp 0.3s ease-out;
+            cursor: pointer;
+        `;
+
+        const iconSpan = document.createElement('span');
+        iconSpan.style.cssText = 'font-weight: 700; font-size: 16px; flex-shrink: 0; margin-top: 1px;';
+        iconSpan.textContent = icon;
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+
+        notification.appendChild(iconSpan);
+        notification.appendChild(textSpan);
+        document.body.appendChild(notification);
+
+        notification.addEventListener('click', () => notification.remove());
+
+        const duration = type === 'error' ? 5000 : 3500;
+
+        setTimeout(() => {
+            if (notification.parentNode) {
                 notification.style.animation = 'slideOutDown 0.3s ease-out';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
+                setTimeout(() => {
+                    if (notification.parentNode) notification.remove();
+                }, 300);
+            }
+        }, duration);
     }
     
     calculateNextBackupTime(interval) {

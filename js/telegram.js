@@ -478,87 +478,178 @@ class TelegramNotifier {
 
     generateReceiptPDFBlob(member, fee) {
         try {
-            if (!window.jspdf) return null;
+            if (!window.jspdf) {
+                console.warn('jsPDF not loaded, skipping PDF generation');
+                return null;
+            }
             const { jsPDF } = window.jspdf;
             const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
-            const libraryName = settings.libraryName || 'Library Management System';
+            const libraryName = (settings.libraryName || 'Library Management System').toUpperCase();
 
-            const doc = new jsPDF();
-            const pageWidth = doc.internal.pageSize.getWidth();
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = doc.internal.pageSize.getWidth();
+            const H = doc.internal.pageSize.getHeight();
 
-            doc.setFillColor(244, 196, 48);
-            doc.rect(0, 0, pageWidth, 40, 'F');
+            const GOLD = [244, 196, 48];
+            const DARK = [26, 26, 26];
+            const WHITE = [255, 255, 255];
+            const LIGHT_GRAY = [248, 248, 248];
+            const MID_GRAY = [224, 224, 224];
+            const TEXT_GRAY = [100, 100, 100];
+            const GREEN = [46, 125, 50];
+            const GREEN_LIGHT = [232, 245, 233];
+            const GOLD_DARK = [180, 140, 20];
 
-            doc.setFontSize(20);
+            const margin = 12;
+            const innerW = W - margin * 2;
+
+            doc.setFillColor(...DARK);
+            doc.rect(0, 0, W, H, 'F');
+            doc.setFillColor(...WHITE);
+            doc.rect(margin - 3, margin - 3, innerW + 6, H - margin * 2 + 6, 'F');
+
+            doc.setFillColor(...GOLD);
+            doc.rect(margin - 3, margin - 3, innerW + 6, 52, 'F');
+
+            doc.setFontSize(22);
             doc.setFont('helvetica', 'bold');
-            doc.setTextColor(26, 26, 26);
-            doc.text(libraryName, pageWidth / 2, 20, { align: 'center' });
+            doc.setTextColor(...DARK);
+            doc.text(libraryName, W / 2, margin + 16, { align: 'center' });
 
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Payment Receipt', pageWidth / 2, 32, { align: 'center' });
-
-            doc.setTextColor(0, 0, 0);
-
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Member Details', 20, 55);
-            doc.setFont('helvetica', 'normal');
             doc.setFontSize(11);
-            doc.text(`Name: ${member.name}`, 20, 65);
-            doc.text(`Contact: ${member.contact}`, 20, 73);
-            doc.text(`Seat: ${member.seat || 'N/A'}`, 20, 81);
-            doc.text(`Member ID: #${String(member.id).slice(-6)}`, 20, 89);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(60, 50, 0);
+            doc.text('PAYMENT RECEIPT', W / 2, margin + 26, { align: 'center' });
 
+            const receiptNum = `RCP-${String(fee.id || Date.now()).slice(-8).toUpperCase()}`;
+            const genDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            doc.setFontSize(8.5);
+            doc.setTextColor(60, 50, 0);
+            doc.text(`Receipt No: ${receiptNum}`, margin + 2, margin + 38);
+            doc.text(`Date: ${genDate}`, W - margin - 3, margin + 38, { align: 'right' });
+
+            doc.setFillColor(...DARK);
+            doc.rect(margin - 3, margin + 48, innerW + 6, 3, 'F');
+
+            let y = margin + 62;
+
+            const drawSectionHeader = (label, yPos) => {
+                doc.setFillColor(...DARK);
+                doc.rect(margin - 3, yPos - 1, innerW + 6, 9, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(...GOLD);
+                doc.text(label, margin + 2, yPos + 5.5);
+            };
+
+            drawSectionHeader('MEMBER INFORMATION', y);
+            y += 12;
+
+            const midX = margin - 3 + (innerW + 6) / 2;
+
+            const rows1 = [
+                ['Member Name', member.name || 'N/A'],
+                ['Contact', member.contact || 'N/A'],
+                ['Seat Number', member.seat ? `Seat ${member.seat}` : 'Not Assigned'],
+                ['Member ID', `#${String(member.id || '').slice(-8).toUpperCase()}`]
+            ];
+
+            rows1.forEach((row, i) => {
+                const bg = i % 2 === 0 ? LIGHT_GRAY : WHITE;
+                doc.setFillColor(...bg);
+                doc.rect(margin - 3, y - 5.5, innerW + 6, 9, 'F');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(...TEXT_GRAY);
+                doc.text(row[0], margin + 2, y);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(...DARK);
+                doc.text(String(row[1]), midX + 2, y);
+                y += 9;
+            });
+
+            y += 6;
+
+            drawSectionHeader('PAYMENT INFORMATION', y);
+            y += 12;
+
+            const payDate = fee.paymentDate
+                ? new Date(fee.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            const rows2 = [
+                ['Payment Month', fee.month || 'N/A'],
+                ['Payment Date', payDate],
+                ['Payment Method', fee.paymentMethod || 'N/A'],
+                ['Notes', fee.notes || '-']
+            ];
+
+            rows2.forEach((row, i) => {
+                const bg = i % 2 === 0 ? LIGHT_GRAY : WHITE;
+                doc.setFillColor(...bg);
+                doc.rect(margin - 3, y - 5.5, innerW + 6, 9, 'F');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(...TEXT_GRAY);
+                doc.text(row[0], margin + 2, y);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(...DARK);
+                doc.text(String(row[1]), midX + 2, y);
+                y += 9;
+            });
+
+            y += 4;
+            doc.setFillColor(...GOLD);
+            doc.rect(margin - 3, y, innerW + 6, 14, 'F');
+            doc.setFont('helvetica', 'bold');
             doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Payment Details', 20, 105);
+            doc.setTextColor(...DARK);
+            doc.text('TOTAL AMOUNT', margin + 4, y + 9.5);
+            doc.setFontSize(15);
+            doc.text(`Rs. ${Number(fee.amount || 0).toLocaleString('en-IN')}`, W - margin - 3, y + 9.5, { align: 'right' });
 
-            doc.setFillColor(244, 196, 48);
-            doc.rect(20, 110, pageWidth - 40, 10, 'F');
+            y += 22;
+
+            const stampCenterX = W / 2;
+            doc.setFillColor(...GREEN_LIGHT);
+            doc.circle(stampCenterX, y + 12, 20, 'F');
+            doc.setDrawColor(...GREEN);
+            doc.setLineWidth(1.2);
+            doc.circle(stampCenterX, y + 12, 20, 'S');
+            doc.setLineWidth(0.5);
+            doc.circle(stampCenterX, y + 12, 18, 'S');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.setTextColor(...GREEN);
+            doc.text('PAID', stampCenterX, y + 10, { align: 'center' });
+            doc.setFontSize(8.5);
+            doc.text('CLEARED', stampCenterX, y + 18, { align: 'center' });
+
+            y += 42;
+
+            doc.setDrawColor(...MID_GRAY);
+            doc.setLineWidth(0.4);
+            doc.line(margin - 3, y, W - margin + 3, y);
+
+            y += 8;
+            doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Month', 22, 117);
-            doc.text('Amount', 80, 117);
-            doc.text('Payment Date', 115, 117);
-            doc.text('Method', 165, 117);
+            doc.setTextColor(...DARK);
+            doc.text('Thank you for your timely payment!', W / 2, y, { align: 'center' });
 
+            y += 6;
             doc.setFont('helvetica', 'normal');
-            doc.setFillColor(255, 255, 255);
-            doc.rect(20, 120, pageWidth - 40, 10, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(20, 120, pageWidth - 40, 10);
+            doc.setFontSize(8);
+            doc.setTextColor(...TEXT_GRAY);
+            doc.text('This is a computer-generated receipt. No signature required.', W / 2, y, { align: 'center' });
 
-            const payDate = fee.paymentDate ? new Date(fee.paymentDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
-            doc.text(String(fee.month || ''), 22, 127);
-            doc.text(`Rs. ${fee.amount}`, 80, 127);
-            doc.text(payDate, 115, 127);
-            doc.text(fee.paymentMethod || 'N/A', 165, 127);
+            y += 5;
+            doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, W / 2, y, { align: 'center' });
 
-            doc.setFillColor(244, 196, 48);
-            doc.rect(20, 130, pageWidth - 40, 10, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.text('Total:', 80, 137);
-            doc.text(`Rs. ${fee.amount}`, 120, 137);
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.setTextColor(76, 175, 80);
-            doc.text('STATUS: PAID', pageWidth / 2, 155, { align: 'center' });
-            doc.setTextColor(0, 0, 0);
-
-            if (fee.notes) {
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'italic');
-                doc.text(`Notes: ${fee.notes}`, 20, 170);
-            }
-
-            doc.setFillColor(240, 240, 240);
-            doc.rect(20, 185, pageWidth - 40, 20, 'F');
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Thank you for your payment!', pageWidth / 2, 194, { align: 'center' });
-            doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, 201, { align: 'center' });
+            doc.setDrawColor(...GOLD_DARK);
+            doc.setLineWidth(1.0);
+            doc.rect(margin - 3, margin - 3, innerW + 6, H - margin * 2 + 6);
 
             return doc.output('blob');
         } catch (err) {
@@ -567,7 +658,7 @@ class TelegramNotifier {
         }
     }
 
-    formatPaymentCompleteForMember(member, fee, libraryName) {
+    formatPaymentCompleteForMember(member, fee, libraryName, hasPdf = false) {
         const lib = this.escapeHtml(libraryName || 'Library Management System');
         let msg = `✅ <b>Payment Confirmed!</b>\n\n`;
         msg += `📚 <b>${lib}</b>\n`;
@@ -582,7 +673,9 @@ class TelegramNotifier {
         if (member.seat && member.seat > 0) {
             msg += `🪑 <b>Seat:</b> ${this.escapeHtml(member.seat)}\n`;
         }
-        msg += `\n📄 Receipt PDF इस message के साथ attached है।\n`;
+        if (hasPdf) {
+            msg += `\n📄 <b>Receipt PDF</b> नीचे attached है।\n`;
+        }
         msg += `\nधन्यवाद! 🙏\n`;
         msg += `\n⏰ <i>${new Date().toLocaleString('en-IN')}</i>`;
         return msg;
@@ -616,12 +709,16 @@ class TelegramNotifier {
         const settings = JSON.parse(localStorage.getItem('librarySettings')) || {};
         const libraryName = settings.libraryName || 'Library Management System';
 
-        const message = this.formatPaymentCompleteForMember(member, fee, libraryName);
+        const pdfBlob = this.generateReceiptPDFBlob(member, fee);
+        const hasPdf = !!pdfBlob;
+
+        const message = this.formatPaymentCompleteForMember(member, fee, libraryName, hasPdf);
         await this.sendMessageToChat(member.telegramChatId, message);
 
-        const pdfBlob = this.generateReceiptPDFBlob(member, fee);
-        if (pdfBlob) {
-            const fileName = `Receipt_${member.name.replace(/\s+/g, '_')}_${fee.month}.pdf`;
+        if (hasPdf) {
+            const safeName = (member.name || 'Member').replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+            const safeMonth = (fee.month || '').replace(/[^a-zA-Z0-9\-]/g, '');
+            const fileName = `Receipt_${safeName}_${safeMonth}.pdf`;
             const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
             await this.sendDocumentToChat(member.telegramChatId, pdfFile, `📄 Payment Receipt - ${fee.month}`);
         }
