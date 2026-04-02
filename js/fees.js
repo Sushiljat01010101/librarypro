@@ -55,7 +55,14 @@ function sendWhatsAppReminder(feeId) {
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
     
-    window.open(whatsappUrl, '_blank');
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => document.body.removeChild(link), 100);
     storageManager.showNotification('Opening WhatsApp...', 'success');
 }
 

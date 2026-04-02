@@ -503,7 +503,14 @@ function sendWhatsAppMessage(phoneNumber, message) {
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     
-    window.open(whatsappURL, '_blank');
+    const link = document.createElement('a');
+    link.href = whatsappURL;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => document.body.removeChild(link), 100);
 }
 
 function printReceipt() {
