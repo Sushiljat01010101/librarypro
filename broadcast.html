@@ -11,16 +11,11 @@
     <div class="mobile-header">
         <div class="mobile-header-content">
             <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <div class="hamburger"><span></span><span></span><span></span></div>
             </button>
             <div class="mobile-library-name">📚 Library MS</div>
         </div>
     </div>
-
     <div class="menu-overlay" id="menuOverlay"></div>
 
     <div class="app-container">
@@ -30,246 +25,241 @@
                 <button class="sidebar-toggle" id="sidebarToggle">☰</button>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="text">Dashboard</span>
-                </a>
-                <a href="members.html" class="nav-item">
-                    <span class="icon">👥</span>
-                    <span class="text">Members</span>
-                </a>
-                <a href="seats.html" class="nav-item">
-                    <span class="icon">🪑</span>
-                    <span class="text">Seats</span>
-                </a>
-                <a href="books.html" class="nav-item">
-                    <span class="icon">📚</span>
-                    <span class="text">Books</span>
-                </a>
-                <a href="fees.html" class="nav-item">
-                    <span class="icon">💰</span>
-                    <span class="text">Fees</span>
-                </a>
-                <a href="receipts.html" class="nav-item">
-                    <span class="icon">🧾</span>
-                    <span class="text">Payment Receipts</span>
-                </a>
-                <a href="expenses.html" class="nav-item">
-                    <span class="icon">💸</span>
-                    <span class="text">Expenses</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📈</span>
-                    <span class="text">Reports</span>
-                </a>
-                <a href="broadcast.html" class="nav-item active">
-                    <span class="icon">📢</span>
-                    <span class="text">Broadcast</span>
-                </a>
-                <a href="activity.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="text">Activity Log</span>
-                </a>
-                <a href="settings.html" class="nav-item">
-                    <span class="icon">⚙️</span>
-                    <span class="text">Settings</span>
-                </a>
-                <a href="help.html" class="nav-item">
-                    <span class="icon">❓</span>
-                    <span class="text">Help & Support</span>
-                </a>
-                <a href="#" class="nav-item logout-btn" id="logoutBtn">
-                    <span class="icon">🚪</span>
-                    <span class="text">Logout</span>
-                </a>
+                <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="text">Dashboard</span></a>
+                <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="text">Members</span></a>
+                <a href="seats.html" class="nav-item"><span class="icon">🪑</span><span class="text">Seats</span></a>
+                <a href="books.html" class="nav-item"><span class="icon">📚</span><span class="text">Books</span></a>
+                <a href="fees.html" class="nav-item"><span class="icon">💰</span><span class="text">Fees</span></a>
+                <a href="receipts.html" class="nav-item"><span class="icon">🧾</span><span class="text">Payment Receipts</span></a>
+                <a href="expenses.html" class="nav-item"><span class="icon">💸</span><span class="text">Expenses</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="text">Reports</span></a>
+                <a href="broadcast.html" class="nav-item active"><span class="icon">📢</span><span class="text">Broadcast</span></a>
+                <a href="activity.html" class="nav-item"><span class="icon">📋</span><span class="text">Activity Log</span></a>
+                <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="text">Settings</span></a>
+                <a href="help.html" class="nav-item"><span class="icon">❓</span><span class="text">Help & Support</span></a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn"><span class="icon">🚪</span><span class="text">Logout</span></a>
             </nav>
         </aside>
 
         <main class="main-content">
             <header class="page-header">
                 <div class="header-left">
-                    <h1>📢 Broadcast</h1>
-                    <p class="subtitle">Send message, photo or video to members on Telegram</p>
+                    <h1>📢 Broadcast Message</h1>
+                    <p class="subtitle">Send message, photo or video to members via Telegram</p>
                 </div>
                 <div class="header-right">
-                    <span class="bot-status" id="botStatus">
-                        <span class="status-dot"></span>
-                        <span class="status-text">Checking bot...</span>
-                    </span>
+                    <div class="bot-status-pill" id="botStatusPill">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Checking...</span>
+                    </div>
                 </div>
             </header>
 
+            <!-- Bot Not Configured Warning -->
+            <div class="alert-banner" id="botWarning" style="display:none;">
+                <span class="alert-icon">⚠️</span>
+                <span class="alert-msg">Telegram Bot Token not configured. <a href="settings.html">Go to Settings</a> to set it up before broadcasting.</span>
+            </div>
+
             <div class="page-content">
 
-                <!-- Stats Bar -->
-                <div class="broadcast-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="totalMembers">0</div>
-                            <div class="stat-label">Total Members</div>
-                        </div>
+                <!-- Stats Row -->
+                <div class="bc-stats-row">
+                    <div class="bc-stat">
+                        <div class="bc-stat-num" id="stat-total">0</div>
+                        <div class="bc-stat-lbl">Total Members</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💬</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="chatIdMembers">0</div>
-                            <div class="stat-label">Have Chat ID</div>
-                        </div>
+                    <div class="bc-stat success">
+                        <div class="bc-stat-num" id="stat-ready">0</div>
+                        <div class="bc-stat-lbl">Ready (have Chat ID)</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="selectedCount">0</div>
-                            <div class="stat-label">Selected</div>
-                        </div>
+                    <div class="bc-stat warning">
+                        <div class="bc-stat-num" id="stat-no-id">0</div>
+                        <div class="bc-stat-lbl">No Chat ID</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🚫</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="noChatIdCount">0</div>
-                            <div class="stat-label">No Chat ID</div>
-                        </div>
+                    <div class="bc-stat gold">
+                        <div class="bc-stat-num" id="stat-selected">0</div>
+                        <div class="bc-stat-lbl">Selected</div>
                     </div>
                 </div>
 
-                <div class="broadcast-layout">
+                <div class="bc-main-grid">
 
-                    <!-- Left: Compose -->
-                    <div class="compose-section">
-                        <div class="section-card">
-                            <div class="card-header">
-                                <h3>✍️ Compose Message</h3>
+                    <!-- LEFT: Compose -->
+                    <div class="bc-left">
+
+                        <!-- Message Compose Card -->
+                        <div class="bc-card">
+                            <div class="bc-card-head">
+                                <span class="bc-card-title">✍️ Compose Message</span>
                             </div>
-                            <div class="card-body">
+                            <div class="bc-card-body">
 
-                                <!-- Message Type Tabs -->
-                                <div class="msg-type-tabs">
-                                    <button class="msg-tab active" data-type="text">💬 Text</button>
-                                    <button class="msg-tab" data-type="photo">🖼️ Photo</button>
-                                    <button class="msg-tab" data-type="video">🎥 Video</button>
-                                    <button class="msg-tab" data-type="document">📎 Document</button>
+                                <!-- Type Selector -->
+                                <div class="type-selector">
+                                    <button class="type-btn active" data-type="text">
+                                        <span class="type-icon">💬</span>
+                                        <span>Text</span>
+                                    </button>
+                                    <button class="type-btn" data-type="photo">
+                                        <span class="type-icon">🖼️</span>
+                                        <span>Photo</span>
+                                    </button>
+                                    <button class="type-btn" data-type="video">
+                                        <span class="type-icon">🎥</span>
+                                        <span>Video</span>
+                                    </button>
+                                    <button class="type-btn" data-type="document">
+                                        <span class="type-icon">📎</span>
+                                        <span>Document</span>
+                                    </button>
+                                </div>
+
+                                <!-- Quick Templates (only for text) -->
+                                <div id="templateRow" class="template-row">
+                                    <span class="template-label">Quick templates:</span>
+                                    <button class="tmpl-btn" data-tmpl="fee">💰 Fee Reminder</button>
+                                    <button class="tmpl-btn" data-tmpl="holiday">🎉 Holiday Notice</button>
+                                    <button class="tmpl-btn" data-tmpl="closed">🔒 Library Closed</button>
+                                    <button class="tmpl-btn" data-tmpl="custom">✨ Welcome</button>
                                 </div>
 
                                 <!-- Text Panel -->
                                 <div class="msg-panel active" id="panel-text">
-                                    <label class="input-label">Message Text <span class="required">*</span></label>
-                                    <textarea id="broadcastText" placeholder="Type your message here...&#10;&#10;You can use HTML formatting:&#10;&lt;b&gt;Bold&lt;/b&gt;, &lt;i&gt;Italic&lt;/i&gt;, &lt;code&gt;Code&lt;/code&gt;" rows="7"></textarea>
-                                    <div class="char-count"><span id="charCount">0</span> characters</div>
+                                    <label class="field-label">Message <span class="req">*</span></label>
+                                    <textarea id="broadcastText" rows="7" placeholder="Type your message here...&#10;&#10;HTML supported: &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;"></textarea>
+                                    <div class="char-row">
+                                        <span id="charCount">0</span> characters
+                                    </div>
                                 </div>
 
                                 <!-- Photo Panel -->
                                 <div class="msg-panel" id="panel-photo">
-                                    <label class="input-label">Select Photo <span class="required">*</span></label>
-                                    <div class="file-drop-zone" id="photoDropZone">
-                                        <div class="drop-icon">🖼️</div>
-                                        <div class="drop-text">Click or drag & drop image</div>
-                                        <div class="drop-sub">JPG, PNG, GIF, WebP (max 10MB)</div>
-                                        <input type="file" id="photoInput" accept="image/*" hidden>
+                                    <label class="field-label">Photo <span class="req">*</span></label>
+                                    <div class="upload-zone" id="photoZone">
+                                        <input type="file" id="photoFile" accept="image/*" hidden>
+                                        <div class="upload-icon">🖼️</div>
+                                        <div class="upload-title">Click or drag & drop</div>
+                                        <div class="upload-hint">JPG, PNG, WebP — max 10MB</div>
                                     </div>
-                                    <div class="file-preview" id="photoPreview" style="display:none;">
-                                        <img id="photoPreviewImg" src="" alt="Preview">
-                                        <button class="remove-file-btn" id="removePhoto">✕</button>
+                                    <div class="file-thumb" id="photoThumb" style="display:none;">
+                                        <img id="photoImg" src="" alt="">
+                                        <button class="remove-btn" data-remove="photo">✕ Remove</button>
                                     </div>
-                                    <label class="input-label mt-12">Caption (optional)</label>
-                                    <textarea id="photoCaption" placeholder="Add a caption..." rows="3"></textarea>
+                                    <label class="field-label mt-10">Caption (optional)</label>
+                                    <textarea id="photoCaption" rows="3" placeholder="Add a caption..."></textarea>
                                 </div>
 
                                 <!-- Video Panel -->
                                 <div class="msg-panel" id="panel-video">
-                                    <label class="input-label">Select Video <span class="required">*</span></label>
-                                    <div class="file-drop-zone" id="videoDropZone">
-                                        <div class="drop-icon">🎥</div>
-                                        <div class="drop-text">Click or drag & drop video</div>
-                                        <div class="drop-sub">MP4, AVI, MOV (max 50MB)</div>
-                                        <input type="file" id="videoInput" accept="video/*" hidden>
+                                    <label class="field-label">Video <span class="req">*</span></label>
+                                    <div class="upload-zone" id="videoZone">
+                                        <input type="file" id="videoFile" accept="video/*" hidden>
+                                        <div class="upload-icon">🎥</div>
+                                        <div class="upload-title">Click or drag & drop</div>
+                                        <div class="upload-hint">MP4, MOV — max 50MB</div>
                                     </div>
-                                    <div class="file-preview video-preview-box" id="videoPreview" style="display:none;">
-                                        <video id="videoPreviewEl" controls></video>
-                                        <button class="remove-file-btn" id="removeVideo">✕</button>
+                                    <div class="file-thumb video-thumb" id="videoThumb" style="display:none;">
+                                        <video id="videoEl" controls></video>
+                                        <button class="remove-btn" data-remove="video">✕ Remove</button>
                                     </div>
-                                    <label class="input-label mt-12">Caption (optional)</label>
-                                    <textarea id="videoCaption" placeholder="Add a caption..." rows="3"></textarea>
+                                    <label class="field-label mt-10">Caption (optional)</label>
+                                    <textarea id="videoCaption" rows="3" placeholder="Add a caption..."></textarea>
                                 </div>
 
                                 <!-- Document Panel -->
                                 <div class="msg-panel" id="panel-document">
-                                    <label class="input-label">Select Document <span class="required">*</span></label>
-                                    <div class="file-drop-zone" id="documentDropZone">
-                                        <div class="drop-icon">📎</div>
-                                        <div class="drop-text">Click or drag & drop file</div>
-                                        <div class="drop-sub">PDF, Word, Excel, etc. (max 50MB)</div>
-                                        <input type="file" id="documentInput" hidden>
+                                    <label class="field-label">File <span class="req">*</span></label>
+                                    <div class="upload-zone" id="docZone">
+                                        <input type="file" id="docFile" hidden>
+                                        <div class="upload-icon">📎</div>
+                                        <div class="upload-title">Click or drag & drop</div>
+                                        <div class="upload-hint">PDF, Word, Excel — max 50MB</div>
                                     </div>
-                                    <div class="file-info-box" id="documentInfo" style="display:none;">
-                                        <span class="file-icon">📄</span>
-                                        <span id="documentName"></span>
-                                        <button class="remove-file-btn inline" id="removeDocument">✕</button>
+                                    <div class="file-info" id="docInfo" style="display:none;">
+                                        <span class="file-icon-lg">📄</span>
+                                        <span id="docName" class="doc-name"></span>
+                                        <button class="remove-btn small" data-remove="document">✕</button>
                                     </div>
-                                    <label class="input-label mt-12">Caption (optional)</label>
-                                    <textarea id="documentCaption" placeholder="Add a caption..." rows="3"></textarea>
+                                    <label class="field-label mt-10">Caption (optional)</label>
+                                    <textarea id="docCaption" rows="3" placeholder="Add a caption..."></textarea>
                                 </div>
 
                                 <!-- Send Button -->
-                                <button class="btn-broadcast" id="sendBroadcastBtn" disabled>
-                                    <span class="btn-icon">🚀</span>
-                                    <span class="btn-text">Send Broadcast</span>
+                                <button class="send-btn" id="sendBtn" disabled>
+                                    <span id="sendBtnIcon">🚀</span>
+                                    <span id="sendBtnText">Send Broadcast</span>
                                 </button>
 
                             </div>
                         </div>
 
                         <!-- Progress Card -->
-                        <div class="section-card" id="progressCard" style="display:none;">
-                            <div class="card-header">
-                                <h3>📊 Broadcast Progress</h3>
+                        <div class="bc-card" id="progressCard" style="display:none;">
+                            <div class="bc-card-head">
+                                <span class="bc-card-title">📊 Sending Progress</span>
+                                <span class="progress-pct" id="progressPct">0%</span>
                             </div>
-                            <div class="card-body">
-                                <div class="progress-bar-wrap">
-                                    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+                            <div class="bc-card-body">
+                                <div class="prog-bar-wrap">
+                                    <div class="prog-bar" id="progressBar"></div>
                                 </div>
-                                <div class="progress-stats">
-                                    <span class="prog-sent">✅ Sent: <b id="sentCount">0</b></span>
-                                    <span class="prog-failed">❌ Failed: <b id="failedCount">0</b></span>
-                                    <span class="prog-total">📬 Total: <b id="totalSendCount">0</b></span>
+                                <div class="prog-counts">
+                                    <div class="prog-count success"><span id="cntSent">0</span><small>Sent</small></div>
+                                    <div class="prog-count danger"><span id="cntFailed">0</span><small>Failed</small></div>
+                                    <div class="prog-count muted"><span id="cntTotal">0</span><small>Total</small></div>
                                 </div>
-                                <div class="progress-log" id="progressLog"></div>
+                                <div class="prog-log" id="progressLog"></div>
+                            </div>
+                        </div>
+
+                        <!-- History Card -->
+                        <div class="bc-card" id="historyCard">
+                            <div class="bc-card-head">
+                                <span class="bc-card-title">🕓 Broadcast History</span>
+                                <button class="clear-hist-btn" id="clearHistoryBtn">Clear</button>
+                            </div>
+                            <div class="bc-card-body no-pad">
+                                <div id="historyList">
+                                    <div class="empty-hist">No broadcasts sent yet</div>
+                                </div>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Right: Members List -->
-                    <div class="members-section">
-                        <div class="section-card">
-                            <div class="card-header">
-                                <h3>👥 Select Recipients</h3>
-                                <div class="member-controls">
-                                    <input type="text" id="memberSearch" placeholder="🔍 Search members..." class="member-search-input">
-                                    <div class="select-btns">
-                                        <button class="btn-sm btn-outline" id="selectAllBtn">Select All</button>
-                                        <button class="btn-sm btn-outline" id="deselectAllBtn">Deselect All</button>
+                    <!-- RIGHT: Members -->
+                    <div class="bc-right">
+                        <div class="bc-card h-full">
+                            <div class="bc-card-head col">
+                                <div class="head-row">
+                                    <span class="bc-card-title">👥 Recipients</span>
+                                    <div class="bulk-btns">
+                                        <button class="bulk-btn" id="selectReadyBtn">✅ All with Chat ID</button>
+                                        <button class="bulk-btn danger" id="deselectBtn">☐ Deselect All</button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body no-padding">
+                                <input type="text" id="memberSearch" class="search-input" placeholder="🔍 Search by name, phone, seat...">
                                 <div class="member-filter-tabs">
-                                    <button class="filter-tab active" data-filter="with-chatid">💬 Has Chat ID</button>
-                                    <button class="filter-tab" data-filter="all">All Members</button>
-                                    <button class="filter-tab" data-filter="no-chatid">🚫 No Chat ID</button>
+                                    <button class="mf-tab active" data-mf="all">All</button>
+                                    <button class="mf-tab" data-mf="ready">💬 Has ID</button>
+                                    <button class="mf-tab" data-mf="active">✅ Active</button>
+                                    <button class="mf-tab" data-mf="inactive">❌ Inactive</button>
                                 </div>
-                                <div class="members-list" id="membersList">
-                                    <div class="no-data-msg">Loading members...</div>
-                                </div>
+                            </div>
+                            <div class="bc-card-body no-pad">
+                                <div class="members-scroll" id="membersList"></div>
                             </div>
                         </div>
                     </div>
 
                 </div>
-
             </div>
         </main>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
 
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>

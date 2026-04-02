@@ -34,6 +34,7 @@ The system encompasses several core features:
 -   **Settings & Backup**: Configurable library settings, password management, dynamic seat management, complete data export/import (JSON), data clearing, and an auto backup system with customizable schedules (Daily, Weekly, Monthly, Custom) and optional Telegram integration for backup file delivery.
 -   **Telegram Notifications**: Real-time notifications for member and payment events, with secure handling of photos and ID proofs by sending to Telegram and storing only references locally. Includes a test notification feature. Each member can have an individual Telegram Chat ID stored, enabling direct member-facing notifications: payment confirmations with PDF receipts and pending payment reminders are sent to each member's personal Telegram account using the same bot token configured in Settings.
 -   **Help & Support Center**: Modern page with developer information, feature guides, quick tips, and a multilingual (English/Hindi) AI-powered chatbot assistant with a comprehensive knowledge base.
+-   **Broadcast**: Professional broadcasting page to send bulk messages (text, photo, video, document) to all members with Telegram Chat IDs via Telegram Bot API. Features: member selection with filters, quick message templates, real-time send progress log, broadcast history (stored in LocalStorage), toast notifications, bot status indicator, and rate-limit-aware sending.
 
 ### System Design Choices
 -   **No Backend Dependency**: Relies entirely on client-side technologies and LocalStorage.
