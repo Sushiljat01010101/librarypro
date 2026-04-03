@@ -2,40 +2,82 @@ const storageManager = new StorageManager();
 
 storageManager.applyTheme();
 
-storageManager.checkForMissedBackups();
+// ============================================================
+// Supabase Async Auth — Main Entry Point
+// ============================================================
+(async () => {
+    const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
 
-storageManager.checkAndPerformScheduledBackup();
-
-setInterval(() => {
-    storageManager.checkAndPerformScheduledBackup();
-}, 60 * 60 * 1000);
-
-if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-    const loginForm = document.getElementById('loginForm');
-    
-    if (storageManager.isLoggedIn()) {
-        window.location.href = 'dashboard.html';
-    }
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            if (storageManager.login(username, password, rememberMe)) {
+    if (isLoginPage) {
+        // --- LOGIN PAGE LOGIC ---
+        // If already logged in, redirect to dashboard
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
                 window.location.href = 'dashboard.html';
-            } else {
-                alert('Invalid username or password!');
+                return;
             }
-        });
-    }
-} else {
-    storageManager.checkAuth();
-}
+        } catch (e) {
+            // No session — stay on login page
+        }
 
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Signing in...';
+
+                const result = await storageManager.loginAsync(email, password);
+
+                if (result.success) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(result.error || 'Invalid email or password!');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        }
+    } else {
+        // --- PROTECTED PAGE LOGIC ---
+        const user = await storageManager.checkAuthAsync();
+        if (!user) return; // checkAuthAsync already handles redirect
+
+        // Check for scheduled backups (fire-and-forget, non-blocking)
+        storageManager.checkForMissedBackups();
+        storageManager.checkAndPerformScheduledBackup();
+        setInterval(() => {
+            storageManager.checkAndPerformScheduledBackup();
+        }, 60 * 60 * 1000);
+
+        // Dynamic Admin Panel sidebar button visibility
+        const isAdmin = await storageManager.isAdmin();
+        if (isAdmin) {
+            const adminLinks = document.querySelectorAll('.admin-panel-link');
+            adminLinks.forEach(link => {
+                link.style.display = '';
+            });
+        }
+
+        // Update user name in header
+        const currentUserEl = document.getElementById('currentUser');
+        if (currentUserEl) {
+            currentUserEl.textContent = storageManager.getUser().name;
+        }
+    }
+})();
+
+// ============================================================
+// Sidebar Toggle & Mobile Menu (unchanged from original)
+// ============================================================
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
@@ -90,16 +132,22 @@ navItems.forEach(item => {
     });
 });
 
+// ============================================================
+// Logout Button (uses async Supabase signOut)
+// ============================================================
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
+    logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (confirm('Are you sure you want to logout?')) {
-            storageManager.logout();
+            await storageManager.logoutAsync();
         }
     });
 }
 
+// ============================================================
+// Modal Helpers (unchanged)
+// ============================================================
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -127,6 +175,9 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// ============================================================
+// Header Info (unchanged)
+// ============================================================
 const currentDate = document.getElementById('currentDate');
 if (currentDate) {
     currentDate.textContent = new Date().toLocaleDateString('en-IN', {
@@ -135,11 +186,6 @@ if (currentDate) {
         month: 'short',
         year: 'numeric'
     });
-}
-
-const currentUser = document.getElementById('currentUser');
-if (currentUser) {
-    currentUser.textContent = storageManager.getUser().name;
 }
 
 function updateLibraryName() {

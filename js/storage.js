@@ -1,20 +1,14 @@
 class StorageManager {
     constructor() {
-        this.initializeDefaultUser();
+        // DEPRECATED: initializeDefaultUser() — Supabase handles users now.
         this.initializeSettings();
         this.initializeSeats();
     }
     
-    initializeDefaultUser() {
-        if (!localStorage.getItem('libraryUser')) {
-            const defaultUser = {
-                username: 'admin',
-                password: 'admin123',
-                name: 'Administrator'
-            };
-            localStorage.setItem('libraryUser', JSON.stringify(defaultUser));
-        }
-    }
+    // ============================================================
+    // DEPRECATED — Old localStorage auth (kept as no-ops to avoid breaks)
+    // ============================================================
+    initializeDefaultUser() { /* DEPRECATED: Supabase handles users */ }
     
     initializeSettings() {
         if (!localStorage.getItem('librarySettings')) {
@@ -27,10 +21,192 @@ class StorageManager {
             localStorage.setItem('librarySettings', JSON.stringify(defaultSettings));
         }
     }
-    
+
     getUser() {
-        return JSON.parse(localStorage.getItem('libraryUser'));
+        // Return Supabase cached user info if available, fallback to localStorage for name/settings
+        if (this._cachedSupabaseUser) {
+            return {
+                name: this._cachedSupabaseUser.user_metadata?.name || this._cachedSupabaseUser.email || 'User',
+                email: this._cachedSupabaseUser.email,
+                username: this._cachedSupabaseUser.email
+            };
+        }
+        return JSON.parse(localStorage.getItem('libraryUser')) || { name: 'User', username: '' };
     }
+
+    // ============================================================
+    // NEW — Supabase Async Authentication Methods
+    // ============================================================
+
+    /**
+     * Async login using Supabase email/password auth.
+     * @returns {{ success: boolean, error?: string }}
+     */
+    async loginAsync(email, password) {
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            if (error) {
+                return { success: false, error: error.message };
+            }
+            return { success: true, data };
+        } catch (err) {
+            return { success: false, error: err.message || 'An unexpected error occurred.' };
+        }
+    }
+
+    /**
+     * Async logout — signs out from Supabase and redirects to login.
+     */
+    async logoutAsync() {
+        try {
+            await supabaseClient.auth.signOut();
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+        window.location.href = 'index.html';
+    }
+
+    /**
+     * Async Auth Guard — call this on every protected page load.
+     * 1. Checks for an active session via getSession().
+     * 2. Live-verifies the user still exists via getUser().
+     * 3. Checks user_metadata.expiry_date for account expiry.
+     * Returns the user object if valid, or redirects away.
+     */
+    async checkAuthAsync() {
+        try {
+            // Step 1: Check local session
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+            if (sessionError || !session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            // Step 2: Live server verification — does the user still exist?
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                console.warn('⚠️ User no longer exists in database. Logging out.');
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            // Step 3: Check expiry date
+            const expiryDate = user.user_metadata?.expiry_date;
+            if (expiryDate) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const expiry = new Date(expiryDate);
+                expiry.setHours(0, 0, 0, 0);
+                if (today > expiry) {
+                    alert('⚠️ Your account has expired. Please contact the administrator.');
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return null;
+                }
+            }
+
+            // Cache user for synchronous getUser() calls
+            this._cachedSupabaseUser = user;
+            return user;
+        } catch (err) {
+            console.error('Auth check failed:', err);
+            window.location.href = 'index.html';
+            return null;
+        }
+    }
+
+    /**
+     * Check if the current user has admin privileges.
+     * @returns {Promise<boolean>}
+     */
+    async isAdmin() {
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            return user?.user_metadata?.is_admin === true;
+        } catch {
+            return false;
+        }
+    }
+
+    // ============================================================
+    // Admin Panel Helper Methods (use supabaseAdmin — Service Role)
+    // ============================================================
+
+    /**
+     * Create a new user with metadata.
+     */
+    async adminCreateUser(email, password, name, expiryDate) {
+        try {
+            const { data, error } = await supabaseAdmin.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true,
+                user_metadata: {
+                    name: name,
+                    expiry_date: expiryDate,
+                    is_admin: false
+                }
+            });
+            if (error) return { success: false, error: error.message };
+            return { success: true, data };
+        } catch (err) {
+            return { success: false, error: err.message };
+        }
+    }
+
+    /**
+     * List all users in the project.
+     */
+    async adminListUsers() {
+        try {
+            const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+            if (error) return { success: false, error: error.message };
+            return { success: true, users: data.users };
+        } catch (err) {
+            return { success: false, error: err.message };
+        }
+    }
+
+    /**
+     * Delete a user by their UUID.
+     */
+    async adminDeleteUser(userId) {
+        try {
+            const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+            if (error) return { success: false, error: error.message };
+            return { success: true };
+        } catch (err) {
+            return { success: false, error: err.message };
+        }
+    }
+
+    /**
+     * Update user metadata or password.
+     * @param {string} userId
+     * @param {object} updates — e.g. { password: '...', user_metadata: { expiry_date: '...' } }
+     */
+    async adminUpdateUser(userId, updates) {
+        try {
+            const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userId, updates);
+            if (error) return { success: false, error: error.message };
+            return { success: true, data };
+        } catch (err) {
+            return { success: false, error: err.message };
+        }
+    }
+
+    // ============================================================
+    // DEPRECATED SYNC AUTH — kept as no-ops so existing page-specific
+    // JS files don't crash if they reference these.
+    // ============================================================
+    login() { console.warn('DEPRECATED: Use loginAsync()'); return false; }
+    logout() { this.logoutAsync(); }
+    isLoggedIn() { console.warn('DEPRECATED: Use checkAuthAsync()'); return false; }
+    checkAuth() { console.warn('DEPRECATED: Use checkAuthAsync()'); }
     
     getSettings() {
         return JSON.parse(localStorage.getItem('librarySettings')) || {
@@ -318,35 +494,6 @@ class StorageManager {
         }
         
         return false;
-    }
-    
-    login(username, password, remember) {
-        const user = this.getUser();
-        if (user.username === username && user.password === password) {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            if (remember) {
-                localStorage.setItem('rememberMe', 'true');
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    logout() {
-        sessionStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('rememberMe');
-        window.location.href = 'index.html';
-    }
-    
-    isLoggedIn() {
-        return sessionStorage.getItem('isLoggedIn') === 'true' || 
-               localStorage.getItem('rememberMe') === 'true';
-    }
-    
-    checkAuth() {
-        if (!this.isLoggedIn()) {
-            window.location.href = 'index.html';
-        }
     }
     
     getMembers() {
