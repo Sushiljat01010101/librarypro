@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Library Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* ============================================ */
+        /* Admin Panel — Premium Dark Mode Styles       */
+        /* ============================================ */
+        .admin-header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(244, 196, 48, 0.08) 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .admin-header h1 { font-size: 28px; color: var(--primary-gold); }
+        .admin-header .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        .admin-header .btn-back {
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .admin-header .btn-back:hover { border-color: var(--primary-gold); color: var(--primary-gold); }
+
+        .admin-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
+        @media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } }
+
+        /* Create User Card */
+        .admin-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+        .admin-card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-card-header h2 { font-size: 18px; color: var(--primary-gold); }
+        .admin-card-header .icon { font-size: 22px; }
+        .admin-card-body { padding: 25px; }
+
+        .admin-card .form-group { margin-bottom: 18px; }
+        .admin-card .form-group:last-child { margin-bottom: 0; }
+
+        .admin-btn-create {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--dark-gold));
+            border: none;
+            border-radius: 10px;
+            color: var(--bg-primary);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        .admin-btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244,196,48,0.35); }
+        .admin-btn-create:disabled {
+            opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none;
+        }
+
+        /* User Table */
+        .user-table-wrap { overflow-x: auto; }
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        .user-table thead { background: var(--bg-secondary); }
+        .user-table th {
+            padding: 14px 18px;
+            text-align: left;
+            color: var(--primary-gold);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+        .user-table td {
+            padding: 14px 18px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .user-table tbody tr { transition: background 0.2s; }
+        .user-table tbody tr:hover { background: rgba(244,196,48,0.04); }
+
+        .expiry-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .expiry-badge.valid { background: rgba(76,175,80,0.15); color: #4caf50; }
+        .expiry-badge.expired { background: rgba(244,67,54,0.15); color: #f44336; }
+        .expiry-badge.no-expiry { background: rgba(255,152,0,0.15); color: #ff9800; }
+        .admin-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(244,196,48,0.2);
+            color: var(--primary-gold);
+        }
+
+        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-btn:hover { border-color: var(--primary-gold); color: var(--primary-gold); }
+        .action-btn.danger { border-color: rgba(244,67,54,0.4); }
+        .action-btn.danger:hover { border-color: #f44336; color: #f44336; background: rgba(244,67,54,0.1); }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            color: var(--primary-gold);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover { background: var(--primary-gold); color: var(--bg-primary); }
+
+        .users-count {
+            padding: 6px 14px;
+            background: rgba(244,196,48,0.12);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+
+        .empty-users {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-users .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal overrides for admin */
+        .admin-modal .modal-content { max-width: 450px; }
+        .admin-modal .modal-header h2 { font-size: 18px; }
+
+        .admin-content { padding: 30px; min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <div class="mobile-header-content">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <div class="hamburger"><span></span><span></span><span></span></div>
+            </button>
+            <div class="mobile-library-name">📚 Library MS</div>
+        </div>
+    </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">📚 Library MS</div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="text">Dashboard</span></a>
+                <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="text">Members</span></a>
+                <a href="seats.html" class="nav-item"><span class="icon">🪑</span><span class="text">Seats</span></a>
+                <a href="books.html" class="nav-item"><span class="icon">📚</span><span class="text">Books</span></a>
+                <a href="fees.html" class="nav-item"><span class="icon">💰</span><span class="text">Fees</span></a>
+                <a href="receipts.html" class="nav-item"><span class="icon">🧾</span><span class="text">Payment Receipts</span></a>
+                <a href="expenses.html" class="nav-item"><span class="icon">💸</span><span class="text">Expenses</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="text">Reports</span></a>
+                <a href="broadcast.html" class="nav-item"><span class="icon">📢</span><span class="text">Broadcast</span></a>
+                <a href="activity.html" class="nav-item"><span class="icon">📋</span><span class="text">Activity Log</span></a>
+                <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="text">Settings</span></a>
+                <a href="help.html" class="nav-item"><span class="icon">❓</span><span class="text">Help & Support</span></a>
+                <a href="admin.html" class="nav-item admin-panel-link active"><span class="icon">🛡️</span><span class="text">Admin Panel</span></a>
+                <a href="#" class="nav-item logout-btn" id="logoutBtn"><span class="icon">🚪</span><span class="text">Logout</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="admin-content">
+                <div class="admin-header">
+                    <div>
+                        <h1>🛡️ Admin Panel</h1>
+                        <p class="subtitle">Manage users, expiry dates, and access control</p>
+                    </div>
+                    <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+                </div>
+
+                <div class="admin-grid">
+                    <!-- Left: Create User -->
+                    <div>
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <span class="icon">➕</span>
+                                <h2>Create New User</h2>
+                            </div>
+                            <div class="admin-card-body">
+                                <form id="createUserForm">
+                                    <div class="form-group">
+                                        <label for="newUserName">Full Name</label>
+                                        <input type="text" id="newUserName" placeholder="Enter full name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newUserEmail">Email</label>
+                                        <input type="email" id="newUserEmail" placeholder="user@example.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newUserPassword">Password</label>
+                                        <input type="password" id="newUserPassword" placeholder="Minimum 6 characters" required minlength="6">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newUserExpiry">Expiry Date</label>
+                                        <input type="date" id="newUserExpiry" required>
+                                    </div>
+                                    <button type="submit" class="admin-btn-create" id="createBtn">
+                                        🚀 Create User
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Users List -->
+                    <div>
+                        <div class="admin-card">
+                            <div class="admin-card-header" style="justify-content: space-between;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span class="icon">👥</span>
+                                    <h2>Registered Users</h2>
+                                    <span class="users-count" id="usersCount">0 users</span>
+                                </div>
+                                <button class="refresh-btn" id="refreshBtn" onclick="loadUsers()">🔄 Refresh</button>
+                            </div>
+                            <div class="admin-card-body" style="padding: 0;">
+                                <div class="user-table-wrap">
+                                    <table class="user-table" id="usersTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Expiry Status</th>
+                                                <th>Role</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="usersTableBody">
+                                            <tr>
+                                                <td colspan="5" class="empty-users">
+                                                    <div class="empty-icon">👥</div>
+                                                    <p>Loading users...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Expiry Modal -->
+    <div id="editExpiryModal" class="modal admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📅 Edit Expiry Date</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="editExpiryForm" style="padding: 25px;">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>User</label>
+                    <input type="text" id="editUserDisplay" disabled style="opacity: 0.7;">
+                </div>
+                <div class="form-group">
+                    <label for="editExpiryDate">New Expiry Date</label>
+                    <input type="date" id="editExpiryDate" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPwModal" class="modal admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔑 Reset Password</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="resetPwForm" style="padding: 25px;">
+                <input type="hidden" id="resetPwUserId">
+                <div class="form-group">
+                    <label>User</label>
+                    <input type="text" id="resetPwUserDisplay" disabled style="opacity: 0.7;">
+                </div>
+                <div class="form-group">
+                    <label for="resetPwNew">New Password</label>
+                    <input type="password" id="resetPwNew" placeholder="Minimum 6 characters" required minlength="6">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Reset Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/telegram.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+    // ============================================================
+    // Admin Panel Logic
+    // ============================================================
+    (async () => {
+        // Extra admin guard — non-admins get redirected
+        const isAdmin = await storageManager.isAdmin();
+        if (!isAdmin) {
+            alert('⛔ Access Denied. You do not have admin privileges.');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        // Load users on page ready
+        await loadUsers();
+    })();
+
+    // ---- Load & Render Users ----
+    async function loadUsers() {
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);"><span class="loading-spinner"></span> Loading users...</td></tr>`;
+
+        const result = await storageManager.adminListUsers();
+
+        if (!result.success) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#f44336;">❌ Failed to load users: ${result.error}</td></tr>`;
+            return;
+        }
+
+        const users = result.users;
+        document.getElementById('usersCount').textContent = `${users.length} user${users.length !== 1 ? 's' : ''}`;
+
+        if (users.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-users"><div class="empty-icon">👥</div><p>No users found</p></td></tr>`;
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        tbody.innerHTML = users.map(user => {
+            const meta = user.user_metadata || {};
+            const name = meta.name || '—';
+            const email = user.email || '—';
+            const expiry = meta.expiry_date;
+            const isAdminUser = meta.is_admin === true;
+
+            let expiryHtml;
+            if (!expiry) {
+                expiryHtml = `<span class="expiry-badge no-expiry">⚠ No expiry set</span>`;
+            } else {
+                const expiryDate = new Date(expiry);
+                expiryDate.setHours(0, 0, 0, 0);
+                if (today > expiryDate) {
+                    expiryHtml = `<span class="expiry-badge expired">❌ EXPIRED (${expiry})</span>`;
+                } else {
+                    expiryHtml = `<span class="expiry-badge valid">✅ Valid till: ${expiry}</span>`;
+                }
+            }
+
+            const roleHtml = isAdminUser ? `<span class="admin-badge">👑 ADMIN</span>` : `<span style="color:var(--text-muted); font-size:13px;">User</span>`;
+
+            return `<tr>
+                <td><strong style="color:var(--text-primary);">${escapeHtml(name)}</strong></td>
+                <td>${escapeHtml(email)}</td>
+                <td>${expiryHtml}</td>
+                <td>${roleHtml}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="action-btn" onclick="openEditExpiry('${user.id}', '${escapeHtml(name)}', '${expiry || ''}')">📅 Expiry</button>
+                        <button class="action-btn" onclick="openResetPw('${user.id}', '${escapeHtml(name)}')">🔑 Password</button>
+                        <button class="action-btn danger" onclick="deleteUser('${user.id}', '${escapeHtml(name)}')">🗑️ Delete</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ---- Create User ----
+    document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('createBtn');
+        const name = document.getElementById('newUserName').value.trim();
+        const email = document.getElementById('newUserEmail').value.trim();
+        const password = document.getElementById('newUserPassword').value;
+        const expiry = document.getElementById('newUserExpiry').value;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Creating...';
+
+        const result = await storageManager.adminCreateUser(email, password, name, expiry);
+
+        if (result.success) {
+            alert(`✅ User "${name}" created successfully!`);
+            document.getElementById('createUserForm').reset();
+            await loadUsers();
+        } else {
+            alert(`❌ Failed to create user: ${result.error}`);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Create User';
+    });
+
+    // ---- Edit Expiry ----
+    function openEditExpiry(userId, name, currentExpiry) {
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editUserDisplay').value = name;
+        document.getElementById('editExpiryDate').value = currentExpiry;
+        showModal('editExpiryModal');
+    }
+
+    document.getElementById('editExpiryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = document.getElementById('editUserId').value;
+        const newExpiry = document.getElementById('editExpiryDate').value;
+
+        const result = await storageManager.adminUpdateUser(userId, {
+            user_metadata: { expiry_date: newExpiry }
+        });
+
+        if (result.success) {
+            alert('✅ Expiry date updated!');
+            hideModal('editExpiryModal');
+            await loadUsers();
+        } else {
+            alert(`❌ Failed: ${result.error}`);
+        }
+    });
+
+    // ---- Reset Password ----
+    function openResetPw(userId, name) {
+        document.getElementById('resetPwUserId').value = userId;
+        document.getElementById('resetPwUserDisplay').value = name;
+        document.getElementById('resetPwNew').value = '';
+        showModal('resetPwModal');
+    }
+
+    document.getElementById('resetPwForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = document.getElementById('resetPwUserId').value;
+        const newPassword = document.getElementById('resetPwNew').value;
+
+        const result = await storageManager.adminUpdateUser(userId, { password: newPassword });
+
+        if (result.success) {
+            alert('✅ Password has been reset!');
+            hideModal('resetPwModal');
+        } else {
+            alert(`❌ Failed: ${result.error}`);
+        }
+    });
+
+    // ---- Delete User ----
+    async function deleteUser(userId, name) {
+        if (!confirm(`⚠️ Are you sure you want to permanently delete "${name}"?\n\nThis action cannot be undone.`)) {
+            return;
+        }
+
+        const result = await storageManager.adminDeleteUser(userId);
+
+        if (result.success) {
+            alert(`✅ User "${name}" has been deleted.`);
+            await loadUsers();
+        } else {
+            alert(`❌ Failed: ${result.error}`);
+        }
+    }
+
+    // ---- Utility ----
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+    </script>
+</body>
+</html>

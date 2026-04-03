@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/help.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="mobile-header">
@@ -78,6 +79,10 @@
             <a href="help.html" class="nav-item active">
                 <i class="fas fa-question-circle"></i>
                 <span>Help & Support</span>
+            </a>
+            <a href="admin.html" class="nav-item admin-panel-link" style="display: none;">
+                <i class="fas fa-shield-alt"></i>
+                <span>Admin Panel</span>
             </a>
         </nav>
 
@@ -327,6 +332,7 @@
         </div>
     </div>
 
+    <script src="js/supabase-config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>

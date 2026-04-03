@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System - Login</title>
     <link rel="stylesheet" href="css/style.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
 <body class="login-page">
     <div class="login-container">
         <div class="login-box">
@@ -17,8 +18,8 @@
             
             <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
                 </div>
                 
                 <div class="form-group">
@@ -26,22 +27,12 @@
                     <input type="password" id="password" name="password" required placeholder="Enter your password">
                 </div>
                 
-                <div class="form-group remember-me">
-                    <label>
-                        <input type="checkbox" id="rememberMe" name="rememberMe">
-                        Remember Me
-                    </label>
-                </div>
-                
                 <button type="submit" class="btn-primary">Login</button>
-                
-                <div class="default-credentials">
-                    <small>Default: admin / admin123</small>
-                </div>
             </form>
         </div>
     </div>
     
+    <script src="js/supabase-config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>

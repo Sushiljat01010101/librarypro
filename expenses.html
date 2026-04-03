@@ -6,6 +6,7 @@
     <title>Expenses - Library Management System</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/expenses.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="mobile-header">
@@ -77,6 +78,10 @@
                 <a href="help.html" class="nav-item">
                     <span class="icon">❓</span>
                     <span class="text">Help & Support</span>
+                </a>
+                <a href="admin.html" class="nav-item admin-panel-link" style="display: none;">
+                    <span class="icon">🛡️</span>
+                    <span class="text">Admin Panel</span>
                 </a>
                 <a href="#" class="nav-item logout-btn" id="logoutBtn">
                     <span class="icon">🚪</span>
@@ -246,6 +251,7 @@
         </div>
     </div>
     
+    <script src="js/supabase-config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>

@@ -6,6 +6,7 @@
     <title>Broadcast - Library Management System</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/broadcast.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="mobile-header">
@@ -37,6 +38,7 @@
                 <a href="activity.html" class="nav-item"><span class="icon">📋</span><span class="text">Activity Log</span></a>
                 <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="text">Settings</span></a>
                 <a href="help.html" class="nav-item"><span class="icon">❓</span><span class="text">Help & Support</span></a>
+                <a href="admin.html" class="nav-item admin-panel-link" style="display: none;"><span class="icon">🛡️</span><span class="text">Admin Panel</span></a>
                 <a href="#" class="nav-item logout-btn" id="logoutBtn"><span class="icon">🚪</span><span class="text">Logout</span></a>
             </nav>
         </aside>
@@ -261,6 +263,7 @@
     <!-- Toast Container -->
     <div id="toastContainer"></div>
 
+    <script src="js/supabase-config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/main.js"></script>
