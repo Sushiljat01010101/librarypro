@@ -208,4 +208,83 @@ function loadRecentActivity() {
     });
 }
 
+function checkAndDisplayExpiry() {
+    const user = storageManager.getUser();
+    if (!user || !user.expiryDate) return false;
+
+    const expiryDateStr = user.expiryDate;
+    const expiryDateObj = new Date(expiryDateStr);
+    expiryDateObj.setHours(0, 0, 0, 0);
+    
+    // Validate if the Date parsing succeeded
+    if (isNaN(expiryDateObj.getTime())) return true;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = expiryDateObj - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // Update UI elements
+    const expiryInfoEl = document.getElementById('userExpiryInfo');
+    const expiryDateEl = document.getElementById('userExpiryDate');
+    const daysLeftEl = document.getElementById('userDaysLeft');
+
+    if (expiryInfoEl && expiryDateEl && daysLeftEl) {
+        expiryInfoEl.style.display = 'block';
+        expiryDateEl.textContent = new Date(expiryDateStr).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        });
+
+        if (diffDays > 0) {
+            daysLeftEl.textContent = `${diffDays} day${diffDays !== 1 ? 's' : ''} left`;
+            if (diffDays <= 3) {
+                daysLeftEl.style.color = '#fff';
+                daysLeftEl.style.background = 'var(--danger-color, #f44336)';
+                
+                if (!sessionStorage.getItem('expiryAlertShown')) {
+                    const alertDaysEl = document.getElementById('expiryAlertDays');
+                    if (alertDaysEl) alertDaysEl.textContent = diffDays;
+                    showModal('expiryAlertModal');
+                    sessionStorage.setItem('expiryAlertShown', 'true');
+                }
+            } else if (diffDays <= 7) {
+                daysLeftEl.style.color = '#fff';
+                daysLeftEl.style.background = 'var(--warning-color, #ff9800)';
+            } else {
+                daysLeftEl.style.color = 'var(--success-color, #4caf50)';
+                daysLeftEl.style.background = 'rgba(76, 175, 80, 0.1)';
+            }
+        } else if (diffDays === 0) {
+            daysLeftEl.textContent = 'Expires today!';
+            daysLeftEl.style.color = '#fff';
+            daysLeftEl.style.background = 'var(--danger-color, #f44336)';
+            
+            if (!sessionStorage.getItem('expiryAlertShown')) {
+                const alertDaysEl = document.getElementById('expiryAlertDays');
+                if (alertDaysEl) alertDaysEl.textContent = '0';
+                showModal('expiryAlertModal');
+                sessionStorage.setItem('expiryAlertShown', 'true');
+            }
+        } else {
+            daysLeftEl.textContent = 'Expired';
+            daysLeftEl.style.color = '#fff';
+            daysLeftEl.style.background = 'var(--danger-color, #f44336)';
+        }
+    }
+    
+    return true; // Indicates success
+}
+
 loadDashboardStats();
+
+// Try to check and display expiry, with retries to account for async Supabase user fetch
+let expiryCheckRetries = 0;
+function tryDisplayExpiry() {
+    const success = checkAndDisplayExpiry();
+    if (!success && expiryCheckRetries < 15) {
+        expiryCheckRetries++;
+        setTimeout(tryDisplayExpiry, 300);
+    }
+}
+tryDisplayExpiry();

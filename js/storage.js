@@ -28,7 +28,8 @@ class StorageManager {
             return {
                 name: this._cachedSupabaseUser.user_metadata?.name || this._cachedSupabaseUser.email || 'User',
                 email: this._cachedSupabaseUser.email,
-                username: this._cachedSupabaseUser.email
+                username: this._cachedSupabaseUser.email,
+                expiryDate: this._cachedSupabaseUser.user_metadata?.expiry_date || null
             };
         }
         return JSON.parse(localStorage.getItem('libraryUser')) || { name: 'User', username: '' };
